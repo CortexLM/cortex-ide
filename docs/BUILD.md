@@ -10,9 +10,9 @@ This guide covers building Cortex IDE on **Windows**, **macOS**, and **Linux**.
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| **Node.js** | >= 20.x | Frontend build tooling |
+| **Node.js** | >= 24.x | Frontend build tooling |
 | **npm** | >= 10.x | Package manager (comes with Node.js) |
-| **Rust** | >= 1.85 (2024 edition) | Backend compilation |
+| **Rust** | >= 1.90 | Backend compilation |
 | **Git** | >= 2.x | Source code management |
 
 ### Windows
@@ -95,7 +95,7 @@ On Windows, download and run [rustup-init.exe](https://rustup.rs/).
 After installation, verify:
 
 ```bash
-rustc --version   # Should be >= 1.85.0
+rustc --version   # Should be >= 1.90.0
 cargo --version
 ```
 
@@ -106,14 +106,14 @@ cargo --version
 We recommend using [nvm](https://github.com/nvm-sh/nvm) (or [nvm-windows](https://github.com/coreybutler/nvm-windows)):
 
 ```bash
-nvm install 20
-nvm use 20
+nvm install 24
+nvm use 24
 ```
 
 Verify:
 
 ```bash
-node --version   # Should be >= 20.x
+node --version   # Should be >= 24.x
 npm --version    # Should be >= 10.x
 ```
 
@@ -250,13 +250,13 @@ WebView2 ships with Windows 10 (1803+) and Windows 11. If missing, download the 
 
 ### Node.js version mismatch
 
-Ensure you're using Node.js >= 20:
+Ensure you're using Node.js >= 24:
 
 ```bash
 node --version
 ```
 
-If using nvm: `nvm use 20`
+If using nvm: `nvm use 24`
 
 ### Permission denied on Linux AppImage
 
