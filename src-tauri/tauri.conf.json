@@ -12,7 +12,7 @@
   "app": {
     "withGlobalTauri": true,
     "security": {
-      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* wss://localhost:* wss://127.0.0.1:* https://api.openai.com https://api.anthropic.com https://api.cohere.com https://*.sentry.io https://api.github.com wss://api.openai.com https://openrouter.ai https://*.openrouter.ai; worker-src 'self' blob:"
+      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* wss://localhost:* wss://127.0.0.1:* https://api.openai.com https://api.anthropic.com https://api.cohere.com https://*.sentry.io https://api.github.com wss://api.openai.com https://openrouter.ai https://*.openrouter.ai; worker-src 'self' blob:"
     },
     "windows": [
       {
