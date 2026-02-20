@@ -16,7 +16,7 @@ mod tests;
 
 use std::collections::VecDeque;
 use std::net::TcpListener;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
 
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, RunEvent};
@@ -462,48 +462,19 @@ pub fn register_state(
 
 // ===== Setup =====
 
-pub fn setup_app(
-    app: &mut tauri::App,
-    remote_manager: Arc<RemoteManager>,
-    startup_time: std::time::Instant,
-) -> Result<(), Box<dyn std::error::Error>> {
-    app.manage(crate::window::WindowManagerState::new());
+/// Guard ensuring Phase B initialization runs exactly once.
+static PHASE_B_INIT: OnceLock<()> = OnceLock::new();
 
-    let app_handle = app.handle().clone();
-
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
-    {
-        use tauri_plugin_deep_link::DeepLinkExt;
-
-        let app_handle_for_deep_link = app_handle.clone();
-        tauri::async_runtime::spawn(async move {
-            tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-            if let Ok(Some(urls)) = app_handle_for_deep_link.deep_link().get_current() {
-                let url_strings: Vec<String> = urls.iter().map(|u| u.to_string()).collect();
-                if !url_strings.is_empty() {
-                    info!("Handling initial deep links: {:?}", url_strings);
-                    crate::deep_link::handle_deep_link(&app_handle_for_deep_link, url_strings);
-                }
-            }
-        });
-
-        let app_handle_for_listener = app_handle.clone();
-        app.deep_link().on_open_url(move |event| {
-            let urls: Vec<String> = event.urls().iter().map(|u| u.to_string()).collect();
-            info!("Received deep link while running: {:?}", urls);
-            crate::deep_link::handle_deep_link(&app_handle_for_listener, urls);
-        });
-    }
-
-    let remote_manager_for_setup = remote_manager;
-
+/// Phase B: Deferred initialization triggered after frontend first paint.
+///
+/// Runs heavy operations (extensions, LSP, AI, MCP, SSH, auto-update) in
+/// parallel without blocking time-to-window.
+fn run_phase_b(app_handle: AppHandle, remote_manager: Arc<RemoteManager>) {
     tauri::async_runtime::spawn(async move {
-        info!("Starting parallel initialization");
-        let init_start = std::time::Instant::now();
+        info!("Phase B: starting deferred initialization");
+        let phase_b_start = std::time::Instant::now();
 
         let (
-            _windows_result,
-            _settings_result,
             _extensions_result,
             _lsp_result,
             _profiles_result,
@@ -511,18 +482,6 @@ pub fn setup_app(
             _ai_result,
             _mcp_result,
         ) = tokio::join!(
-            async {
-                let t = std::time::Instant::now();
-                crate::window::restore_windows(&app_handle).await;
-                info!("Windows restored in {:?}", t.elapsed());
-            },
-            async {
-                let t = std::time::Instant::now();
-                if let Err(e) = crate::settings::preload_settings(&app_handle).await {
-                    warn!("Failed to preload settings: {}", e);
-                }
-                info!("Settings preloaded in {:?}", t.elapsed());
-            },
             async {
                 let t = std::time::Instant::now();
                 let app_for_ext = app_handle.clone();
@@ -543,7 +502,7 @@ pub fn setup_app(
             },
             async {
                 let t = std::time::Instant::now();
-                if let Err(e) = remote_manager_for_setup.load_profiles().await {
+                if let Err(e) = remote_manager.load_profiles().await {
                     warn!("Failed to load SSH profiles: {}", e);
                 } else {
                     info!("SSH profiles loaded in {:?}", t.elapsed());
@@ -578,19 +537,106 @@ pub fn setup_app(
         );
 
         info!(
-            "Parallel initialization completed in {:?}",
+            "Phase B: deferred initialization completed in {:?}",
+            phase_b_start.elapsed()
+        );
+
+        if let Err(e) = app_handle.emit(
+            "backend:phase_b_ready",
+            serde_json::json!({
+                "initialized": ["extensions", "lsp", "ssh_profiles", "auto_update", "ai_providers", "mcp"]
+            }),
+        ) {
+            warn!("Failed to emit backend:phase_b_ready event: {}", e);
+        }
+    });
+}
+
+/// Frontend calls this command after first meaningful paint to trigger
+/// Phase B (heavy) backend initialization.
+#[tauri::command]
+pub async fn frontend_ready(app: AppHandle) -> Result<(), String> {
+    if PHASE_B_INIT.set(()).is_err() {
+        info!("Phase B already initialized, skipping");
+        return Ok(());
+    }
+
+    info!("Frontend ready signal received, triggering Phase B initialization");
+
+    let remote_manager = app.state::<Arc<RemoteManager>>();
+    let remote_manager = (*remote_manager).clone();
+    run_phase_b(app, remote_manager);
+
+    Ok(())
+}
+
+pub fn setup_app(
+    app: &mut tauri::App,
+    startup_time: std::time::Instant,
+) -> Result<(), Box<dyn std::error::Error>> {
+    app.manage(crate::window::WindowManagerState::new());
+
+    let app_handle = app.handle().clone();
+
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    {
+        use tauri_plugin_deep_link::DeepLinkExt;
+
+        let app_handle_for_deep_link = app_handle.clone();
+        tauri::async_runtime::spawn(async move {
+            tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+            if let Ok(Some(urls)) = app_handle_for_deep_link.deep_link().get_current() {
+                let url_strings: Vec<String> = urls.iter().map(|u| u.to_string()).collect();
+                if !url_strings.is_empty() {
+                    info!("Handling initial deep links: {:?}", url_strings);
+                    crate::deep_link::handle_deep_link(&app_handle_for_deep_link, url_strings);
+                }
+            }
+        });
+
+        let app_handle_for_listener = app_handle.clone();
+        app.deep_link().on_open_url(move |event| {
+            let urls: Vec<String> = event.urls().iter().map(|u| u.to_string()).collect();
+            info!("Received deep link while running: {:?}", urls);
+            crate::deep_link::handle_deep_link(&app_handle_for_listener, urls);
+        });
+    }
+
+    // Phase A: Minimal initialization needed before window becomes visible.
+    // Only settings preload and window restore — the minimum for the frontend shell.
+    tauri::async_runtime::spawn(async move {
+        info!("Phase A: starting critical-path initialization");
+        let init_start = std::time::Instant::now();
+
+        let (_windows_result, _settings_result) = tokio::join!(
+            async {
+                let t = std::time::Instant::now();
+                crate::window::restore_windows(&app_handle).await;
+                info!("Windows restored in {:?}", t.elapsed());
+            },
+            async {
+                let t = std::time::Instant::now();
+                if let Err(e) = crate::settings::preload_settings(&app_handle).await {
+                    warn!("Failed to preload settings: {}", e);
+                }
+                info!("Settings preloaded in {:?}", t.elapsed());
+            }
+        );
+
+        info!(
+            "Phase A: critical-path initialization completed in {:?}",
             init_start.elapsed()
         );
 
         if let Err(e) = app_handle.emit(
             "backend:ready",
             serde_json::json!({
-                "preloaded": ["settings", "extensions", "ai_providers", "windows"]
+                "preloaded": ["settings", "windows"]
             }),
         ) {
             warn!("Failed to emit backend:ready event: {}", e);
         } else {
-            info!("Backend ready - all data preloaded");
+            info!("Backend ready - shell data preloaded");
         }
     });
 

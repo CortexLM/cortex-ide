@@ -2,6 +2,8 @@
 macro_rules! misc_commands {
     (@commands $callback:ident [ $($acc:tt)* ]) => {
         $callback!([ $($acc)*
+            // Startup lifecycle commands
+            $crate::app::frontend_ready,
             // Server commands
             $crate::app::start_server,
             $crate::app::stop_server,

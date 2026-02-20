@@ -138,13 +138,12 @@ pub fn run() {
         .plugin(tauri_plugin_deep_link::init());
 
     let remote_manager = Arc::new(remote::RemoteManager::new());
-    let remote_manager_for_setup = remote_manager.clone();
 
     let builder = app::register_state(builder, remote_manager);
 
     builder
         .invoke_handler(app::cortex_commands!())
-        .setup(move |tauri_app| app::setup_app(tauri_app, remote_manager_for_setup, startup_time))
+        .setup(move |tauri_app| app::setup_app(tauri_app, startup_time))
         .on_window_event(|window, event| {
             if let WindowEvent::CloseRequested { .. } = event {
                 let label = window.label();

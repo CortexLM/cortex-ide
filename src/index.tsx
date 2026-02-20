@@ -139,13 +139,13 @@ requestAnimationFrame(() => {
     setTimeout(() => initialLoader.remove(), 150);
   }
   
-  // Emit frontend:ready event to backend for metrics
-  import("@tauri-apps/api/event").then(({ emit }) => {
+  // Signal backend to start Phase B (deferred heavy initialization)
+  import("@tauri-apps/api/core").then(({ invoke }) => {
     const startupTime = performance.now() - STARTUP_METRICS.scriptStart;
-    emit("frontend:ready", { startupTime }).catch(() => {
+    invoke("frontend_ready").catch(() => {
       // Silent fail - not critical
     });
-    logStartup(`frontend:ready emitted (${startupTime.toFixed(1)}ms)`);
+    logStartup(`frontend_ready invoked (${startupTime.toFixed(1)}ms)`);
   }).catch(() => {
     // Not in Tauri context (browser dev)
   });
