@@ -118,11 +118,6 @@ function createManualChunks(id: string): string | undefined {
     return "vendor-solid";
   }
 
-  // Solid icons - Many icon components
-  if (id.includes("solid-icons")) {
-    return "vendor-icons";
-  }
-
   // Tauri plugins - Group all Tauri-related code
   if (id.includes("@tauri-apps")) {
     return "vendor-tauri";
@@ -144,13 +139,10 @@ function createManualChunks(id: string): string | undefined {
 export default defineConfig(async (): Promise<UserConfig> => ({
   plugins: [
     solid({
-      // Enable HMR and solid-specific optimizations
       hot: true,
-      // Include solid-icons in JSX transformation (fixes "React is not defined")
       include: [
         /\.tsx$/,
         /\.jsx$/,
-        /solid-icons/,
       ],
     }),
     tailwindcss(),
@@ -174,16 +166,22 @@ export default defineConfig(async (): Promise<UserConfig> => ({
 
   // Dependency optimization for dev server
   optimizeDeps: {
-    // Only include pure JS dependencies (no JSX)
     include: [
+      "solid-js",
+      "solid-js/store",
+      "solid-js/web",
+      "@tauri-apps/api/core",
+      "@tauri-apps/api/event",
+      "@solidjs/router",
+      "@tauri-apps/plugin-dialog",
+      "@tauri-apps/plugin-clipboard-manager",
+      "@tauri-apps/plugin-shell",
+      "@tauri-apps/plugin-os",
       "marked",
       "diff",
     ],
-    // Exclude solid-icons - it needs JSX transformation
-    exclude: ["solid-icons"],
-    // Aggressive esbuild optimization
     esbuildOptions: {
-      target: "esnext",
+      target: "es2021",
       treeShaking: true,
       // Minify pre-bundled deps for faster parsing
       minify: true,
@@ -200,8 +198,7 @@ export default defineConfig(async (): Promise<UserConfig> => ({
   build: {
     // Use esbuild for faster minification (default in Vite 5+, but explicit)
     minify: "esbuild",
-    // Target modern browsers for smaller bundles
-    target: "esnext",
+    target: "es2021",
     // Enable source maps for production debugging (optional, remove for smaller builds)
     sourcemap: false,
     // CSS code splitting
@@ -265,8 +262,7 @@ export default defineConfig(async (): Promise<UserConfig> => ({
         annotations: true,
       },
     },
-    // Report compressed size for better insights
-    reportCompressedSize: true,
+    reportCompressedSize: false,
   },
 
   // CSS configuration
@@ -286,8 +282,7 @@ export default defineConfig(async (): Promise<UserConfig> => ({
   esbuild: {
     // Remove console.log and debugger in production
     drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
-    // Target modern browsers
-    target: "esnext",
+    target: "es2021",
     // Enable tree-shaking
     treeShaking: true,
     // Legal comments handling
@@ -318,6 +313,8 @@ export default defineConfig(async (): Promise<UserConfig> => ({
       clientFiles: [
         // Entry points
         "./src/index.tsx",
+        "./src/AppShell.tsx",
+        "./src/AppCore.tsx",
         // Pages
         "./src/pages/Home.tsx",
         "./src/pages/Session.tsx",
@@ -326,13 +323,17 @@ export default defineConfig(async (): Promise<UserConfig> => ({
         "./src/components/cortex/CortexDesktopLayout.tsx",
         // All providers (critical for startup)
         "./src/context/OptimizedProviders.tsx",
+        // Tier 1 providers
+        "./src/context/I18nContext.tsx",
         "./src/context/ThemeContext.tsx",
+        "./src/context/CortexColorThemeContext.tsx",
+        "./src/context/ToastContext.tsx",
+        "./src/context/SettingsContext.tsx",
+        "./src/context/WindowsContext.tsx",
+        "./src/context/LayoutContext.tsx",
+        // Tier 2+ providers
         "./src/context/SDKContext.tsx",
         "./src/context/SessionContext.tsx",
-        "./src/context/SettingsContext.tsx",
-        "./src/context/LayoutContext.tsx",
-        "./src/context/WindowsContext.tsx",
-        "./src/context/ToastContext.tsx",
         "./src/context/EditorContext.tsx",
         "./src/context/WorkspaceContext.tsx",
         "./src/context/CommandContext.tsx",

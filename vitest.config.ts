@@ -70,9 +70,7 @@ export default defineConfig({
     
     // Transform dependencies that need JSX processing
     deps: {
-      // Inline solid-icons and other packages that need transformation
       inline: [
-        "solid-icons",
         "@solid-primitives",
       ],
     },
