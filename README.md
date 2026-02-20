@@ -110,8 +110,8 @@ gantt
 
 | Feature | Description | Status |
 |---------|-------------|--------|
-| **AI Inline Completions & Predictions** | Ghost text suggestions powered by multi-provider LLM backends (OpenAI, Anthropic, Groq, DeepSeek, Mistral, local models). Fill-in-the-middle (FIM) prompts, codebase-aware context injection, Tab/Escape/Alt+] keybindings, smart caching and debouncing. | 🔄 In Progress |
-| **AI Chat & Conversation System** | Multi-turn chat panel with streaming responses, thread management, slash commands (/file, /folder, /workspace, /web, /search, /terminal), @-mentions for context, model selection across providers, and prompt templates library. | 🔄 In Progress |
+| **AI Inline Completions & Predictions** | Ghost text suggestions powered by the Cortex Foundation inference network. Fill-in-the-middle (FIM) prompts, codebase-aware context injection, Tab/Escape/Alt+] keybindings, smart caching and debouncing. | 🔄 In Progress |
+| **AI Chat & Conversation System** | Multi-turn chat panel with streaming responses, thread management, slash commands (/file, /folder, /workspace, /web, /search, /terminal), @-mentions for context, model selection via Cortex Foundation inferences, and prompt templates library. | 🔄 In Progress |
 | **Multi-File AI Editing (Composer)** | Unified flow: describe a change in natural language, AI generates a multi-file edit plan, executes changes via tool system, presents diffs for review with accept/reject per file. Integrated undo support. | 📋 Planned |
 | **Codebase Indexing & Semantic Search** | Workspace file walking, semantic chunking, vector embeddings, similarity search for RAG-powered AI context. @codebase mentions in chat for codebase-aware answers. Natural language code search. | 🔄 In Progress |
 | **AI-Powered Git** | AI commit message generation from staged diffs, PR description auto-generation, AI code review with inline comments in diff editor, AI-assisted merge conflict resolution, diff explanation in plain language. | 📋 Planned |
@@ -153,7 +153,7 @@ gantt
 |---------|-------------|--------|
 | **Security Hardening** | Content Security Policy, shell spawn restrictions, path traversal protection, workspace trust, process sandboxing (Landlock on Linux, Seatbelt on macOS, ACLs on Windows), credential encryption via OS keychain, deep link validation. | 🔄 In Progress |
 | **Design System & Theming** | Unified design token system, Tailwind CSS v4, dark/light/high-contrast/system themes, VS Code theme import, color/token customization per category, icon themes, product icon themes. Responsive layout with resizable panels, glassmorphism floating panels. | 🔄 In Progress |
-| **Performance** | Parallel startup initialization, batch IPC with LRU caching, MessagePack serialization for large payloads, Vite code splitting with 20+ manual chunks, lazy-loaded pages and providers, WebGL terminal rendering. | 🔄 In Progress |
+| **Performance** | Parallel startup initialization, batch IPC with LRU caching, MessagePack serialization for large payloads, Vite code splitting with 20+ manual chunks, lazy-loaded pages, WebGL terminal rendering. | 🔄 In Progress |
 | **Internationalization** | Multi-language support (English, French, Chinese, Japanese, Spanish, German), RTL detection, locale-based formatting, fallback system. | 🔄 In Progress |
 | **Build & CI/CD** | Tauri v2 desktop builds (macOS, Windows, Linux), Vite frontend bundling, semantic-release versioning, GitHub Actions CI with type checking, formatting, and cross-platform verification. | 🔄 In Progress |
 | **Accessibility** | Screen reader support, ARIA live regions, keyboard navigation in all overlays/menus, prefers-reduced-motion support, high-contrast mode, accessibility help dialog. | 🔄 In Progress |
