@@ -59,120 +59,110 @@ Cortex IDE aims to be the most complete IDE for AI, specialized in **agent orche
 
 ```mermaid
 gantt
-    title Cortex IDE — February Alpha Roadmap
+    title Cortex IDE — Alpha Roadmap
     dateFormat  YYYY-MM-DD
     axisFormat  %b %d
 
     section Launch
-    Project kickoff (Alpha)                        :milestone, m1, 2026-02-20, 0d
+    Project kickoff (Alpha)                          :milestone, m1, 2026-02-20, 0d
 
-    section AI Core
-    Wire AI prediction pipeline                    :crit, ai1, 2026-02-20, 3d
-    Fix inline completions (FIM, streaming, RAG)   :crit, ai2, 2026-02-20, 4d
-    Connect AI providers (persist keys, retry)     :ai3, 2026-02-21, 3d
-    Unified Composer (multi-file AI edits)         :ai4, 2026-02-23, 4d
-    AI code review & git integration               :ai5, 2026-02-25, 3d
+    section AI Intelligence
+    AI Inline Completions & Predictions              :crit, a1, 2026-02-20, 5d
+    AI Chat & Conversation System                    :crit, a2, 2026-02-20, 5d
+    Multi-File AI Editing (Composer)                  :a3, 2026-02-23, 5d
+    Codebase Indexing & Semantic Search               :a4, 2026-02-22, 5d
+    AI-Powered Git (commits, reviews, PR)             :a5, 2026-02-25, 3d
 
     section Agent Orchestration
-    Wire agent run_task to real LLM calls          :crit, ag1, 2026-02-20, 3d
-    Sandbox AI tools (read/write/exec)             :crit, ag2, 2026-02-20, 2d
-    Unify CLI + GUI agent systems                  :ag3, 2026-02-22, 4d
-    Token budget & cost tracking                   :ag4, 2026-02-24, 3d
-    Factory workflow engine (stubs to real)         :ag5, 2026-02-24, 4d
+    Multi-Agent Execution Engine                      :crit, b1, 2026-02-20, 5d
+    Agent Tool System & Sandboxing                    :crit, b2, 2026-02-20, 4d
+    Visual Workflow Designer (Factory)                :b3, 2026-02-23, 5d
+    Agent Monitoring & Cost Tracking                  :b4, 2026-02-25, 3d
 
-    section Editor & IDE
-    Fix all context stubs (Theme, Keymap, i18n)    :ed1, 2026-02-21, 2d
-    Terminal reconnect & decorations               :ed2, 2026-02-22, 2d
-    Wire LSP didChangeWatchedFiles                 :ed3, 2026-02-23, 2d
-    Unify design token system                      :ed4, 2026-02-24, 3d
-    Split giant components (>50KB)                 :ed5, 2026-02-25, 3d
+    section Core IDE
+    Code Editor & Monaco Integration                  :c1, 2026-02-20, 4d
+    Integrated Terminal & Shell Integration            :c2, 2026-02-21, 4d
+    Git & Source Control                               :c3, 2026-02-21, 4d
+    Language Server Protocol (40+ languages)            :c4, 2026-02-22, 4d
+    Debugger & Debug Adapter Protocol                   :c5, 2026-02-23, 4d
+    Extension & Plugin System                           :c6, 2026-02-24, 4d
 
-    section Security & Stability
-    Sandbox shell spawn args                       :crit, sec1, 2026-02-20, 2d
-    Disable withGlobalTauri                        :crit, sec2, 2026-02-20, 1d
-    Typed error handling (replace String errors)   :sec3, 2026-02-22, 4d
-    Fix std::sync::Mutex in async contexts         :sec4, 2026-02-23, 2d
-    Deep link & path validation                    :sec5, 2026-02-24, 2d
-
-    section Testing & Build
-    AI backend test suite                          :t1, 2026-02-24, 4d
-    CI release build pipeline                      :t2, 2026-02-25, 3d
-    Add lint & format tooling                      :t3, 2026-02-26, 2d
+    section Platform
+    Security Hardening & Sandboxing                    :d1, 2026-02-20, 4d
+    Design System & Theming                            :d2, 2026-02-24, 4d
+    Performance Optimization                           :d3, 2026-02-25, 3d
+    Testing & CI/CD Pipeline                           :d4, 2026-02-25, 3d
 
     section Milestone
-    Functional IDE (end of Feb)                    :milestone, m2, 2026-02-28, 0d
+    Functional Alpha Release                           :milestone, m2, 2026-02-28, 0d
 ```
 
-### Detailed Roadmap
+### February 2026 — Feature Roadmap
 
-#### Phase 1 — Critical Fixes (Feb 20–23)
+#### AI Intelligence
 
-| Area | Task | Status |
-|------|------|--------|
-| **AI Core** | Wire `ai_predict` to ProviderManager (currently returns null) | 🔄 In Progress |
-| **AI Core** | Fix streaming completions (result discarded, double API call) | 🔄 In Progress |
-| **AI Core** | Fix debounce logic (stale requests not aborted) | 🔄 In Progress |
-| **AI Core** | Add RAG context to inline completions | 🔄 In Progress |
-| **AI Core** | Persist provider config & API keys across restarts | 🔄 In Progress |
-| **Agents** | Wire `run_task()` to real LLM calls (currently prints "Done") | 🔄 In Progress |
-| **Agents** | Replace 2-word agent system prompts with real prompts | 🔄 In Progress |
-| **Agents** | Connect ToolRegistry to AgentOrchestrator | 🔄 In Progress |
-| **Security** | Sandbox AI tools (read/write/exec) — restrict to workspace | 🔄 In Progress |
-| **Security** | Restrict shell spawn `args: true` to allowlists | 🔄 In Progress |
-| **Security** | Disable `withGlobalTauri`, use scoped IPC | 🔄 In Progress |
-| **Security** | Validate deep link paths | 🔄 In Progress |
-| **Engine** | Wire `cortex_engine::Session::run()` (ignores all user input) | 🔄 In Progress |
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **AI Inline Completions & Predictions** | Ghost text suggestions powered by multi-provider LLM backends (OpenAI, Anthropic, Groq, DeepSeek, Mistral, local models). Fill-in-the-middle (FIM) prompts, codebase-aware context injection, Tab/Escape/Alt+] keybindings, smart caching and debouncing. | 🔄 In Progress |
+| **AI Chat & Conversation System** | Multi-turn chat panel with streaming responses, thread management, slash commands (/file, /folder, /workspace, /web, /search, /terminal), @-mentions for context, model selection across providers, and prompt templates library. | 🔄 In Progress |
+| **Multi-File AI Editing (Composer)** | Unified flow: describe a change in natural language, AI generates a multi-file edit plan, executes changes via tool system, presents diffs for review with accept/reject per file. Integrated undo support. | 📋 Planned |
+| **Codebase Indexing & Semantic Search** | Workspace file walking, semantic chunking, vector embeddings, similarity search for RAG-powered AI context. @codebase mentions in chat for codebase-aware answers. Natural language code search. | 🔄 In Progress |
+| **AI-Powered Git** | AI commit message generation from staged diffs, PR description auto-generation, AI code review with inline comments in diff editor, AI-assisted merge conflict resolution, diff explanation in plain language. | 📋 Planned |
+| **Inline AI Assistant** | Ctrl+K inline edit with quick actions (Explain, Fix, Refactor, Add Types, Document, Optimize), streaming diff preview, accept/reject flow. | 🔄 In Progress |
 
-#### Phase 2 — AI Feature Parity (Feb 23–26)
+#### Agent Orchestration
 
-| Area | Task | Status |
-|------|------|--------|
-| **AI** | Unified Composer flow (prompt -> multi-file plan -> execute -> review) | 📋 Planned |
-| **AI** | Wire `@codebase` mention to RAG context in chat UI | 📋 Planned |
-| **AI** | AI commit message generation in GitPanel | 📋 Planned |
-| **AI** | AI code review (inline comments in diff editor) | 📋 Planned |
-| **AI** | AI conflict resolution in MergeEditor | 📋 Planned |
-| **AI** | Image/screenshot support in chat | 📋 Planned |
-| **AI** | Retry logic & rate-limit handling for providers | 📋 Planned |
-| **Agents** | Unify CLI `cortex-agents` crate into GUI backend | 📋 Planned |
-| **Agents** | Token/cost budget management per agent and session | 📋 Planned |
-| **Agents** | Factory stubs: wire agent spawn, sub-workflow, approval | 📋 Planned |
-| **LSP** | Implement `workspace/didChangeWatchedFiles` | 📋 Planned |
-| **Indexer** | Replace hash embeddings with real embedding model | 📋 Planned |
-| **Indexer** | Incremental indexing (mtime check, dirty tracking) | 📋 Planned |
-| **Indexer** | Fix `.gitignore` parsing (use `ignore` crate) | 📋 Planned |
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **Multi-Agent Execution Engine** | Spawn, monitor, and coordinate multiple AI agents working in parallel. Agent types: Code, Research, Test, Review, Custom. DAG-based task dependency resolution, background execution, routing engine for parallel vs sequential dispatch. | 🔄 In Progress |
+| **Agent Tool System & Sandboxing** | Built-in tools (read/write files, search, run commands, web fetch, file edit) with workspace-scoped sandboxing, permission system, user approval flow for destructive actions. SSRF protection on network tools. | 🔄 In Progress |
+| **Visual Workflow Designer (Factory)** | Canvas-based visual workflow builder with drag-and-drop nodes: triggers, actions, conditions, parallel splits, loops, agent nodes, sub-workflows, approval gates. Execution engine, live monitoring, audit logging. | 📋 Planned |
+| **Agent Monitoring & Cost Tracking** | LiveMonitor dashboard with real-time agent status, step history, token usage tracking, cost budgets per agent and session. Pause/resume/cancel controls. Agent Follow mode auto-navigates editor to agent activity. | 📋 Planned |
+| **Inter-Agent Communication** | Message passing between running agents, shared semantic context from codebase index, task delegation from parent to child agents, result aggregation. | 📋 Planned |
+| **Custom Agents & Rules** | User-defined agents with custom system prompts, tool configurations, and permission levels. Rules library for reusable agent behavior definitions. Prompt store for template management. | 🔄 In Progress |
 
-#### Phase 3 — Polish & Stability (Feb 26–28)
+#### Core IDE
 
-| Area | Task | Status |
-|------|------|--------|
-| **Editor** | Complete context stubs (Theme, Keymap, i18n, Editor, Notebook) | 📋 Planned |
-| **Terminal** | Re-enable command decorations, fix isFocused, add persistence | 📋 Planned |
-| **UI** | Unify design token systems (resolve spacing/z-index conflicts) | 📋 Planned |
-| **UI** | Define missing `--jb-*` CSS variables for default theme | 📋 Planned |
-| **UI** | Split giant components (FileExplorer 117K, MenuBar 111K, etc.) | 📋 Planned |
-| **Performance** | Replace `std::sync::Mutex` with `tokio::sync::Mutex` in async | 📋 Planned |
-| **Performance** | Fix N+1 IPC patterns in ExtensionsContext | 📋 Planned |
-| **Performance** | Lazy-load Tier 5 providers (Debug, Collab, REPL, etc.) | 📋 Planned |
-| **Errors** | Typed error handling for Tauri commands (replace 735 String errors) | 📋 Planned |
-| **Errors** | Add per-panel ErrorBoundary for sidebar panels | 📋 Planned |
-| **Errors** | Surface errors to UI instead of silent console.error | 📋 Planned |
-| **Build** | Fix version mismatch (package.json vs Cargo.toml) | 📋 Planned |
-| **Build** | Add lint/format tooling (ESLint/Biome) | 📋 Planned |
-| **Build** | CI release build pipeline (tauri build on all platforms) | 📋 Planned |
-| **Tests** | AI backend test suite (session, completions, providers, agents) | 📋 Planned |
-| **Tests** | Factory backend test suite | 📋 Planned |
-| **Dead Code** | Remove 12+ dead component files and unused Chat/ directory | 📋 Planned |
-| **Dead Code** | Remove `ai/storage.rs` (232 lines, not in mod.rs) | 📋 Planned |
-| **Dead Code** | Fix broken Node.js imports in `terminalLinks.ts` | 📋 Planned |
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **Code Editor** | Monaco Editor with syntax highlighting, multi-cursor editing, code folding, minimap, sticky scroll, breadcrumbs, find & replace (regex, preserve case), bracket pair colorization, indent guides, Vim/Emacs keymaps, Zen mode, split/grid editor layout, hex editor, image viewer. | 🔄 In Progress |
+| **Integrated Terminal** | xterm.js v6 with WebGL rendering, multiple tabs, split panes, terminal groups, shell integration (OSC 633 for bash/zsh/fish/PowerShell), command detection, CWD tracking, inline completions, auto-reply rules, built-in SSH terminal, inline image rendering (iTerm2/Sixel/Kitty). | 🔄 In Progress |
+| **Git & Source Control** | Full Git integration: status, staging (file/hunk/line-level), commit, branch, merge, rebase (interactive), cherry-pick, bisect, stash, tags, worktrees, LFS, submodules. Visual commit graph, inline blame with heatmap, 3-way merge editor, PR management (GitHub/GitLab/Bitbucket). | 🔄 In Progress |
+| **Language Intelligence (LSP)** | 40+ built-in language server configurations with auto-download. Full LSP 3.17 support: completions, hover, go-to-definition, references, rename, code actions, semantic tokens, inlay hints, call/type hierarchy, folding, document colors, code lens. Multi-root workspace support. | 🔄 In Progress |
+| **Debugger (DAP)** | Full Debug Adapter Protocol client. 5 auto-detected adapters (Node.js, Python/debugpy, Rust/CodeLLDB, C++/GDB, Go/Delve). Breakpoints (line, conditional, logpoint, data, exception), variable inspection, watch expressions, call stack, memory inspector, disassembly view, multi-session. | 🔄 In Progress |
+| **Extension & Plugin System** | Multi-tier architecture: WASM sandbox (wasmtime), Web Worker host, Node.js host. 42+ hook types, 18+ granular permissions with user approval, ed25519 plugin signing, marketplace browser, extension profiler, extension bisect debugging. MCP client + server integration. | 🔄 In Progress |
+| **File Explorer & Workspace** | Tree view with expand/collapse, file nesting, compact folders, multi-root workspaces, git status indicators, file icons, drag-and-drop, context menus, directory picker. Open editors section, workspace trust system. | 🔄 In Progress |
+| **Search** | Project-wide search with regex, case-sensitive, whole word, include/exclude patterns. Semantic search powered by AI. Search editor with editable results. File finder (Quick Open) with fuzzy matching. | 🔄 In Progress |
+| **Settings & Configuration** | Full settings editor (GUI + JSON), theme customizer with live preview, keyboard shortcuts editor, user profiles, settings sync. VS Code theme import support. Dark/Light/High Contrast modes. | 🔄 In Progress |
+| **Collaboration** | Real-time collaboration via CRDT (Yjs), WebSocket server, presence awareness, cursor overlay, shared editing sessions. Channel-based communication. | 📋 Planned |
+| **Remote Development** | SSH remote connections with file operations, SFTP, terminal forwarding. Port forwarding, tunnel management. WSL integration. DevContainer support (planned). | 📋 Planned |
+| **Notebook Support** | Jupyter-style notebook editor with code/markdown cells, kernel management (Python, Node.js), cell execution, output rendering (text, HTML, images, JSON, ANSI), notebook diff. | 📋 Planned |
+| **Testing** | Test explorer with framework detection (cargo test, pytest, jest, vitest, mocha). Run/debug tests, coverage overlay with line-level indicators, test output panel, watch mode. | 🔄 In Progress |
+| **Tasks & Build** | Task runner with tasks.json support, problem matchers, build task integration. Output channels for task logging. | 🔄 In Progress |
+
+#### Platform & Infrastructure
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **Security Hardening** | Content Security Policy, shell spawn restrictions, path traversal protection, workspace trust, process sandboxing (Landlock on Linux, Seatbelt on macOS, ACLs on Windows), credential encryption via OS keychain, deep link validation. | 🔄 In Progress |
+| **Design System & Theming** | Unified design token system, Tailwind CSS v4, dark/light/high-contrast/system themes, VS Code theme import, color/token customization per category, icon themes, product icon themes. Responsive layout with resizable panels, glassmorphism floating panels. | 🔄 In Progress |
+| **Performance** | Parallel startup initialization, batch IPC with LRU caching, MessagePack serialization for large payloads, Vite code splitting with 20+ manual chunks, lazy-loaded pages and providers, WebGL terminal rendering. | 🔄 In Progress |
+| **Internationalization** | Multi-language support (English, French, Chinese, Japanese, Spanish, German), RTL detection, locale-based formatting, fallback system. | 🔄 In Progress |
+| **Build & CI/CD** | Tauri v2 desktop builds (macOS, Windows, Linux), Vite frontend bundling, semantic-release versioning, GitHub Actions CI with type checking, formatting, and cross-platform verification. | 🔄 In Progress |
+| **Accessibility** | Screen reader support, ARIA live regions, keyboard navigation in all overlays/menus, prefers-reduced-motion support, high-contrast mode, accessibility help dialog. | 🔄 In Progress |
 
 ### Post-February Goals
 
 | Target | Milestone |
 |--------|-----------|
-| **March 2026** | Beta release, extension marketplace seeding, VS Code `.vsix` compatibility |
-| **March 2026** | DevContainer support, remote port forwarding |
-| **April 2026+** | Next-edit prediction, TextMate grammar loading, community feedback integration |
+| **March 2026** | Beta release with stability improvements and community feedback |
+| **March 2026** | Extension marketplace seeding with first-party extensions |
+| **March 2026** | VS Code `.vsix` extension compatibility layer |
+| **March 2026** | DevContainer support and remote port forwarding |
+| **April 2026** | Next-edit prediction (Cursor Tab equivalent) |
+| **April 2026** | TextMate grammar loading for expanded syntax highlighting |
+| **April 2026** | AI Bug Finder and natural language code search |
+| **Q2 2026** | Extension ecosystem growth, public beta |
 
 ---
 
