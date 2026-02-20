@@ -211,17 +211,12 @@ export function detectLanguageFromPath(filePath: string): string {
 }
 
 /**
- * Preload highlighter in background (call after initial render)
+ * Lightweight synchronous fallback for rendering code before Shiki loads.
+ * Returns a plain `<pre>` block with escaped HTML — no syntax highlighting.
+ * Use this as the initial/placeholder render while `highlightCode()` resolves.
  */
-export function preloadHighlighter(): void {
-  const schedule = typeof requestIdleCallback !== "undefined"
-    ? requestIdleCallback
-    : (cb: () => void) => setTimeout(cb, 2000);
-  
-  schedule(() => {
-    // Just initialize the highlighter, don't preload languages
-    getHighlighter().catch(() => {});
-  });
+export function getPlainHighlightHtml(code: string, _language?: string): string {
+  return createPlainHtml(code);
 }
 
 /**

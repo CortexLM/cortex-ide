@@ -15,7 +15,11 @@ import type * as Monaco from "monaco-editor";
 // Constants
 // ============================================================================
 
-/** Number of editor instances to keep in the pool */
+/**
+ * Maximum number of editor instances in the pool.
+ * Pool is created on demand — no editors are pre-allocated.
+ * Editors are only instantiated in `acquireEditor()` when a tab is opened.
+ */
 const EDITOR_POOL_SIZE = 4;
 
 /** Delay before disposing unused models (ms) */

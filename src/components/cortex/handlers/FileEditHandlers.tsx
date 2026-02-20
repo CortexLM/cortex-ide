@@ -7,14 +7,19 @@ import { useNavigate } from "@solidjs/router";
 import { useEditor } from "@/context/editor/EditorProvider";
 import { useSDK } from "@/context/SDKContext";
 import { fsWriteFile } from "@/utils/tauri-api";
-import { MonacoManager } from "@/utils/monacoManager";
 import { createLogger } from "@/utils/logger";
 import { getWindowLabel } from "@/utils/windowStorage";
 
 const logger = createLogger("FileEditHandlers");
 
+let _monacoMgr: typeof import("@/utils/monacoManager") | null = null;
+
 function getActiveMonacoEditor() {
-  const monaco = MonacoManager.getInstance().getMonacoOrNull();
+  if (!_monacoMgr) {
+    import("@/utils/monacoManager").then(m => { _monacoMgr = m; });
+    return null;
+  }
+  const monaco = _monacoMgr.MonacoManager.getInstance().getMonacoOrNull();
   if (!monaco) return null;
   const editors = monaco.editor.getEditors();
   for (const ed of editors) {

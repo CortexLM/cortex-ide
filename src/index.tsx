@@ -2,7 +2,7 @@ import { render } from "solid-js/web";
 import { Router, Route } from "@solidjs/router";
 import { lazy, Suspense } from "solid-js";
 import { initializeWindowStorage } from "@/utils/windowStorage";
-import { preloadHighlighter } from "@/utils/shikiHighlighter";
+
 // CRITICAL: Use AppShell instead of App for instant first paint
 // AppShell is minimal (~1KB) and lazy-loads AppCore (with 68 providers) after render
 import AppShell from "./AppShell";
@@ -43,39 +43,10 @@ logStartup("Window storage init done");
 // These resources are not needed for initial render but improve UX when accessed.
 // Loading during idle time prevents blocking the main thread during startup.
 
-function deferredPreload() {
-  // Preload Shiki highlighter for code blocks in chat/markdown
-  preloadHighlighter();
-  
-  // Preload Monaco editor for code editing
-  // This warms up the Monaco instance so it's ready when user opens a file
-  import("@/utils/monacoManager").then(({ MonacoManager }) => {
-    MonacoManager.getInstance().ensureLoaded().catch(() => {
-      // Silent fail - Monaco will load on demand if preload fails
-    });
-  });
-}
-
-/**
- * Second-pass preload: Removed - was causing Vite to add modulepreload
- * for heavy chunks, blocking startup.
- * 
- * These chunks will load naturally when AppCore imports them after first paint.
- * The lazy() wrapper in AppShell ensures they don't block initial render.
- */
-// function deferredPreloadPhase2() { /* removed */ }
-
-if ('requestIdleCallback' in window) {
-  // Phase 1: Critical preloads (Monaco, Shiki) - needed soon after startup
-  (window as any).requestIdleCallback(() => {
-    deferredPreload();
-  }, { timeout: 3000 });
-  
-  // Phase 2 removed - heavy context preloads were causing Vite modulepreload issues
-} else {
-  // Fallback: defer with setTimeout
-  setTimeout(() => deferredPreload(), 500);
-}
+// Monaco and Shiki are NOT preloaded here — they load on demand:
+// - Monaco loads when the user first opens/focuses an editor tab
+// - Shiki loads when a code block first appears in AI chat or file preview
+// This keeps the main bundle lean and avoids blocking startup.
 
 // ============================================================================
 // CODE SPLITTING: Lazy-loaded Pages
