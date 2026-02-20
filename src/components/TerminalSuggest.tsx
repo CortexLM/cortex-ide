@@ -1,7 +1,8 @@
 import { Show, For, createSignal, createEffect, onCleanup, createMemo, JSX } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { Icon } from "./ui/Icon";
-import "@/styles/terminal.css";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("terminal");
 
 // Suggestion types for categorization
 export type SuggestionType = "history" | "command" | "file" | "directory" | "git" | "npm" | "arg";

@@ -4,7 +4,8 @@ import { useExtensionRecommendations } from "../../context/ExtensionRecommendati
 import { ExtensionCard, ViewportMode } from "./ExtensionCard";
 import { Button, IconButton, Input, Text, Badge } from "@/components/ui";
 import { tokens } from "@/design-system/tokens";
-import "../../styles/extensions.css";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("extensions");
 
 interface ExtensionsPanelProps {
   onClose?: () => void;

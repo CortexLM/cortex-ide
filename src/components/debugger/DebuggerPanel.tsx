@@ -14,7 +14,8 @@ import { Button, ListItem, Badge, Text } from "@/components/ui";
 import { tokens } from "@/design-system/tokens";
 import { Icon } from "../ui/Icon";
 
-import "@/styles/debug.css";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("debug");
 
 type ViewId = "variables" | "watch" | "callStack" | "breakpoints";
 type PanelId = "console" | "disassembly" | "memory" | "scripts";

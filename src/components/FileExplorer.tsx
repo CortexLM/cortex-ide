@@ -26,6 +26,8 @@ import { fsDeleteFile, fsDeleteDirectory } from "../utils/tauri-api";
 import { type ExplorerRevealPayload, addAppEventListener } from "../utils/eventBus";
 
 import { tokens } from "@/design-system/tokens";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("tree");
 
 
 import { SidebarSkeleton } from "./ui/SidebarSkeleton";

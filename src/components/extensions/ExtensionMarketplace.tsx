@@ -3,7 +3,8 @@ import { useExtensions, Extension, MarketplaceExtension } from "../../context/Ex
 import { ExtensionCard, ViewMode } from "./ExtensionCard";
 import { ExtensionDetail, ExtensionDetailData, MOCK_EXTENSION_DETAIL } from "./ExtensionDetail";
 import { tokens } from "@/design-system/tokens";
-import "../../styles/extensions.css";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("extensions");
 
 interface ExtensionMarketplaceProps {
   onClose?: () => void;

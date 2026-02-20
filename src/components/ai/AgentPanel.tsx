@@ -22,6 +22,8 @@ import { AgentActivityFeed } from "./AgentActivityFeed";
 import { AgentSkeleton } from "../ui/AgentSkeleton";
 import { Button, IconButton, Card, ListItem, Badge, Text, LoadingSpinner } from "@/components/ui";
 import { tokens } from "@/design-system/tokens";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("agent-panel");
 
 
 

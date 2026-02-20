@@ -11,6 +11,8 @@ import { useWorkspace } from "@/context/WorkspaceContext";
 import { useMultiRepo } from "@/context/MultiRepoContext";
 import { KeymapEditor, Toggle, Select, SectionHeader, OptionCard, FormGroup, InfoBox, Button, Kbd, EditorSettingsPanel, TerminalSettingsPanel, FilesSettingsPanel, NetworkSettingsPanel, JsonSettingsEditor, GitSettingsPanel } from "@/components/settings";
 import { KeymapProvider } from "@/context/KeymapContext";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("settings");
 import { CopilotSettingsPanel, CopilotSignInModal } from "@/components/ai/CopilotStatus";
 import { ExtensionsPanel } from "@/components/extensions";
 import { Button as UIButton, IconButton, Input, Card, Text, Badge } from "@/components/ui";

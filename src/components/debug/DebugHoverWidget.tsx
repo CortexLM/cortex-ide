@@ -38,6 +38,8 @@ import {
   createInitialHoverState,
   buildTreePath,
 } from "@/utils/debugHover";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("debug");
 
 // ============================================================================
 // Types

@@ -12,6 +12,8 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
 import * as monaco from "monaco-editor";
 import { useTesting, TestItem, TestStatus } from "@/context/TestingContext";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("testing");
 
 export interface TestDecorationsProps {
   editor: monaco.editor.IStandaloneCodeEditor;

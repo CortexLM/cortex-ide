@@ -33,13 +33,13 @@
 
 /* =============================================================================
    IMPORTS - Component & Feature Modules (Consolidated)
+   =============================================================================
+   Feature-specific CSS (features.css, activity-bar.css, command-center.css,
+   testing.css) is lazy-loaded via src/utils/lazyStyles.ts in the components
+   that need them, to reduce synchronous CSS at startup.
    ============================================================================= */
 @import "./components.css";
-@import "./features.css";
-@import "./activity-bar.css";
 @import "./titlebar.css";
-@import "./command-center.css";
-@import "./testing.css";
 
 /* =============================================================================
    THEMES - Optional theme overrides (loaded conditionally)

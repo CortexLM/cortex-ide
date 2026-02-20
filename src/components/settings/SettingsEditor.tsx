@@ -34,6 +34,8 @@ import { useWorkspaceTrust } from "@/context/WorkspaceTrustContext";
 import { isSettingRestricted, getSettingRestrictionReason } from "@/utils/restrictedSettings";
 import { tokens } from "@/design-system/tokens";
 import { Button, IconButton, Input, Text, Badge, Toggle } from "@/components/ui";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("settings");
 
 // =============================================================================
 // TYPES & INTERFACES

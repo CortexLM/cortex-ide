@@ -38,6 +38,9 @@ import type {
   SignatureHelp,
   Position as LSPPosition,
 } from "@/context/LSPContext";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("editor");
+loadStylesheet("editor-features");
 import { LightBulbWidget } from "./LightBulbWidget";
 import {
   updateCodeLensSettings,

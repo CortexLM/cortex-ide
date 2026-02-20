@@ -10,6 +10,8 @@ import {
 import { Icon } from "@/components/ui/Icon";
 import { Button, IconButton } from "@/components/ui";
 import { tokens } from '@/design-system/tokens';
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("testing");
 
 // ============================================================================
 // Types

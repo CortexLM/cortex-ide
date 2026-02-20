@@ -13,7 +13,8 @@ import { WebLinksAddon } from "@xterm/addon-web-links";
 import { SearchAddon } from "@xterm/addon-search";
 import { Unicode11Addon } from "@xterm/addon-unicode11";
 import "@xterm/xterm/css/xterm.css";
-import "@/styles/terminal.css";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("terminal");
 import { TerminalSuggest, useTerminalSuggestions, Suggestion } from "./TerminalSuggest";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { TerminalQuickFix as _TerminalQuickFix } from "./TerminalQuickFix";

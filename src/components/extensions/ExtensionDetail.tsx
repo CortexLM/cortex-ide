@@ -1,7 +1,8 @@
 import { Component, Show, For, createSignal, createMemo } from "solid-js";
 import { Markdown } from "../Markdown";
 import { tokens } from "@/design-system/tokens";
-import "../../styles/extensions.css";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("extensions");
 
 // ============================================================================
 // Type Definitions

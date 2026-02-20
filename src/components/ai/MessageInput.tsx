@@ -8,6 +8,8 @@ import {
 } from "solid-js";
 import { Icon } from "../ui/Icon";
 import { tokens } from "@/design-system/tokens";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("agent-panel");
 
 // ============================================================================
 // Types

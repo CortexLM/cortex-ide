@@ -1,5 +1,7 @@
 import { Component, createSignal, createEffect, onMount, onCleanup, Show, For } from "solid-js";
 import type { Breakpoint } from "../../context/DebugContext";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("debug");
 
 // ============== Types ==============
 

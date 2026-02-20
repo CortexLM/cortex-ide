@@ -28,6 +28,8 @@ import {
 import { tokens } from "@/design-system/tokens";
 import type { CommandCenterState } from "@/types/workbench";
 import { Icon } from '../ui/Icon';
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("command-center");
 
 // =============================================================================
 // TYPES

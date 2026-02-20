@@ -3,7 +3,8 @@ import { Extension, MarketplaceExtension, ExtensionUpdateInfo } from "../../cont
 import { Card, Text, Button, Badge } from "@/components/ui";
 import { tokens } from "@/design-system/tokens";
 import { RuntimeStatusIndicator } from "./ExtensionRuntimeStatus";
-import "../../styles/extensions.css";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("extensions");
 
 export type ViewMode = "grid" | "list";
 export type ViewportMode = "normal" | "narrow" | "mini";

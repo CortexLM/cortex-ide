@@ -33,6 +33,8 @@ import type * as Monaco from "monaco-editor";
 import { invoke } from "@tauri-apps/api/core";
 import { useLSP, type Range, type TextEdit } from "@/context/LSPContext";
 import { useEditor } from "@/context/EditorContext";
+import { loadStylesheet } from "@/utils/lazyStyles";
+loadStylesheet("editor-features");
 
 // ============================================================================
 // Types
