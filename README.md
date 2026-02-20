@@ -162,7 +162,6 @@ gantt
 |--------|-----------|
 | **March 2026** | Beta release with stability improvements and community feedback |
 | **March 2026** | Extension marketplace seeding with first-party extensions |
-| **March 2026** | VS Code `.vsix` extension compatibility layer |
 | **March 2026** | DevContainer support and remote port forwarding |
 | **April 2026** | Next-edit prediction (Cursor Tab equivalent) |
 | **April 2026** | TextMate grammar loading for expanded syntax highlighting |
