@@ -1,22 +1,23 @@
 /**
- * OptimizedProviders - All Providers SYNCHRONOUS
+ * OptimizedProviders - Two-Tier Provider Loading
  * 
  * PERFORMANCE STRATEGY:
- * - Providers are SMALL (~2-10KB each) - no need to lazy load them
- * - Providers MUST be sync so contexts are immediately available
+ * - Tier 1 (Essential): ~15 providers loaded synchronously for first meaningful paint
+ * - Tier 2 (Deferred): ~53 providers loaded after first paint via requestIdleCallback
  * - Heavy COMPONENTS (Monaco, Terminal, etc.) are lazy-loaded in Layout.tsx
  * - IPC calls in providers are DEFERRED to not block first paint
  * 
  * This ensures:
- * 1. All useXxx() hooks work immediately
- * 2. No "must be used within Provider" errors
- * 3. App shell renders fast, heavy components load progressively
+ * 1. First paint is fast with only essential providers
+ * 2. Deferred providers mount after idle callback
+ * 3. All useXxx() hooks work immediately once children render
+ * 4. App shell renders fast, heavy components load progressively
  */
 
 const PROVIDERS_START = performance.now();
 if (import.meta.env.DEV) console.log(`[STARTUP] OptimizedProviders.tsx module loading @ ${PROVIDERS_START.toFixed(1)}ms`);
 
-import { ParentProps, JSX, ErrorBoundary } from "solid-js";
+import { ParentProps, JSX, ErrorBoundary, createSignal, onMount, Show } from "solid-js";
 
 // ============================================================================
 // ERROR FALLBACK
@@ -40,37 +41,33 @@ function ErrorFallback(err: Error): JSX.Element {
 }
 
 // ============================================================================
-// ALL PROVIDERS - SYNCHRONOUS IMPORTS
-// Providers are small and MUST be available immediately for hooks to work
+// TIER 1: ESSENTIAL PROVIDERS - Synchronous, needed for first meaningful paint
 // ============================================================================
-
-// Tier 1: Core (absolutely essential)
 import { I18nProvider } from "@/context/I18nContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { CortexColorThemeProvider } from "@/context/CortexColorThemeContext";
 import { ToastProvider } from "@/context/ToastContext";
+import { SDKProvider } from "@/context/SDKContext";
 import { SettingsProvider } from "@/context/SettingsContext";
+import { CommandProvider } from "@/context/CommandContext";
+import { EditorProvider } from "@/context/EditorContext";
+import { KeymapProvider } from "@/context/KeymapContext";
 import { WindowsProvider } from "@/context/WindowsContext";
 import { LayoutProvider } from "@/context/LayoutContext";
+import { NotificationsProvider } from "@/context/NotificationsContext";
+import { SearchProvider } from "@/context/SearchContext";
+import { WorkspaceProvider } from "@/context/WorkspaceContext";
+import { EditorFeaturesProvider } from "@/context/editor/EditorFeaturesProvider";
 
-// Tier 2: SDK & Infrastructure
+// ============================================================================
+// TIER 2: DEFERRED PROVIDERS - Loaded after first paint
+// ============================================================================
 import { ColorCustomizationsProvider } from "@/context/ColorCustomizationsContext";
 import { TokenColorCustomizationsProvider } from "@/context/TokenColorCustomizationsContext";
-import { SDKProvider } from "@/context/SDKContext";
-import { NotificationsProvider } from "@/context/NotificationsContext";
 import { ActivityIndicatorProvider } from "@/context/ActivityIndicatorContext";
 import { ProfilesProvider } from "@/context/ProfilesContext";
 import { FileIconThemeProvider } from "@/context/theme/IconThemeProvider";
 import { ProductIconThemeProvider } from "@/context/theme/ProductIconTheme";
-
-// Tier 3: Editor & Workspace
-import { KeymapProvider } from "@/context/KeymapContext";
-import { CommandProvider } from "@/context/CommandContext";
-import { WorkspaceProvider } from "@/context/WorkspaceContext";
-import { EditorProvider } from "@/context/EditorContext";
-import { EditorFeaturesProvider } from "@/context/editor/EditorFeaturesProvider";
-
-// Tier 4: Features
 import { AccessibilityProvider } from "@/context/AccessibilityContext";
 import { ZenModeProvider } from "@/components/ZenMode";
 import { RecentProjectsProvider } from "@/context/RecentProjectsContext";
@@ -93,11 +90,8 @@ import { QuickInputProvider } from "@/context/QuickInputContext";
 import { QuickPickProvider } from "@/context/QuickPickContext";
 import { BookmarksProvider } from "@/context/BookmarksContext";
 import { SemanticSearchProvider } from "@/context/SemanticSearchContext";
-import { SearchProvider } from "@/context/SearchContext";
 import { OutlineProvider } from "@/context/OutlineContext";
 import { ExtensionRecommendationsProvider } from "@/context/ExtensionRecommendationsContext";
-
-// Tier 5: Development Tools
 import { TerminalsProvider } from "@/context/TerminalsContext";
 import { PreviewProvider } from "@/context/PreviewContext";
 import { PlanProvider } from "@/context/PlanContext";
@@ -125,7 +119,6 @@ import { TimelineProvider } from "@/context/TimelineContext";
 import { WorkspaceSymbolsProvider } from "@/context/WorkspaceSymbolsContext";
 import { TunnelProvider } from "@/context/TunnelContext";
 import { PullRequestProvider } from "@/context/PullRequestContext";
-
 import { MergeEditorProvider } from "@/context/merge/MergeEditorProvider";
 import { DiffEditorProvider } from "@/context/diff/DiffEditorProvider";
 import { TabsProvider } from "@/context/editor/TabsProvider";
@@ -134,44 +127,43 @@ import { CommandPaletteProvider } from "@/context/CommandPaletteContext";
 if (import.meta.env.DEV) console.log(`[STARTUP] All provider imports done @ ${performance.now().toFixed(1)}ms (${(performance.now() - PROVIDERS_START).toFixed(1)}ms for imports)`);
 
 // ============================================================================
-// MAIN EXPORT - All providers nested synchronously
-// 
-// This is the CORRECT approach for SolidJS:
-// - All providers load upfront (they're small, ~2-10KB each)
-// - Heavy components (Monaco, Terminal) are lazy in Layout.tsx
-// - Hooks always find their provider immediately
+// DEFERRED PROVIDERS COMPONENT
+// Wraps Tier 2 providers, mounted after first paint via requestIdleCallback.
+// Children are only rendered once all deferred providers are ready,
+// ensuring useXxx() hooks always find their provider.
 // ============================================================================
-export function OptimizedProviders(props: ParentProps): JSX.Element {
-  if (import.meta.env.DEV) console.log(`[STARTUP] OptimizedProviders rendering @ ${performance.now().toFixed(1)}ms`);
+function DeferredProviders(props: ParentProps): JSX.Element {
+  const [ready, setReady] = createSignal(false);
+
+  onMount(() => {
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(() => setReady(true));
+    } else {
+      setTimeout(() => setReady(true), 0);
+    }
+  });
+
+  if (import.meta.env.DEV) {
+    onMount(() => {
+      const check = setInterval(() => {
+        if (ready()) {
+          console.log(`[STARTUP] DeferredProviders ready @ ${performance.now().toFixed(1)}ms`);
+          clearInterval(check);
+        }
+      }, 10);
+    });
+  }
+
   return (
-    <ErrorBoundary fallback={ErrorFallback}>
-      {/* Tier 1: Core */}
-      <I18nProvider>
-      <ThemeProvider>
-      <CortexColorThemeProvider>
-      <ToastProvider>
-      <SettingsProvider>
-      <WindowsProvider>
-      <LayoutProvider>
-      
-      {/* Tier 2: SDK & Infrastructure */}
+    <Show when={ready()}>
+      {/* Tier 2: Deferred providers - order preserved for dependency correctness */}
       <ColorCustomizationsProvider>
       <TokenColorCustomizationsProvider>
-      <SDKProvider>
-      <NotificationsProvider>
       <ActivityIndicatorProvider>
       <ProfilesProvider>
       <FileIconThemeProvider>
       <ProductIconThemeProvider>
-      
-      {/* Tier 3: Editor & Workspace */}
-      <KeymapProvider>
-      <CommandProvider>
-      <WorkspaceProvider>
-      <EditorProvider>
-      <EditorFeaturesProvider>
-      
-      {/* Tier 4: Features */}
+
       <AccessibilityProvider>
       <ZenModeProvider>
       <RecentProjectsProvider>
@@ -194,11 +186,9 @@ export function OptimizedProviders(props: ParentProps): JSX.Element {
       <QuickPickProvider>
       <BookmarksProvider>
       <SemanticSearchProvider>
-      <SearchProvider>
       <OutlineProvider>
       <ExtensionRecommendationsProvider>
-      
-      {/* Tier 5: Development Tools */}
+
       <TerminalsProvider>
       <PreviewProvider>
       <PlanProvider>
@@ -264,10 +254,9 @@ export function OptimizedProviders(props: ParentProps): JSX.Element {
       </PlanProvider>
       </PreviewProvider>
       </TerminalsProvider>
-      
+
       </ExtensionRecommendationsProvider>
       </OutlineProvider>
-      </SearchProvider>
       </SemanticSearchProvider>
       </BookmarksProvider>
       </QuickPickProvider>
@@ -290,25 +279,60 @@ export function OptimizedProviders(props: ParentProps): JSX.Element {
       </RecentProjectsProvider>
       </ZenModeProvider>
       </AccessibilityProvider>
-      
-      </EditorFeaturesProvider>
-      </EditorProvider>
-      </WorkspaceProvider>
-      </CommandProvider>
-      </KeymapProvider>
-      
+
       </ProductIconThemeProvider>
       </FileIconThemeProvider>
       </ProfilesProvider>
       </ActivityIndicatorProvider>
-      </NotificationsProvider>
-      </SDKProvider>
       </TokenColorCustomizationsProvider>
       </ColorCustomizationsProvider>
-      
+    </Show>
+  );
+}
+
+// ============================================================================
+// MAIN EXPORT - Two-tier provider loading
+// 
+// Tier 1: Essential providers loaded synchronously (first meaningful paint)
+// Tier 2: Deferred providers loaded after requestIdleCallback
+// ============================================================================
+export function OptimizedProviders(props: ParentProps): JSX.Element {
+  if (import.meta.env.DEV) console.log(`[STARTUP] OptimizedProviders rendering @ ${performance.now().toFixed(1)}ms`);
+  return (
+    <ErrorBoundary fallback={ErrorFallback}>
+      {/* Tier 1: Essential providers - always available immediately */}
+      <I18nProvider>
+      <ThemeProvider>
+      <CortexColorThemeProvider>
+      <ToastProvider>
+      <SDKProvider>
+      <SettingsProvider>
+      <CommandProvider>
+      <KeymapProvider>
+      <WindowsProvider>
+      <LayoutProvider>
+      <NotificationsProvider>
+      <SearchProvider>
+      <WorkspaceProvider>
+      <EditorProvider>
+      <EditorFeaturesProvider>
+
+        {/* Tier 2: Deferred providers - mounted after first paint */}
+        <DeferredProviders>
+          {props.children}
+        </DeferredProviders>
+
+      </EditorFeaturesProvider>
+      </EditorProvider>
+      </WorkspaceProvider>
+      </SearchProvider>
+      </NotificationsProvider>
       </LayoutProvider>
       </WindowsProvider>
+      </KeymapProvider>
+      </CommandProvider>
       </SettingsProvider>
+      </SDKProvider>
       </ToastProvider>
       </CortexColorThemeProvider>
       </ThemeProvider>

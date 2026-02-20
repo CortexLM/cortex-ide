@@ -116,7 +116,7 @@ npm run typecheck      # tsc --noEmit
 - **SolidJS only** — use `createSignal`, `createMemo`, `createEffect`, `onMount`, `onCleanup`, `Show`, `For`, `Switch/Match`
 - Use `@/` path alias for all imports (e.g., `@/context/EditorContext`)
 - Lazy-load heavy components with `lazy(() => import(...))` and wrap in `<Suspense>`
-- Context providers are composed in `context/utils/ProviderComposer.tsx` — add new providers to `OptimizedProviders` in `App.tsx`
+- Context providers are composed in `context/OptimizedProviders.tsx` using two-tier loading: Tier 1 (15 essential providers) loads synchronously for first paint, Tier 2 (53+ deferred providers) loads after `requestIdleCallback`. Add new providers to the appropriate tier in `OptimizedProviders.tsx`
 - Monaco editor providers in `providers/` bridge LSP results to Monaco's API
 - All Tauri IPC calls go through `@tauri-apps/api/core` `invoke()` or the SDK in `sdk/`
 - CSS uses Tailwind v4 utility classes — no CSS modules for new components
