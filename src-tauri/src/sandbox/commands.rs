@@ -15,6 +15,7 @@ use tracing::{error, info};
 use uuid::Uuid;
 
 use super::{SandboxConfig, SandboxedProcess};
+use crate::LazyState;
 
 /// State for tracking active sandboxed processes.
 pub struct SandboxState(pub Arc<DashMap<String, Arc<Mutex<SandboxedProcess>>>>);
@@ -60,7 +61,7 @@ pub struct SandboxSpawnResponse {
 /// Spawn a new sandboxed process.
 #[tauri::command]
 pub async fn sandbox_spawn(
-    state: State<'_, SandboxState>,
+    state: State<'_, LazyState<SandboxState>>,
     config: SandboxSpawnRequest,
 ) -> Result<SandboxSpawnResponse, String> {
     let sandbox_config = SandboxConfig {
@@ -90,6 +91,7 @@ pub async fn sandbox_spawn(
     );
 
     state
+        .get()
         .0
         .insert(process_id.clone(), Arc::new(Mutex::new(process)));
 
@@ -99,10 +101,11 @@ pub async fn sandbox_spawn(
 /// Wait for a sandboxed process to exit and return its exit code.
 #[tauri::command]
 pub async fn sandbox_wait(
-    state: State<'_, SandboxState>,
+    state: State<'_, LazyState<SandboxState>>,
     process_id: String,
 ) -> Result<i32, String> {
     let process_mutex = state
+        .get()
         .0
         .get(&process_id)
         .map(|entry| Arc::clone(entry.value()))
@@ -120,7 +123,7 @@ pub async fn sandbox_wait(
         e
     })?;
 
-    state.0.remove(&process_id);
+    state.get().0.remove(&process_id);
 
     info!(
         process_id = %process_id,
@@ -134,10 +137,11 @@ pub async fn sandbox_wait(
 /// Kill a sandboxed process.
 #[tauri::command]
 pub async fn sandbox_kill(
-    state: State<'_, SandboxState>,
+    state: State<'_, LazyState<SandboxState>>,
     process_id: String,
 ) -> Result<(), String> {
     let process_mutex = state
+        .get()
         .0
         .get(&process_id)
         .map(|entry| Arc::clone(entry.value()))
@@ -155,7 +159,7 @@ pub async fn sandbox_kill(
         e
     })?;
 
-    state.0.remove(&process_id);
+    state.get().0.remove(&process_id);
 
     info!(process_id = %process_id, "Sandboxed process killed");
 
@@ -165,10 +169,11 @@ pub async fn sandbox_kill(
 /// Check if a sandboxed process is still running.
 #[tauri::command]
 pub async fn sandbox_status(
-    state: State<'_, SandboxState>,
+    state: State<'_, LazyState<SandboxState>>,
     process_id: String,
 ) -> Result<bool, String> {
     let process_mutex = state
+        .get()
         .0
         .get(&process_id)
         .map(|entry| Arc::clone(entry.value()))

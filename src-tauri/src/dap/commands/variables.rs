@@ -9,6 +9,7 @@ use super::super::protocol::{SetExpressionResponse, Variable};
 use super::state::DebuggerState;
 use super::types::{EvaluateResult, SetVariableResult};
 use super::validation::validate_session_id;
+use crate::LazyState;
 
 const MAX_EXPRESSION_LEN: usize = 10_000;
 const MAX_NAME_LEN: usize = 1_000;
@@ -53,12 +54,12 @@ fn validate_value(value: &str) -> Result<(), String> {
 /// Get variables for current frame
 #[tauri::command]
 pub async fn debug_get_variables(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<Vec<Variable>, String> {
     validate_session_id(&session_id)?;
 
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -73,13 +74,13 @@ pub async fn debug_get_variables(
 /// Expand a variable (get children)
 #[tauri::command]
 pub async fn debug_expand_variable(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     variables_reference: i64,
 ) -> Result<Vec<Variable>, String> {
     validate_session_id(&session_id)?;
 
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -94,7 +95,7 @@ pub async fn debug_expand_variable(
 /// Expand a variable with paging support (get children with start/count)
 #[tauri::command]
 pub async fn debug_expand_variable_paged(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     variables_reference: i64,
     start: Option<i64>,
@@ -102,7 +103,7 @@ pub async fn debug_expand_variable_paged(
 ) -> Result<Vec<Variable>, String> {
     validate_session_id(&session_id)?;
 
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -117,7 +118,7 @@ pub async fn debug_expand_variable_paged(
 /// Evaluate an expression
 #[tauri::command]
 pub async fn debug_evaluate(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     expression: String,
     context: Option<String>,
@@ -125,7 +126,7 @@ pub async fn debug_evaluate(
     validate_session_id(&session_id)?;
     validate_expression(&expression)?;
 
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -146,7 +147,7 @@ pub async fn debug_evaluate(
 /// Set the value of a variable
 #[tauri::command]
 pub async fn debug_set_variable(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     variables_reference: i64,
     name: String,
@@ -156,7 +157,7 @@ pub async fn debug_set_variable(
     validate_variable_name(&name)?;
     validate_value(&value)?;
 
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -177,7 +178,7 @@ pub async fn debug_set_variable(
 /// Set an expression value
 #[tauri::command]
 pub async fn debug_set_expression(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     expression: String,
     value: String,
@@ -187,7 +188,7 @@ pub async fn debug_set_expression(
     validate_expression(&expression)?;
     validate_value(&value)?;
 
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -201,14 +202,14 @@ pub async fn debug_set_expression(
 /// Evaluate an expression in REPL context
 #[tauri::command]
 pub async fn debug_evaluate_repl(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     expression: String,
 ) -> Result<EvaluateResult, String> {
     validate_session_id(&session_id)?;
     validate_expression(&expression)?;
 
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;

@@ -17,16 +17,17 @@ use super::types::{
     ExceptionFilterOptionInput, InstructionBreakpointInput, InstructionBreakpointResult,
     SessionBreakpoint,
 };
+use crate::LazyState;
 
 /// Set breakpoints for a file
 #[tauri::command]
 pub async fn debug_set_breakpoints(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     path: String,
     breakpoints: Vec<BreakpointLocation>,
 ) -> Result<Vec<SessionBreakpoint>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -71,12 +72,12 @@ pub async fn debug_set_breakpoints(
 /// Set function breakpoints
 #[tauri::command]
 pub async fn debug_set_function_breakpoints(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     function_names: Vec<String>,
     conditions: Option<Vec<Option<String>>>,
 ) -> Result<Vec<SessionBreakpoint>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -103,12 +104,12 @@ pub async fn debug_set_function_breakpoints(
 /// Toggle a breakpoint at a specific line
 #[tauri::command]
 pub async fn debug_toggle_breakpoint(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     path: String,
     line: i64,
 ) -> Result<Vec<SessionBreakpoint>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -134,10 +135,10 @@ pub async fn debug_toggle_breakpoint(
 /// Get all breakpoints for a session
 #[tauri::command]
 pub async fn debug_get_breakpoints(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<HashMap<String, Vec<SessionBreakpoint>>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -167,11 +168,11 @@ pub async fn debug_get_breakpoints(
 /// Set instruction breakpoints
 #[tauri::command]
 pub async fn debug_set_instruction_breakpoint(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     breakpoints: Vec<InstructionBreakpointInput>,
 ) -> Result<InstructionBreakpointResult, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -210,11 +211,11 @@ pub async fn debug_set_instruction_breakpoint(
 /// Remove instruction breakpoints (by setting an empty list)
 #[tauri::command]
 pub async fn debug_remove_instruction_breakpoint(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     instruction_references: Vec<String>,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -249,11 +250,11 @@ pub async fn debug_remove_instruction_breakpoint(
 /// Set data breakpoints (watchpoints)
 #[tauri::command]
 pub async fn debug_set_data_breakpoints(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     breakpoints: Vec<DataBreakpointInput>,
 ) -> Result<DataBreakpointResult, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -296,12 +297,12 @@ pub async fn debug_set_data_breakpoints(
 /// Set exception breakpoints
 #[tauri::command]
 pub async fn debug_set_exception_breakpoints(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     filters: Vec<String>,
     filter_options: Option<Vec<ExceptionFilterOptionInput>>,
 ) -> Result<ExceptionBreakpointResult, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -341,13 +342,13 @@ pub async fn debug_set_exception_breakpoints(
 /// Get data breakpoint info for a variable (check if data breakpoint can be set)
 #[tauri::command]
 pub async fn debug_data_breakpoint_info(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     variables_reference: Option<i64>,
     name: String,
     frame_id: Option<i64>,
 ) -> Result<DataBreakpointInfoResponse, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;

@@ -11,6 +11,7 @@ use tracing::{error, info};
 use super::ContextServerState;
 use super::protocol::{McpClient, McpClientBuilder};
 use super::types::*;
+use crate::LazyState;
 
 // =====================
 // Server Management
@@ -20,9 +21,9 @@ use super::types::*;
 #[tauri::command]
 pub async fn mcp_add_server(
     config: ContextServerConfig,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<String, String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
     let id = manager.add_server(config);
     info!("Added context server: {}", id);
     Ok(id)
@@ -32,10 +33,10 @@ pub async fn mcp_add_server(
 #[tauri::command]
 pub async fn mcp_remove_server(
     server_id: String,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<bool, String> {
     let client_to_shutdown = {
-        let mut manager = state.0.lock().await;
+        let mut manager = state.get().0.lock().await;
 
         // Disconnect if connected
         if let Some(server) = manager.get_server_mut(&server_id) {
@@ -51,7 +52,7 @@ pub async fn mcp_remove_server(
         let _ = client.shutdown().await;
     }
 
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
     let removed = manager.remove_server(&server_id);
     if removed {
         info!("Removed context server: {}", server_id);
@@ -62,9 +63,9 @@ pub async fn mcp_remove_server(
 /// List all context servers
 #[tauri::command]
 pub async fn mcp_list_servers(
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<Vec<ContextServerInfo>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     Ok(manager.list_servers())
 }
 
@@ -72,9 +73,9 @@ pub async fn mcp_list_servers(
 #[tauri::command]
 pub async fn mcp_get_server(
     server_id: String,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<Option<ContextServerInfo>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     Ok(manager.get_server(&server_id).map(|s| s.to_info()))
 }
 
@@ -83,11 +84,11 @@ pub async fn mcp_get_server(
 pub async fn mcp_connect(
     app: AppHandle,
     server_id: String,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<ContextServerInfo, String> {
     // Get config and update status
     let config = {
-        let mut manager = state.0.lock().await;
+        let mut manager = state.get().0.lock().await;
         let server = manager
             .get_server_mut(&server_id)
             .ok_or_else(|| format!("Server not found: {}", server_id))?;
@@ -113,7 +114,7 @@ pub async fn mcp_connect(
             let capabilities = client.capabilities.clone();
             let server_info_data = client.server_info.clone();
 
-            let mut manager = state.0.lock().await;
+            let mut manager = state.get().0.lock().await;
             if let Some(server) = manager.get_server_mut(&server_id) {
                 server.status = ServerStatus::Connected;
                 server.client = Some(Arc::new(TokioMutex::new(client)));
@@ -146,7 +147,7 @@ pub async fn mcp_connect(
         Err(e) => {
             error!("Failed to connect to context server {}: {}", server_id, e);
 
-            let mut manager = state.0.lock().await;
+            let mut manager = state.get().0.lock().await;
             if let Some(server) = manager.get_server_mut(&server_id) {
                 server.status = ServerStatus::Error;
             }
@@ -171,10 +172,10 @@ pub async fn mcp_connect(
 pub async fn mcp_disconnect(
     app: AppHandle,
     server_id: String,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<(), String> {
     let client = {
-        let mut manager = state.0.lock().await;
+        let mut manager = state.get().0.lock().await;
         let server = manager
             .get_server_mut(&server_id)
             .ok_or_else(|| format!("Server not found: {}", server_id))?;
@@ -209,7 +210,7 @@ pub async fn mcp_disconnect(
 #[tauri::command]
 pub async fn mcp_list_resources(
     server_id: String,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<Vec<Resource>, String> {
     let client = get_client(&server_id, &state).await?;
     let client = client.lock().await;
@@ -227,7 +228,7 @@ pub async fn mcp_list_resources(
 pub async fn mcp_read_resource(
     server_id: String,
     uri: String,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<Vec<ResourceContents>, String> {
     let client = get_client(&server_id, &state).await?;
     let client = client.lock().await;
@@ -244,7 +245,7 @@ pub async fn mcp_read_resource(
 #[tauri::command]
 pub async fn mcp_list_resource_templates(
     server_id: String,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<Vec<ResourceTemplate>, String> {
     let client = get_client(&server_id, &state).await?;
     let client = client.lock().await;
@@ -265,7 +266,7 @@ pub async fn mcp_list_resource_templates(
 #[tauri::command]
 pub async fn mcp_list_tools(
     server_id: String,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<Vec<Tool>, String> {
     let client = get_client(&server_id, &state).await?;
     let client = client.lock().await;
@@ -284,7 +285,7 @@ pub async fn mcp_call_tool(
     server_id: String,
     tool_name: String,
     arguments: Option<serde_json::Value>,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<CallToolResponse, String> {
     let client = get_client(&server_id, &state).await?;
     let client = client.lock().await;
@@ -305,7 +306,7 @@ pub async fn mcp_call_tool(
 #[tauri::command]
 pub async fn mcp_list_prompts(
     server_id: String,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<Vec<Prompt>, String> {
     let client = get_client(&server_id, &state).await?;
     let client = client.lock().await;
@@ -324,7 +325,7 @@ pub async fn mcp_get_prompt(
     server_id: String,
     prompt_name: String,
     arguments: Option<HashMap<String, String>>,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<PromptsGetResponse, String> {
     let client = get_client(&server_id, &state).await?;
     let client = client.lock().await;
@@ -346,7 +347,7 @@ pub async fn mcp_get_prompt(
 pub async fn mcp_query_context(
     server_ids: Vec<String>,
     query: String,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<Vec<ResourceContents>, String> {
     let mut all_contents = Vec::new();
 
@@ -386,7 +387,7 @@ pub async fn mcp_query_context(
 pub async fn mcp_get_context_for_prompt(
     server_ids: Vec<String>,
     max_tokens: Option<usize>,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<String, String> {
     let max_tokens = max_tokens.unwrap_or(4000);
     let mut context_parts = Vec::new();
@@ -435,7 +436,7 @@ pub async fn mcp_get_context_for_prompt(
 #[tauri::command]
 pub async fn mcp_ping(
     server_id: String,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<bool, String> {
     let client = get_client(&server_id, &state).await?;
     let client = client.lock().await;
@@ -454,7 +455,7 @@ pub async fn mcp_ping(
 pub async fn mcp_set_log_level(
     server_id: String,
     level: LoggingLevel,
-    state: State<'_, ContextServerState>,
+    state: State<'_, LazyState<ContextServerState>>,
 ) -> Result<(), String> {
     let client = get_client(&server_id, &state).await?;
     let client = client.lock().await;
@@ -471,9 +472,9 @@ pub async fn mcp_set_log_level(
 
 async fn get_client(
     server_id: &str,
-    state: &State<'_, ContextServerState>,
+    state: &State<'_, LazyState<ContextServerState>>,
 ) -> Result<Arc<TokioMutex<McpClient>>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     let server = manager
         .get_server(server_id)
         .ok_or_else(|| format!("Server not found: {}", server_id))?;

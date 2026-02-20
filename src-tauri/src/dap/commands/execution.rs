@@ -6,14 +6,15 @@
 use tauri::State;
 
 use super::state::DebuggerState;
+use crate::LazyState;
 
 /// Continue execution
 #[tauri::command]
 pub async fn debug_continue(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -28,10 +29,10 @@ pub async fn debug_continue(
 /// Pause execution
 #[tauri::command]
 pub async fn debug_pause(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -46,10 +47,10 @@ pub async fn debug_pause(
 /// Step over (next line)
 #[tauri::command]
 pub async fn debug_step_over(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -64,10 +65,10 @@ pub async fn debug_step_over(
 /// Step into function
 #[tauri::command]
 pub async fn debug_step_into(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -82,10 +83,10 @@ pub async fn debug_step_into(
 /// Step out of function
 #[tauri::command]
 pub async fn debug_step_out(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -100,10 +101,10 @@ pub async fn debug_step_out(
 /// Step back (reverse debugging)
 #[tauri::command]
 pub async fn debug_step_back(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -118,10 +119,10 @@ pub async fn debug_step_back(
 /// Reverse continue (reverse debugging)
 #[tauri::command]
 pub async fn debug_reverse_continue(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -136,10 +137,10 @@ pub async fn debug_reverse_continue(
 /// Restart the debug session
 #[tauri::command]
 pub async fn debug_restart(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -154,10 +155,10 @@ pub async fn debug_restart(
 /// Step to next instruction (instruction-level stepping)
 #[tauri::command]
 pub async fn debug_step_instruction(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;

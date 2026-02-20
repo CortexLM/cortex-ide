@@ -14,6 +14,7 @@ use tracing::{info, warn};
 use super::state::ExtensionsState;
 use super::types::{Extension, ExtensionSource, MarketplaceExtension};
 use super::utils::{extract_zip_package, find_extension_root};
+use crate::LazyState;
 
 /// Configurable marketplace state holding the registry URL.
 #[derive(Clone)]
@@ -141,8 +142,8 @@ pub async fn get_featured_extensions(app: AppHandle) -> Result<Vec<MarketplaceEx
 #[tauri::command]
 pub async fn check_extension_updates(app: AppHandle) -> Result<Vec<ExtensionUpdateResult>, String> {
     let installed = {
-        let state = app.state::<ExtensionsState>();
-        let manager = state.0.lock();
+        let state = app.state::<LazyState<ExtensionsState>>();
+        let manager = state.get().0.lock();
         manager
             .get_extensions()
             .into_iter()
@@ -276,8 +277,8 @@ pub async fn install_from_marketplace(
                     info!("Successfully cloned extension from git");
                     // Install from the cloned directory (lock scope limited to avoid holding across await)
                     let extension = {
-                        let state = app.state::<ExtensionsState>();
-                        let mut manager = state.0.lock();
+                        let state = app.state::<LazyState<ExtensionsState>>();
+                        let mut manager = state.get().0.lock();
                         let mut ext = manager.install_extension(&temp_dir)?;
                         ext.source = ExtensionSource::Marketplace;
                         ext
@@ -313,8 +314,8 @@ pub async fn install_from_marketplace(
 
     // Install the extension (lock scope limited to avoid holding across await)
     let extension = {
-        let state = app.state::<ExtensionsState>();
-        let mut manager = state.0.lock();
+        let state = app.state::<LazyState<ExtensionsState>>();
+        let mut manager = state.get().0.lock();
         let mut ext = manager.install_extension(&ext_root)?;
         ext.source = ExtensionSource::Marketplace;
         ext
@@ -688,8 +689,8 @@ pub async fn install_from_vsix(app: AppHandle, vsix_path: String) -> Result<Exte
 
     // Install the extension
     let extension = {
-        let state = app.state::<ExtensionsState>();
-        let mut manager = state.0.lock();
+        let state = app.state::<LazyState<ExtensionsState>>();
+        let mut manager = state.get().0.lock();
         let mut ext = manager.install_extension(&ext_root)?;
         ext.source = ExtensionSource::Marketplace;
         ext

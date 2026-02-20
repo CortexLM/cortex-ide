@@ -11,12 +11,13 @@ use tokio::sync::{RwLock, mpsc};
 use super::super::{DebugSession, DebugSessionConfig, DebugSessionEvent, DebugSessionState};
 use super::state::DebuggerState;
 use super::types::DebugSessionInfo;
+use crate::LazyState;
 
 /// Start a new debug session
 #[tauri::command]
 pub async fn debug_start_session(
     app: AppHandle,
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     config: DebugSessionConfig,
 ) -> Result<DebugSessionInfo, String> {
     let session_id = config.id.clone();
@@ -27,7 +28,7 @@ pub async fn debug_start_session(
     let (event_tx, mut event_rx) = mpsc::unbounded_channel::<DebugSessionEvent>();
 
     // Store event sender
-    *state.event_tx.write().await = Some(event_tx.clone());
+    *state.get().event_tx.write().await = Some(event_tx.clone());
 
     // Forward events to frontend
     let app_clone = app.clone();
@@ -56,6 +57,7 @@ pub async fn debug_start_session(
 
     // Store the session
     state
+        .get()
         .sessions
         .write()
         .await
@@ -79,11 +81,11 @@ pub async fn debug_start_session(
 /// Stop a debug session
 #[tauri::command]
 pub async fn debug_stop_session(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     terminate_debuggee: bool,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -98,7 +100,7 @@ pub async fn debug_stop_session(
     drop(sessions);
 
     // Remove the session
-    state.sessions.write().await.remove(&session_id);
+    state.get().sessions.write().await.remove(&session_id);
 
     Ok(())
 }
@@ -106,9 +108,9 @@ pub async fn debug_stop_session(
 /// Get all active debug sessions
 #[tauri::command]
 pub async fn debug_get_sessions(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
 ) -> Result<Vec<DebugSessionInfo>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let mut result = Vec::new();
 
     for (id, session) in sessions.iter() {
@@ -127,10 +129,10 @@ pub async fn debug_get_sessions(
 /// Get session state
 #[tauri::command]
 pub async fn debug_get_session_state(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<DebugSessionState, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -142,10 +144,10 @@ pub async fn debug_get_session_state(
 /// Get adapter capabilities for a debug session
 #[tauri::command]
 pub async fn debug_get_capabilities(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<serde_json::Value, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -160,10 +162,10 @@ pub async fn debug_get_capabilities(
 /// Terminate a debug session (alias for stop with terminate_debuggee=true)
 #[tauri::command]
 pub async fn debug_terminate(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -178,7 +180,7 @@ pub async fn debug_terminate(
     drop(sessions);
 
     // Remove the session
-    state.sessions.write().await.remove(&session_id);
+    state.get().sessions.write().await.remove(&session_id);
 
     Ok(())
 }
@@ -186,10 +188,10 @@ pub async fn debug_terminate(
 /// Disconnect from a debug session without terminating the debuggee
 #[tauri::command]
 pub async fn debug_disconnect(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -204,7 +206,7 @@ pub async fn debug_disconnect(
     drop(sessions);
 
     // Remove the session
-    state.sessions.write().await.remove(&session_id);
+    state.get().sessions.write().await.remove(&session_id);
 
     Ok(())
 }

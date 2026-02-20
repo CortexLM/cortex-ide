@@ -26,6 +26,7 @@ use tauri_plugin_shell::process::CommandChild;
 use tokio::sync::mpsc;
 use tracing::{info, warn};
 
+use crate::LazyState;
 use crate::activity::ActivityState;
 use crate::ai::{AIState, AIToolsState, AgentState, AgentStoreState};
 use crate::auto_update::AutoUpdateState;
@@ -399,21 +400,21 @@ pub fn register_state(
         .manage(ServerState(Arc::new(Mutex::new(None))))
         .manage(LogState(Arc::new(Mutex::new(VecDeque::new()))))
         .manage(PortState(Arc::new(Mutex::new(0))))
-        .manage(ExtensionsState(Arc::new(parking_lot::Mutex::new(
-            ExtensionsManager::new(),
-        ))))
+        .manage(LazyState::new(|| {
+            ExtensionsState(Arc::new(parking_lot::Mutex::new(ExtensionsManager::new())))
+        }))
         .manage(crate::extensions::marketplace::MarketplaceState::new())
         .manage(NodeHostState::new())
         .manage(remote_manager)
         .manage(LspState::new())
         .manage(crate::diagnostics::DiagnosticsState::new())
         .manage(REPLState(Arc::new(Mutex::new(None))))
-        .manage(DebuggerState::new())
+        .manage(LazyState::new(DebuggerState::new))
         .manage(crate::dap::commands::WatchState::new())
         .manage(ToolchainState::new())
         .manage(Arc::new(AutoUpdateState::new()))
         .manage(Arc::new(crate::system_specs::LiveMetricsState::new()))
-        .manage(ContextServerState::new())
+        .manage(LazyState::new(ContextServerState::new))
         .manage(Arc::new(ActivityState::new()))
         .manage(Arc::new(TimelineState::new()))
         .manage(Arc::new(crate::action_log::ActionLogState::new()))
@@ -439,8 +440,8 @@ pub fn register_state(
         .manage(crate::wsl::WSLState::new())
         .manage(crate::ssh_terminal::SSHTerminalState::new())
         .manage(crate::rules_library::RulesWatcherState::new())
-        .manage(crate::testing::TestWatcherState::new())
-        .manage(crate::factory::FactoryState::new())
+        .manage(LazyState::new(crate::testing::TestWatcherState::new))
+        .manage(LazyState::new(crate::factory::FactoryState::new))
         .manage(crate::extensions::activation::ActivationState::new())
         .manage(crate::extensions::registry::RegistryState::new())
         .manage(crate::extensions::permissions::PermissionsState(
@@ -454,10 +455,10 @@ pub fn register_state(
         .manage(crate::extensions::api::scm::ScmApiState::new())
         .manage(crate::workspace::manager::WorkspaceManagerState::new())
         .manage(crate::remote::port_forwarding::PortForwardingState::new())
-        .manage(SandboxState::new())
+        .manage(LazyState::new(SandboxState::new))
         .manage(crate::remote::tunnel::TunnelState::new())
         .manage(crate::git::forge::ForgeState::new())
-        .manage(CollabState::new())
+        .manage(LazyState::new(CollabState::new))
 }
 
 // ===== Setup =====
@@ -683,16 +684,16 @@ pub fn handle_run_event(app: &AppHandle, event: RunEvent) {
             let _ = lsp_state.stop_all_servers();
             info!("All LSP servers stopped on app exit");
 
-            let debugger_state = app.state::<DebuggerState>();
-            debugger_state.stop_all_sessions();
+            let debugger_state = app.state::<LazyState<DebuggerState>>();
+            debugger_state.get().stop_all_sessions();
             info!("All debugger sessions stopped on app exit");
 
-            let context_server_state = app.state::<ContextServerState>();
-            context_server_state.disconnect_all();
+            let context_server_state = app.state::<LazyState<ContextServerState>>();
+            context_server_state.get().disconnect_all();
             info!("All context servers disconnected on app exit");
 
-            let test_watcher_state = app.state::<crate::testing::TestWatcherState>();
-            let _ = test_watcher_state.stop_all();
+            let test_watcher_state = app.state::<LazyState<crate::testing::TestWatcherState>>();
+            let _ = test_watcher_state.get().stop_all();
             info!("All test watchers stopped on app exit");
 
             {
@@ -728,8 +729,8 @@ pub fn handle_run_event(app: &AppHandle, event: RunEvent) {
             }
 
             {
-                let ext_state = app.state::<ExtensionsState>();
-                let manager = ext_state.0.lock();
+                let ext_state = app.state::<LazyState<ExtensionsState>>();
+                let manager = ext_state.get().0.lock();
                 manager.wasm_runtime.unload_all();
                 info!("WASM extension runtime stopped on app exit");
             }

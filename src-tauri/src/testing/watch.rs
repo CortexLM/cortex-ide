@@ -8,6 +8,8 @@ use tauri::{AppHandle, Emitter, Manager};
 use tokio::sync::mpsc;
 use uuid::Uuid;
 
+use crate::LazyState;
+
 /// State for managing test watchers
 pub struct TestWatcherState {
     watchers: Mutex<HashMap<String, WatcherHandle>>,
@@ -61,11 +63,12 @@ pub async fn testing_watch(
     let (shutdown_tx, mut shutdown_rx) = mpsc::channel::<()>(1);
 
     // Get the watcher state
-    let watcher_state = app.try_state::<TestWatcherState>();
+    let watcher_state = app.try_state::<LazyState<TestWatcherState>>();
 
     // Store watcher handle
     if let Some(state) = watcher_state {
         let mut watchers = state
+            .get()
             .watchers
             .lock()
             .map_err(|e| format!("Lock error: {}", e))?;
@@ -233,10 +236,11 @@ pub async fn testing_watch(
 #[tauri::command]
 pub fn testing_stop_watch(watcher_id: String, app: AppHandle) -> Result<(), String> {
     let watcher_state = app
-        .try_state::<TestWatcherState>()
+        .try_state::<LazyState<TestWatcherState>>()
         .ok_or("TestWatcherState not available")?;
 
     let mut watchers = watcher_state
+        .get()
         .watchers
         .lock()
         .map_err(|e| format!("Lock error: {}", e))?;
@@ -254,10 +258,11 @@ pub fn testing_stop_watch(watcher_id: String, app: AppHandle) -> Result<(), Stri
 #[tauri::command]
 pub fn testing_stop_all_watchers(app: AppHandle) -> Result<u32, String> {
     let watcher_state = app
-        .try_state::<TestWatcherState>()
+        .try_state::<LazyState<TestWatcherState>>()
         .ok_or("TestWatcherState not available")?;
 
     let mut watchers = watcher_state
+        .get()
         .watchers
         .lock()
         .map_err(|e| format!("Lock error: {}", e))?;

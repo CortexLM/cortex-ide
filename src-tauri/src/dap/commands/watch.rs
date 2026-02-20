@@ -10,6 +10,7 @@ use tauri::State;
 use tracing::info;
 
 use super::state::DebuggerState;
+use crate::LazyState;
 
 /// A watch expression entry
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -127,7 +128,7 @@ pub async fn debug_get_watches(
 #[tauri::command]
 pub async fn debug_evaluate_watches(
     watch_state: State<'_, WatchState>,
-    debug_state: State<'_, DebuggerState>,
+    debug_state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<Vec<WatchExpression>, String> {
     let expressions: Vec<WatchExpression> = watch_state.expressions.lock().clone();
@@ -136,7 +137,7 @@ pub async fn debug_evaluate_watches(
         return Ok(vec![]);
     }
 
-    let sessions = debug_state.sessions.read().await;
+    let sessions = debug_state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;

@@ -8,16 +8,17 @@ use tracing::info;
 
 use super::CollabState;
 use super::types::{CollabSessionInfo, CursorPosition};
+use crate::LazyState;
 
 /// Create a new collaboration session and start the WebSocket server
 #[tauri::command]
 pub async fn collab_create_session(
     app: AppHandle,
-    state: State<'_, CollabState>,
+    state: State<'_, LazyState<CollabState>>,
     name: String,
     user_name: String,
 ) -> Result<CollabSessionInfo, String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     // Start the WebSocket server if not already running
     let port = manager.ensure_server_running(app.clone()).await?;
@@ -45,11 +46,11 @@ pub async fn collab_create_session(
 #[tauri::command]
 pub async fn collab_join_session(
     app: AppHandle,
-    state: State<'_, CollabState>,
+    state: State<'_, LazyState<CollabState>>,
     session_id: String,
     user_name: String,
 ) -> Result<CollabSessionInfo, String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     // Ensure server is running
     manager.ensure_server_running(app.clone()).await?;
@@ -75,11 +76,11 @@ pub async fn collab_join_session(
 #[tauri::command]
 pub async fn collab_leave_session(
     app: AppHandle,
-    state: State<'_, CollabState>,
+    state: State<'_, LazyState<CollabState>>,
     session_id: String,
     user_id: String,
 ) -> Result<(), String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     let session_removed = manager
         .session_manager
@@ -106,14 +107,14 @@ pub async fn collab_leave_session(
 /// Broadcast cursor position to all peers in a session
 #[tauri::command]
 pub async fn collab_broadcast_cursor(
-    state: State<'_, CollabState>,
+    state: State<'_, LazyState<CollabState>>,
     session_id: String,
     user_id: String,
     file_id: String,
     line: u32,
     column: u32,
 ) -> Result<(), String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -137,12 +138,12 @@ pub async fn collab_broadcast_cursor(
 /// Sync a document update via the CRDT engine
 #[tauri::command]
 pub async fn collab_sync_document(
-    state: State<'_, CollabState>,
+    state: State<'_, LazyState<CollabState>>,
     session_id: String,
     file_id: String,
     update: Vec<u8>,
 ) -> Result<Vec<u8>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
 
     let doc_store = manager
         .session_manager

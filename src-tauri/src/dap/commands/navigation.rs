@@ -7,15 +7,16 @@ use tauri::State;
 
 use super::super::protocol::{GotoTarget, StepInTarget};
 use super::state::DebuggerState;
+use crate::LazyState;
 
 /// Restart execution from a specific stack frame
 #[tauri::command]
 pub async fn debug_restart_frame(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     frame_id: i64,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -29,13 +30,13 @@ pub async fn debug_restart_frame(
 /// Get possible goto targets for a source location
 #[tauri::command]
 pub async fn debug_goto_targets(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     source_path: String,
     line: i64,
     column: Option<i64>,
 ) -> Result<Vec<GotoTarget>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -49,12 +50,12 @@ pub async fn debug_goto_targets(
 /// Jump to a specific goto target
 #[tauri::command]
 pub async fn debug_goto(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     thread_id: i64,
     target_id: i64,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -68,11 +69,11 @@ pub async fn debug_goto(
 /// Get possible step-in targets for the current position
 #[tauri::command]
 pub async fn debug_step_in_targets(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     frame_id: i64,
 ) -> Result<Vec<StepInTarget>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -86,12 +87,12 @@ pub async fn debug_step_in_targets(
 /// Step into a specific target (when multiple step-in targets exist)
 #[tauri::command]
 pub async fn debug_step_in_target(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     thread_id: i64,
     target_id: i64,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -106,12 +107,12 @@ pub async fn debug_step_in_target(
 /// This is an alias for debug_step_in_target for API compatibility
 #[tauri::command]
 pub async fn debug_step_into_target(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     thread_id: i64,
     target_id: i64,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
