@@ -565,10 +565,13 @@ interface LSPState {
   languageStatus: Record<string, LanguageStatusItem[]>;
   loading: boolean;
   error: string | null;
+  initialized: boolean;
 }
 
 interface LSPContextValue {
   state: LSPState;
+  // Lazy initialization - call when first file is opened
+  lazyInit: () => void;
   // Server management
   startServer: (config: LanguageServerConfig) => Promise<ServerInfo>;
   stopServer: (serverId: string) => Promise<void>;
@@ -699,21 +702,19 @@ export function LSPProvider(props: ParentProps) {
     languageStatus: {},
     loading: false,
     error: null,
+    initialized: false,
   });
 
   let unlistenDiagnostics: UnlistenFn | undefined;
+  let listenersInitialized = false;
 
-  // Register cleanup synchronously
-  onCleanup(() => {
-    unlistenDiagnostics?.();
-    // Stop all servers on cleanup
-    stopAllServers().catch(console.error);
-  });
+  // Lazy initialization - sets up event listeners on first file open
+  // Idempotent: safe to call multiple times
+  const lazyInit = () => {
+    if (listenersInitialized) return;
+    listenersInitialized = true;
 
-  onMount(() => {
-    // DEFERRED - Set up LSP diagnostics listener after first paint
-    // LSP diagnostics won't fire until a language server is started and files are opened
-    const initDeferredListeners = async () => {
+    const initListeners = async () => {
       // Listen for diagnostics events from the backend
       unlistenDiagnostics = await listen<{
         server_id: string;
@@ -731,7 +732,7 @@ export function LSPProvider(props: ParentProps) {
         }>;
       }>("lsp:diagnostics", (event) => {
         const { uri, diagnostics } = event.payload;
-        
+
         const mapped: Diagnostic[] = diagnostics.map((d) => ({
           range: d.range,
           severity: mapSeverity(d.severity),
@@ -746,13 +747,26 @@ export function LSPProvider(props: ParentProps) {
 
         setState("diagnostics", uri, { uri, diagnostics: mapped });
       });
+
+      setState("initialized", true);
     };
 
-    // Use requestIdleCallback if available, otherwise setTimeout
+    initListeners().catch(console.error);
+  };
+
+  // Register cleanup synchronously
+  onCleanup(() => {
+    unlistenDiagnostics?.();
+    // Stop all servers on cleanup
+    stopAllServers().catch(console.error);
+  });
+
+  // Deferred fallback: set up listeners during idle time even if no file is opened
+  onMount(() => {
     if ('requestIdleCallback' in window) {
-      (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback(initDeferredListeners, { timeout: 2000 });
+      (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback(() => lazyInit(), { timeout: 2000 });
     } else {
-      setTimeout(initDeferredListeners, 100);
+      setTimeout(() => lazyInit(), 100);
     }
   });
 
@@ -767,6 +781,8 @@ export function LSPProvider(props: ParentProps) {
   };
 
   const startServer = async (config: LanguageServerConfig): Promise<ServerInfo> => {
+    // Ensure event listeners are set up before starting any server
+    lazyInit();
     setState("loading", true);
     setState("error", null);
 
@@ -1829,6 +1845,7 @@ export function LSPProvider(props: ParentProps) {
     <LSPContext.Provider
       value={{
         state,
+        lazyInit,
         startServer,
         stopServer,
         stopAllServers,

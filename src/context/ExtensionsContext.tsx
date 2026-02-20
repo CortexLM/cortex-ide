@@ -244,6 +244,7 @@ export interface ExtensionsContextValue {
   loading: Accessor<boolean>;
   error: Accessor<string | null>;
   extensionsDir: Accessor<string>;
+  initialized: Accessor<boolean>;
 
   // Update State
   outdatedExtensions: Accessor<Map<string, ExtensionUpdateInfo>>;
@@ -418,6 +419,7 @@ export function ExtensionsProvider(props: ParentProps) {
   const [loading, setLoading] = createSignal(false);
   const [error, setError] = createSignal<string | null>(null);
   const [extensionsDir, setExtensionsDir] = createSignal("");
+  const [initialized, setInitialized] = createSignal(false);
 
   // Update state using store for reactive nested updates
   const [updateState, setUpdateState] = createStore<ExtensionUpdateState>({
@@ -488,25 +490,17 @@ export function ExtensionsProvider(props: ParentProps) {
     stopWorkerHost();
   });
 
-  // Load extensions directory path on mount
-  onMount(async () => {
-    try {
-      const dir = await invoke<string>("get_extensions_directory");
-      setExtensionsDir(dir);
-    } catch (e) {
-      console.error("Failed to get extensions directory:", e);
-    }
-  });
-
   // Load all extensions
   const loadExtensions = async () => {
     setLoading(true);
     setError(null);
     try {
       const loaded = await invoke<Extension[]>("load_extensions");
-      setExtensions(loaded);
-      const enabled = loaded.filter((ext) => ext.enabled);
-      setEnabledExtensions(enabled);
+      batch(() => {
+        setExtensions(loaded);
+        const enabled = loaded.filter((ext) => ext.enabled);
+        setEnabledExtensions(enabled);
+      });
       // Also refresh themes when extensions are loaded
       await refreshThemes();
     } catch (e) {
@@ -1502,7 +1496,16 @@ export function ExtensionsProvider(props: ParentProps) {
     // Use requestIdleCallback to defer extension loading until browser is idle
     // This prevents blocking the main thread during startup
     const loadExtensionsDeferred = async () => {
+      // Load extensions directory path (deferred from mount for startup perf)
+      try {
+        const dir = await invoke<string>("get_extensions_directory");
+        setExtensionsDir(dir);
+      } catch (e) {
+        console.error("Failed to get extensions directory:", e);
+      }
+
       await loadExtensions();
+      setInitialized(true);
 
       // Setup event listener for update-related events
       try {
@@ -1566,6 +1569,7 @@ export function ExtensionsProvider(props: ParentProps) {
     loading,
     error,
     extensionsDir,
+    initialized,
 
     // Update state
     outdatedExtensions,
