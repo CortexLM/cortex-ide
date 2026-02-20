@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
 
 vi.mock("@tauri-apps/api/core", () => ({
   invoke: vi.fn(),
@@ -353,40 +352,6 @@ describe("AIContext", () => {
 
       await expect(invoke("ai_send_message", { threadId: "thread-1", content: "test" }))
         .rejects.toThrow("API rate limit exceeded");
-    });
-  });
-
-  describe("Streaming Events", () => {
-    it("should listen for stream chunk event", async () => {
-      vi.mocked(listen).mockResolvedValueOnce(() => {});
-
-      await listen("ai:stream_chunk", () => {});
-
-      expect(listen).toHaveBeenCalledWith("ai:stream_chunk", expect.any(Function));
-    });
-
-    it("should listen for tool call event", async () => {
-      vi.mocked(listen).mockResolvedValueOnce(() => {});
-
-      await listen("ai:tool_call", () => {});
-
-      expect(listen).toHaveBeenCalledWith("ai:tool_call", expect.any(Function));
-    });
-
-    it("should listen for tool result event", async () => {
-      vi.mocked(listen).mockResolvedValueOnce(() => {});
-
-      await listen("ai:tool_result", () => {});
-
-      expect(listen).toHaveBeenCalledWith("ai:tool_result", expect.any(Function));
-    });
-
-    it("should listen for stream error event", async () => {
-      vi.mocked(listen).mockResolvedValueOnce(() => {});
-
-      await listen("ai:error", () => {});
-
-      expect(listen).toHaveBeenCalledWith("ai:error", expect.any(Function));
     });
   });
 

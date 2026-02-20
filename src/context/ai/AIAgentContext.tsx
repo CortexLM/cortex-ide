@@ -22,12 +22,7 @@ import { createStore, produce } from "solid-js/store";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 
-import type { SubAgent, SubAgentStatus } from "../../types";
-
-interface AgentStatusEvent {
-  agentId: string;
-  status: SubAgentStatus;
-}
+import type { SubAgent } from "../../types";
 
 interface IndexProgressEvent {
   totalFiles: number;
@@ -116,20 +111,6 @@ export function AIAgentProvider(props: ParentProps) {
 
   const setupEventListeners = async () => {
     try {
-      const unlistenAgentStatus = await listen<AgentStatusEvent>("ai:agent_status", (event) => {
-        const { agentId, status } = event.payload;
-
-        setState(
-          produce((s) => {
-            const agent = s.agents.find((a) => a.id === agentId);
-            if (agent) {
-              agent.status = status;
-            }
-          })
-        );
-      });
-      unlistenFns.push(unlistenAgentStatus);
-
       const unlistenIndexProgress = await listen<IndexProgressEvent>(
         "ai:index_progress",
         (event) => {

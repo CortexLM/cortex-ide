@@ -213,28 +213,6 @@ export function InlineAssistant(props: InlineAssistantProps) {
         }
       });
 
-      // Also listen for the generic stream event as fallback
-      const genericUnlisten = await listen<StreamChunk>("ai:stream_chunk", (event) => {
-        const chunk = event.payload;
-        fullContent += chunk.content;
-        setStreamingContent(fullContent);
-        
-        if (chunk.done) {
-          setIsProcessing(false);
-          let cleanedContent = fullContent.trim();
-          if (cleanedContent.startsWith("```")) {
-            const lines = cleanedContent.split("\n");
-            lines.shift();
-            if (lines[lines.length - 1]?.trim() === "```") {
-              lines.pop();
-            }
-            cleanedContent = lines.join("\n");
-          }
-          setPreview(cleanedContent);
-          setStreamingContent("");
-        }
-      });
-
       // Prepare messages for the AI
       const messages = [
         {
@@ -261,7 +239,6 @@ export function InlineAssistant(props: InlineAssistantProps) {
 
       // Cleanup listeners
       streamUnlisten?.();
-      genericUnlisten();
       streamUnlisten = null;
     } catch (err) {
       console.error("Inline assist failed:", err);

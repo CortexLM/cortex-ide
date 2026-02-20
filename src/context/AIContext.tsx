@@ -22,7 +22,6 @@ import {
 } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { invoke } from "@tauri-apps/api/core";
-import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { aiLogger } from "../utils/logger";
 
 // Re-export sub-contexts for granular access
@@ -79,37 +78,6 @@ export type {
   MessageContext,
 };
 
-interface StreamChunkEvent {
-  threadId: string;
-  content: string;
-  done: boolean;
-}
-
-interface ToolCallEvent {
-  threadId: string;
-  callId: string;
-  name: string;
-  arguments: Record<string, unknown>;
-}
-
-interface ToolResultEvent {
-  threadId: string;
-  callId: string;
-  output: string;
-  success: boolean;
-  durationMs?: number;
-}
-
-interface AgentStatusEvent {
-  agentId: string;
-  status: "idle" | "running" | "completed" | "failed";
-}
-
-interface ErrorEvent {
-  code: string;
-  message: string;
-}
-
 export interface AIContextValue {
   models: Accessor<AIModel[]>;
   selectedModel: Accessor<string>;
@@ -161,8 +129,6 @@ export function AIProvider(props: ParentProps) {
     streamingContent: "",
     currentStreamAbortController: null,
   });
-
-  const unlistenFns: UnlistenFn[] = [];
 
   let showToast: ((message: string, variant: "success" | "error" | "warning" | "info") => void) | null = null;
 
@@ -274,127 +240,6 @@ export function AIProvider(props: ParentProps) {
       setState("agents", agents);
     } catch (e) {
       console.error("[AIContext] Failed to fetch agents:", e);
-    }
-  };
-
-  const setupEventListeners = async () => {
-    try {
-      const unlistenStreamChunk = await listen<StreamChunkEvent>("ai:stream_chunk", (event) => {
-        const { threadId, content, done } = event.payload;
-
-        if (threadId !== state.activeThreadId) return;
-
-        if (done) {
-          batch(() => {
-            setState(
-              produce((s) => {
-                const thread = s.threads.find((t) => t.id === threadId);
-                if (thread && thread.messages.length > 0) {
-                  const lastMsg = thread.messages[thread.messages.length - 1];
-                  if (lastMsg.role === "assistant") {
-                    lastMsg.content = s.streamingContent;
-                  }
-                  thread.updatedAt = Date.now();
-                }
-              })
-            );
-            setState("isStreaming", false);
-            setState("streamingContent", "");
-            setState("currentStreamAbortController", null);
-          });
-        } else {
-          setState("streamingContent", (prev) => prev + content);
-        }
-      });
-      unlistenFns.push(unlistenStreamChunk);
-
-      const unlistenToolCall = await listen<ToolCallEvent>("ai:tool_call", (event) => {
-        const { threadId, callId, name, arguments: args } = event.payload;
-
-        setState(
-          produce((s) => {
-            const thread = s.threads.find((t) => t.id === threadId);
-            if (thread && thread.messages.length > 0) {
-              const lastMsg = thread.messages[thread.messages.length - 1];
-              if (lastMsg.role === "assistant") {
-                if (!lastMsg.toolCalls) {
-                  lastMsg.toolCalls = [];
-                }
-                lastMsg.toolCalls.push({
-                  id: callId,
-                  name,
-                  arguments: args,
-                  status: "running",
-                });
-              }
-            }
-          })
-        );
-      });
-      unlistenFns.push(unlistenToolCall);
-
-      const unlistenToolResult = await listen<ToolResultEvent>("ai:tool_result", (event) => {
-        const { threadId, callId, output, success, durationMs } = event.payload;
-
-        setState(
-          produce((s) => {
-            const thread = s.threads.find((t) => t.id === threadId);
-            if (thread) {
-              for (const msg of thread.messages) {
-                if (msg.toolCalls) {
-                  const toolCall = msg.toolCalls.find((tc) => tc.id === callId);
-                  if (toolCall) {
-                    toolCall.status = success ? "completed" : "failed";
-                  }
-                }
-                if (!msg.toolResults) {
-                  msg.toolResults = [];
-                }
-                const existingResult = msg.toolResults.find((tr) => tr.callId === callId);
-                if (!existingResult) {
-                  msg.toolResults.push({
-                    callId,
-                    output,
-                    success,
-                    durationMs,
-                  });
-                }
-              }
-            }
-          })
-        );
-      });
-      unlistenFns.push(unlistenToolResult);
-
-      const unlistenAgentStatus = await listen<AgentStatusEvent>("ai:agent_status", (event) => {
-        const { agentId, status } = event.payload;
-
-        setState(
-          produce((s) => {
-            const agent = s.agents.find((a) => a.id === agentId);
-            if (agent) {
-              agent.status = status;
-            }
-          })
-        );
-      });
-      unlistenFns.push(unlistenAgentStatus);
-
-      const unlistenError = await listen<ErrorEvent>("ai:error", (event) => {
-        const { message } = event.payload;
-        notifyError(message);
-
-        if (state.isStreaming) {
-          batch(() => {
-            setState("isStreaming", false);
-            setState("streamingContent", "");
-            setState("currentStreamAbortController", null);
-          });
-        }
-      });
-      unlistenFns.push(unlistenError);
-    } catch (e) {
-      console.error("[AIContext] Failed to setup event listeners:", e);
     }
   };
 
@@ -705,22 +550,15 @@ export function AIProvider(props: ParentProps) {
   onMount(async () => {
     loadFromStorage();
 
-    await setupEventListeners();
-
-    void _fetchModels;
-    void _fetchThreads;
-    void _fetchTools;
+    void _fetchModels();
+    void _fetchThreads();
+    void _fetchTools();
   });
 
   onCleanup(() => {
     if (state.isStreaming) {
       cancelStream();
     }
-
-    for (const unlisten of unlistenFns) {
-      unlisten();
-    }
-    unlistenFns.length = 0;
   });
 
   return <AIContext.Provider value={contextValue}>{props.children}</AIContext.Provider>;

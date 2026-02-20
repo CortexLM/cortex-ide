@@ -3,12 +3,9 @@ import {
   For,
   Show,
   createSignal,
-  onMount,
-  onCleanup,
   JSX,
 } from "solid-js";
 import { createStore, produce } from "solid-js/store";
-import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import { CortexButton } from "./primitives/CortexButton";
 import { CortexIcon } from "./primitives/CortexIcon";
@@ -31,16 +28,6 @@ interface DiffLine {
   lineNumber: number;
 }
 
-interface ToolResultPayload {
-  callId: string;
-  toolName: string;
-  output: string;
-  success: boolean;
-  filePath?: string;
-  oldContent?: string;
-  newContent?: string;
-}
-
 export interface CortexAIModificationsPanelProps {
   onReviewFile?: (filePath: string) => void;
   onClose?: () => void;
@@ -53,45 +40,6 @@ const DIFF_COLORS = {
   removed: { bg: "var(--cortex-diff-removed-bg)", prefix: "-", text: "var(--cortex-diff-removed-text)" },
   unchanged: { bg: "transparent", prefix: " ", text: "var(--cortex-text-primary)" },
 } as const;
-
-function computeDiff(oldText: string, newText: string): DiffLine[] {
-  const oldLines = oldText.split("\n");
-  const newLines = newText.split("\n");
-  const result: DiffLine[] = [];
-  let lineNum = 1;
-  let oi = 0;
-  let ni = 0;
-  while (oi < oldLines.length || ni < newLines.length) {
-    if (oi < oldLines.length && ni < newLines.length) {
-      if (oldLines[oi] === newLines[ni]) {
-        result.push({ type: "unchanged", content: newLines[ni], lineNumber: lineNum++ });
-        oi++; ni++;
-      } else {
-        let found = false;
-        for (let k = 1; k <= 5; k++) {
-          if (ni + k < newLines.length && oldLines[oi] === newLines[ni + k]) {
-            for (let j = 0; j < k; j++) result.push({ type: "added", content: newLines[ni + j], lineNumber: lineNum++ });
-            ni += k; found = true; break;
-          }
-          if (oi + k < oldLines.length && oldLines[oi + k] === newLines[ni]) {
-            for (let j = 0; j < k; j++) result.push({ type: "removed", content: oldLines[oi + j], lineNumber: lineNum++ });
-            oi += k; found = true; break;
-          }
-        }
-        if (!found) {
-          result.push({ type: "removed", content: oldLines[oi], lineNumber: lineNum++ });
-          result.push({ type: "added", content: newLines[ni], lineNumber: lineNum++ });
-          oi++; ni++;
-        }
-      }
-    } else if (oi < oldLines.length) {
-      result.push({ type: "removed", content: oldLines[oi++], lineNumber: lineNum++ });
-    } else {
-      result.push({ type: "added", content: newLines[ni++], lineNumber: lineNum++ });
-    }
-  }
-  return result;
-}
 
 const ModDiffLine: Component<{ line: DiffLine }> = (props) => {
   const c = () => DIFF_COLORS[props.line.type];
@@ -148,31 +96,6 @@ const FileSection: Component<{
 
 export const CortexAIModificationsPanel: Component<CortexAIModificationsPanelProps> = (props) => {
   const [modifications, setModifications] = createStore<FileModification[]>([]);
-  let unlistenFn: UnlistenFn | null = null;
-
-  onMount(async () => {
-    try {
-      unlistenFn = await listen<ToolResultPayload>("ai:tool_result", (event) => {
-        const { callId, toolName, filePath, oldContent, newContent, success } = event.payload;
-        if (!success || !filePath || !toolName.includes("write")) return;
-        const old = oldContent || "";
-        const next = newContent || "";
-        const diffLines = computeDiff(old, next);
-        const additions = diffLines.filter((l) => l.type === "added").length;
-        const deletions = diffLines.filter((l) => l.type === "removed").length;
-        setModifications(produce((mods) => {
-          const existing = mods.findIndex((m) => m.filePath === filePath);
-          const mod: FileModification = { id: callId, filePath, description: `Modified ${filePath}`, additions, deletions, diffLines, status: "pending", newContent: next, oldContent: old };
-          if (existing >= 0) mods[existing] = mod;
-          else mods.push(mod);
-        }));
-      });
-    } catch {
-      // Not in Tauri context
-    }
-  });
-
-  onCleanup(() => { unlistenFn?.(); });
 
   const pendingCount = () => modifications.filter((m) => m.status === "pending").length;
   const editedCount = () => modifications.length;
