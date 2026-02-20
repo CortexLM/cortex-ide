@@ -1,0 +1,49 @@
+/* =============================================================================
+   COMPONENTS (CONSOLIDATED) - Orion IDE Design System
+   =============================================================================
+   Consolidated from: forms.css, modal.css, menu.css, tabs.css, quickinput.css, notifications.css
+   
+   This file imports all UI component styles. Each component retains its
+   original file for maintainability, and this file serves as the single
+   import point.
+   
+   Contents:
+   - Forms (inputs, selects, checkboxes, toggles, radio buttons)
+   - Modal/Dialog
+   - Menu (context menus, menubar)
+   - Tabs (editor tabs)
+   - Quick Input (command palette)
+   - Notifications (toasts, notification center)
+   
+   Dependencies: design-tokens.css, base.css
+   ============================================================================= */
+
+/* =============================================================================
+   FORMS - Import
+   ============================================================================= */
+@import './forms.css';
+
+/* =============================================================================
+   MODAL/DIALOG - Import
+   ============================================================================= */
+@import './modal.css';
+
+/* =============================================================================
+   MENU - Import
+   ============================================================================= */
+@import './menu.css';
+
+/* =============================================================================
+   TABS - Import
+   ============================================================================= */
+@import './tabs.css';
+
+/* =============================================================================
+   QUICK INPUT - Import
+   ============================================================================= */
+@import './quickinput.css';
+
+/* =============================================================================
+   NOTIFICATIONS - Import
+   ============================================================================= */
+@import './notifications.css';

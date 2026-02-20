@@ -1,0 +1,601 @@
+/* ============================================================================
+   CORTEX DESKTOP - CODICONS SYSTEM
+   Based on VS Code Codicons System Analysis
+   ============================================================================ */
+
+/* ============================================================================
+   1. CODICON FONT FACE
+   ============================================================================ */
+
+/*
+ * Note: In a production implementation, you would include the actual codicon.ttf font file.
+ * For now, we use a fallback font stack that includes system symbol fonts.
+ * To use actual codicons, download the font from VS Code and update the URL below.
+ * 
+ * @font-face {
+ *     font-family: "codicon";
+ *     font-display: block;
+ *     src: url("./fonts/codicon.ttf") format("truetype");
+ * }
+ */
+
+/* ============================================================================
+   2. BASE CODICON STYLING
+   - Font: 16px/1 (base size, line-height)
+   - Display: inline-block
+   - Text rendering: optimized for icons
+   - User select: none (prevent accidental selection)
+   ============================================================================ */
+
+.codicon[class*='codicon-'] {
+  font: normal normal normal 16px/1 codicon, "Segoe Fluent Icons", "Segoe MDL2 Assets", system-ui;
+  display: inline-block;
+  text-decoration: none;
+  text-rendering: auto;
+  text-align: center;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ============================================================================
+   3. CODICON ANIMATIONS
+   - Spin animation: steps(30) at 1.5s duration (CPU-efficient throttled FPS)
+   ============================================================================ */
+
+@keyframes codicon-spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Spin modifier - Applied via icon~spin syntax */
+.codicon-sync.codicon-modifier-spin,
+.codicon-loading.codicon-modifier-spin,
+.codicon-gear.codicon-modifier-spin,
+.codicon-notebook-state-executing.codicon-modifier-spin {
+  animation: codicon-spin 1.5s steps(30) infinite;
+}
+
+/* Default spinning icons (always animate) */
+.codicon-loading,
+.codicon-tree-item-loading::before {
+  animation: codicon-spin 1.5s steps(30) infinite;
+}
+
+/* ============================================================================
+   4. CODICON MODIFIERS
+   - Disabled state: 0.4 opacity
+   - Wrench subaction: 0.5 opacity
+   ============================================================================ */
+
+.codicon-modifier-disabled {
+  opacity: 0.4;
+}
+
+.codicon-wrench-subaction {
+  opacity: 0.5;
+}
+
+/* ============================================================================
+   5. ICON SIZING CONVENTIONS
+   - Base: 16px
+   - Icon Label ::before: 16px × 22px
+   - Icon Select Box Item: 36px × 36px
+   - Icon Select Box Icon: 20px font-size
+   - Action Bar Icon: 16px × 16px
+   ============================================================================ */
+
+/* Small icons */
+.codicon-sm {
+  font-size: 12px;
+}
+
+/* Base icons (default) */
+.codicon-md {
+  font-size: 16px;
+}
+
+/* Large icons */
+.codicon-lg {
+  font-size: 20px;
+}
+
+/* Extra large icons */
+.codicon-xl {
+  font-size: 24px;
+}
+
+/* Action bar icon size */
+.codicon-action {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+}
+
+/* ============================================================================
+   6. ICON COLORING & THEMING WITH CSS VARIABLES
+   ============================================================================ */
+
+:root {
+  /* ------------------------------------------------------------------
+     Severity Icon Colors (Problems Panel)
+     ------------------------------------------------------------------ */
+  --cortex-problemsErrorIcon-foreground: #ef7177;
+  --cortex-problemsWarningIcon-foreground: #feb454;
+  --cortex-problemsInfoIcon-foreground: #5ac1fe;
+  
+  /* ------------------------------------------------------------------
+     Symbol Icon Colors - Dark Theme (Default)
+     ------------------------------------------------------------------ */
+  --cortex-symbolIcon-arrayForeground: #bfbdb6;
+  --cortex-symbolIcon-booleanForeground: #75BEFF;
+  --cortex-symbolIcon-classForeground: #EE9D28;
+  --cortex-symbolIcon-colorForeground: #bfbdb6;
+  --cortex-symbolIcon-constantForeground: #bfbdb6;
+  --cortex-symbolIcon-constructorForeground: #B180D7;
+  --cortex-symbolIcon-enumeratorForeground: #EE9D28;
+  --cortex-symbolIcon-enumeratorMemberForeground: #75BEFF;
+  --cortex-symbolIcon-eventForeground: #EE9D28;
+  --cortex-symbolIcon-fieldForeground: #75BEFF;
+  --cortex-symbolIcon-fileForeground: #bfbdb6;
+  --cortex-symbolIcon-folderForeground: #bfbdb6;
+  --cortex-symbolIcon-functionForeground: #B180D7;
+  --cortex-symbolIcon-interfaceForeground: #75BEFF;
+  --cortex-symbolIcon-keyForeground: #bfbdb6;
+  --cortex-symbolIcon-keywordForeground: #bfbdb6;
+  --cortex-symbolIcon-methodForeground: #B180D7;
+  --cortex-symbolIcon-moduleForeground: #bfbdb6;
+  --cortex-symbolIcon-namespaceForeground: #bfbdb6;
+  --cortex-symbolIcon-nullForeground: #bfbdb6;
+  --cortex-symbolIcon-numberForeground: #bfbdb6;
+  --cortex-symbolIcon-objectForeground: #bfbdb6;
+  --cortex-symbolIcon-operatorForeground: #bfbdb6;
+  --cortex-symbolIcon-packageForeground: #bfbdb6;
+  --cortex-symbolIcon-propertyForeground: #bfbdb6;
+  --cortex-symbolIcon-referenceForeground: #bfbdb6;
+  --cortex-symbolIcon-snippetForeground: #bfbdb6;
+  --cortex-symbolIcon-stringForeground: #bfbdb6;
+  --cortex-symbolIcon-structForeground: #bfbdb6;
+  --cortex-symbolIcon-textForeground: #bfbdb6;
+  --cortex-symbolIcon-typeParameterForeground: #bfbdb6;
+  --cortex-symbolIcon-unitForeground: #bfbdb6;
+  --cortex-symbolIcon-variableForeground: #75BEFF;
+  
+  /* ------------------------------------------------------------------
+     Icon Interactive States
+     ------------------------------------------------------------------ */
+  --cortex-icon-quickInputList-focusBackground: rgba(255, 255, 255, 0.1);
+  --cortex-icon-quickInputList-focusForeground: #bfbdb6;
+  --cortex-icon-toolbar-hoverBackground: rgba(255, 255, 255, 0.06);
+  --cortex-icon-list-hoverForeground: #bfbdb6;
+}
+
+/* ============================================================================
+   7. SEVERITY ICONS
+   ============================================================================ */
+
+.severity-icon-error {
+  color: var(--cortex-problemsErrorIcon-foreground);
+}
+
+.severity-icon-warning {
+  color: var(--cortex-problemsWarningIcon-foreground);
+}
+
+.severity-icon-info {
+  color: var(--cortex-problemsInfoIcon-foreground);
+}
+
+.severity-icon-ignore {
+  color: var(--cortex-problemsInfoIcon-foreground);
+  opacity: 0.6;
+}
+
+/* ============================================================================
+   8. SYMBOL ICONS COLOR CODING
+   Symbol icons used in autocomplete, outline, breadcrumbs, etc.
+   ============================================================================ */
+
+.symbol-icon-array { color: var(--cortex-symbolIcon-arrayForeground); }
+.symbol-icon-boolean { color: var(--cortex-symbolIcon-booleanForeground); }
+.symbol-icon-class { color: var(--cortex-symbolIcon-classForeground); }
+.symbol-icon-color { color: var(--cortex-symbolIcon-colorForeground); }
+.symbol-icon-constant { color: var(--cortex-symbolIcon-constantForeground); }
+.symbol-icon-constructor { color: var(--cortex-symbolIcon-constructorForeground); }
+.symbol-icon-enum { color: var(--cortex-symbolIcon-enumeratorForeground); }
+.symbol-icon-enum-member { color: var(--cortex-symbolIcon-enumeratorMemberForeground); }
+.symbol-icon-event { color: var(--cortex-symbolIcon-eventForeground); }
+.symbol-icon-field { color: var(--cortex-symbolIcon-fieldForeground); }
+.symbol-icon-file { color: var(--cortex-symbolIcon-fileForeground); }
+.symbol-icon-folder { color: var(--cortex-symbolIcon-folderForeground); }
+.symbol-icon-function { color: var(--cortex-symbolIcon-functionForeground); }
+.symbol-icon-interface { color: var(--cortex-symbolIcon-interfaceForeground); }
+.symbol-icon-key { color: var(--cortex-symbolIcon-keyForeground); }
+.symbol-icon-keyword { color: var(--cortex-symbolIcon-keywordForeground); }
+.symbol-icon-method { color: var(--cortex-symbolIcon-methodForeground); }
+.symbol-icon-module { color: var(--cortex-symbolIcon-moduleForeground); }
+.symbol-icon-namespace { color: var(--cortex-symbolIcon-namespaceForeground); }
+.symbol-icon-null { color: var(--cortex-symbolIcon-nullForeground); }
+.symbol-icon-number { color: var(--cortex-symbolIcon-numberForeground); }
+.symbol-icon-object { color: var(--cortex-symbolIcon-objectForeground); }
+.symbol-icon-operator { color: var(--cortex-symbolIcon-operatorForeground); }
+.symbol-icon-package { color: var(--cortex-symbolIcon-packageForeground); }
+.symbol-icon-property { color: var(--cortex-symbolIcon-propertyForeground); }
+.symbol-icon-reference { color: var(--cortex-symbolIcon-referenceForeground); }
+.symbol-icon-snippet { color: var(--cortex-symbolIcon-snippetForeground); }
+.symbol-icon-string { color: var(--cortex-symbolIcon-stringForeground); }
+.symbol-icon-struct { color: var(--cortex-symbolIcon-structForeground); }
+.symbol-icon-text { color: var(--cortex-symbolIcon-textForeground); }
+.symbol-icon-type-parameter { color: var(--cortex-symbolIcon-typeParameterForeground); }
+.symbol-icon-unit { color: var(--cortex-symbolIcon-unitForeground); }
+.symbol-icon-variable { color: var(--cortex-symbolIcon-variableForeground); }
+
+/* ============================================================================
+   9. ICON LABEL COMPONENT
+   Combined icon + text rendering with support for:
+   - Icon path/ThemeIcon
+   - Multi-part labels with separators
+   - Description text
+   - Suffix text
+   - Typography modifiers (bold, italic, strikethrough)
+   ============================================================================ */
+
+.cortex-icon-label {
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cortex-icon-label::before {
+  background-size: 16px;
+  background-position: left center;
+  background-repeat: no-repeat;
+  padding-right: 6px;
+  width: 16px;
+  height: 22px;
+  line-height: inherit !important;
+  display: inline-block;
+  vertical-align: top;
+  flex-shrink: 0;
+}
+
+/* Icon path container (for URI/ThemeIcon) */
+.cortex-icon-label-iconpath {
+  width: 16px;
+  height: 22px;
+  margin-right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Main label container */
+.cortex-icon-label-container {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* Name container */
+.cortex-icon-name-container {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Label name */
+.label-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Label separator (for multi-part labels like "folder > file") */
+.label-separator {
+  margin: 0 2px;
+  opacity: 0.5;
+}
+
+/* Suffix container */
+.cortex-icon-suffix-container {
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+
+.label-suffix {
+  opacity: 0.7;
+  white-space: pre;
+}
+
+/* Description container */
+.cortex-icon-description-container {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.label-description {
+  opacity: 0.7;
+  margin-left: 0.5em;
+  font-size: 0.9em;
+  white-space: pre;
+}
+
+/* Light theme description opacity */
+.theme-light .label-description {
+  opacity: 0.95;
+}
+
+/* ============================================================================
+   10. ICON LABEL TYPOGRAPHY MODIFIERS
+   ============================================================================ */
+
+.cortex-icon-label.bold > .cortex-icon-label-container > .cortex-icon-name-container > .label-name {
+  font-weight: bold;
+}
+
+.cortex-icon-label.italic > .cortex-icon-label-container > .cortex-icon-name-container > .label-name {
+  font-style: italic;
+}
+
+.cortex-icon-label.strikethrough > .cortex-icon-label-container > .cortex-icon-name-container > .label-name {
+  text-decoration: line-through;
+}
+
+.cortex-icon-label.deprecated {
+  text-decoration: line-through;
+  opacity: 0.66;
+}
+
+/* Disabled state */
+.cortex-icon-label-container.disabled {
+  color: var(--cortex-text-disabled, #5c6773);
+}
+
+/* ============================================================================
+   11. ICON LABEL IN LISTS (Selection States)
+   ============================================================================ */
+
+.cortex-list:focus .selected .cortex-icon-label,
+.cortex-list:focus .selected .cortex-icon-label::after {
+  color: inherit !important;
+}
+
+.cortex-list-row.focused.selected .label-description,
+.cortex-list-row.selected .label-description {
+  opacity: 0.8;
+}
+
+/* ============================================================================
+   12. ICON SELECT BOX
+   Grid-based icon picker component
+   ============================================================================ */
+
+.icon-select-box {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--cortex-surface-base, #1f2127);
+  border: 1px solid var(--cortex-border-base, #3f4043);
+  border-radius: var(--cortex-radius-lg, 4px);
+}
+
+.icon-select-box-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Search input container */
+.icon-select-input-container {
+  padding: 8px;
+  border-bottom: 1px solid var(--cortex-border-subtle, #2d2f34);
+}
+
+/* Icons grid container (scrollable) */
+.icon-select-icons-container {
+  display: flex;
+  flex-wrap: wrap;
+  overflow-y: auto;
+  padding: 8px;
+  max-height: 240px;
+}
+
+/* Individual icon container */
+.icon-select-box .icon-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+/* Icon container hover state */
+.icon-select-box .icon-container:hover:not(.focused) {
+  background-color: var(--cortex-icon-toolbar-hoverBackground);
+  color: var(--cortex-icon-list-hoverForeground);
+}
+
+/* Icon container focused state */
+.icon-select-box .icon-container.focused {
+  background-color: var(--cortex-icon-quickInputList-focusBackground);
+  color: var(--cortex-icon-quickInputList-focusForeground);
+}
+
+/* Icon ID label container (optional) */
+.icon-select-id-container {
+  padding: 8px;
+  border-top: 1px solid var(--cortex-border-subtle, #2d2f34);
+}
+
+.icon-select-id-label {
+  font-size: 11px;
+  color: var(--cortex-text-muted, #696a6a);
+  font-family: var(--font-code, "SF Mono", monospace);
+}
+
+/* ============================================================================
+   13. ACTION BAR ICONS
+   Toolbar and action button icons
+   ============================================================================ */
+
+.action-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--cortex-radius-sm, 2px);
+  color: var(--cortex-text-muted, #696a6a);
+  transition: background-color 0.1s ease, color 0.1s ease;
+  cursor: pointer;
+}
+
+.action-icon:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--cortex-text-primary, #bfbdb6);
+}
+
+.action-icon:active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.action-icon.active {
+  color: var(--cortex-text-primary, #bfbdb6);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.action-icon:focus-visible {
+  outline: 1px solid var(--cortex-focus-color, #007FD4);
+  outline-offset: 1px;
+}
+
+/* ============================================================================
+   14. TREE ITEM ICONS
+   File explorer and tree view icons
+   ============================================================================ */
+
+.tree-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Chevron icons for expand/collapse */
+.tree-item-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: var(--cortex-text-muted, #696a6a);
+  transition: transform 0.15s ease;
+}
+
+.tree-item-chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.tree-item-chevron.hidden {
+  visibility: hidden;
+}
+
+/* Tree item loading spinner */
+.tree-item-loading .tree-item-icon {
+  animation: codicon-spin 1.5s steps(30) infinite;
+}
+
+/* ============================================================================
+   15. INLINE ICON RENDERING
+   Support for $(icon-name) syntax in text
+   ============================================================================ */
+
+.inline-codicon {
+  font: normal normal normal 16px/1 codicon, "Segoe Fluent Icons", "Segoe MDL2 Assets", system-ui;
+  display: inline;
+  text-decoration: none;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  vertical-align: text-bottom;
+}
+
+/* ============================================================================
+   16. COMMON CODICON ICONS (Character Codes)
+   Reference: These would be populated by the actual codicon font
+   For now, showing structure for common icons
+   ============================================================================ */
+
+/* UI Controls */
+.codicon-add::before { content: "\ea60"; }
+.codicon-close::before { content: "\ea76"; }
+.codicon-check::before { content: "\eab2"; }
+.codicon-menu::before { content: "\eb68"; }
+.codicon-more::before { content: "\eb78"; }
+.codicon-search::before { content: "\eb85"; }
+
+/* Chevrons */
+.codicon-chevron-down::before { content: "\ea99"; }
+.codicon-chevron-up::before { content: "\ea9d"; }
+.codicon-chevron-left::before { content: "\ea9a"; }
+.codicon-chevron-right::before { content: "\ea9c"; }
+
+/* Arrows */
+.codicon-arrow-up::before { content: "\ea78"; }
+.codicon-arrow-down::before { content: "\ea74"; }
+.codicon-arrow-left::before { content: "\ea75"; }
+.codicon-arrow-right::before { content: "\ea77"; }
+
+/* File System */
+.codicon-file::before { content: "\eb60"; }
+.codicon-folder::before { content: "\ea83"; }
+.codicon-folder-opened::before { content: "\eb0e"; }
+.codicon-new-file::before { content: "\eb4b"; }
+.codicon-new-folder::before { content: "\eb4c"; }
+
+/* Editor */
+.codicon-edit::before { content: "\ea73"; }
+.codicon-save::before { content: "\eb93"; }
+.codicon-trash::before { content: "\ea81"; }
+.codicon-copy::before { content: "\eb8c"; }
+
+/* Status */
+.codicon-error::before { content: "\eb87"; }
+.codicon-warning::before { content: "\ea6c"; }
+.codicon-info::before { content: "\ea74"; }
+.codicon-loading::before { content: "\eb39"; }
+.codicon-sync::before { content: "\eb32"; }
+
+/* Source Control */
+.codicon-git-commit::before { content: "\ea68"; }
+.codicon-git-branch::before { content: "\ea68"; }
+.codicon-source-control::before { content: "\ea68"; }
+
+/* Debug */
+.codicon-debug::before { content: "\eb44"; }
+.codicon-debug-start::before { content: "\eb91"; }
+.codicon-debug-stop::before { content: "\eb4e"; }
+
+/* Symbols */
+.codicon-symbol-class::before { content: "\eb5b"; }
+.codicon-symbol-method::before { content: "\eb5c"; }
+.codicon-symbol-function::before { content: "\eb5a"; }
+.codicon-symbol-variable::before { content: "\eb5e"; }
+.codicon-symbol-interface::before { content: "\eb61"; }
+.codicon-symbol-enum::before { content: "\eb5f"; }
+.codicon-symbol-file::before { content: "\eb60"; }

@@ -1,0 +1,980 @@
+/* ============================================================================
+   HIGH-FREQUENCY STREAMING ANIMATIONS
+   ============================================================================
+   
+   GPU-accelerated animations for 60+ FPS streaming updates.
+   Inspired by Zed's smooth animation approach.
+   
+   Features:
+   - Entry/exit animations for lists with stagger support
+   - Smooth cursor/caret animations
+   - GPU-accelerated transforms (translate3d, scale, opacity)
+   - Reduced motion support for accessibility
+   - CSS containment for layout optimization
+   - Reusable animation utilities
+   
+   Performance notes:
+   - All animations use transform/opacity for GPU acceleration
+   - will-change is used sparingly to avoid memory overhead
+   - contain: layout style paint is used for isolation
+   - Animations are designed to complete within 200-300ms
+   ============================================================================ */
+
+/* ==========================================================================
+   DESIGN TOKENS - Animation Variables
+   ========================================================================== */
+
+:root {
+  /* Duration tokens */
+  --anim-duration-instant: 50ms;
+  --anim-duration-fast: 100ms;
+  --anim-duration-normal: 200ms;
+  --anim-duration-slow: 300ms;
+  --anim-duration-slower: 400ms;
+  
+  /* Easing tokens */
+  --anim-ease-linear: linear;
+  --anim-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --anim-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --anim-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --anim-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --anim-ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Transform distance tokens */
+  --anim-slide-distance-sm: 8px;
+  --anim-slide-distance-md: 16px;
+  --anim-slide-distance-lg: 24px;
+  
+  /* Scale tokens */
+  --anim-scale-in: 0.95;
+  --anim-scale-out: 0.95;
+  --anim-scale-pop: 1.02;
+  
+  /* Stagger tokens */
+  --anim-stagger-delay: 30ms;
+  --anim-stagger-max: 300ms;
+  
+  /* Cursor animation tokens */
+  --cursor-blink-duration: 1060ms;
+  --cursor-color: var(--cortex-accent, #0078d4);
+  --cursor-width: 2px;
+  
+  /* Streaming text tokens */
+  --stream-highlight-color: rgba(0, 120, 212, 0.15);
+  --stream-highlight-duration: 500ms;
+}
+
+/* ==========================================================================
+   REDUCED MOTION SUPPORT
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --anim-duration-instant: 0ms;
+    --anim-duration-fast: 0ms;
+    --anim-duration-normal: 0ms;
+    --anim-duration-slow: 0ms;
+    --anim-duration-slower: 0ms;
+    --anim-stagger-delay: 0ms;
+    --anim-stagger-max: 0ms;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   BASE ANIMATION CLASSES
+   ========================================================================== */
+
+/* Animation base - apply to elements that will animate */
+.animated {
+  will-change: transform, opacity;
+  contain: layout style paint;
+}
+
+/* Remove will-change after animation completes */
+.animated:not(.animating) {
+  will-change: auto;
+}
+
+/* ==========================================================================
+   ENTRY ANIMATIONS - @keyframes
+   ========================================================================== */
+
+/* Fade in */
+@keyframes anim-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Fade in from top */
+@keyframes anim-slide-in-top {
+  from {
+    opacity: 0;
+    transform: translate3d(0, calc(-1 * var(--anim-slide-distance-md)), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Fade in from bottom */
+@keyframes anim-slide-in-bottom {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--anim-slide-distance-md), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Fade in from left */
+@keyframes anim-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translate3d(calc(-1 * var(--anim-slide-distance-md)), 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Fade in from right */
+@keyframes anim-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--anim-slide-distance-md), 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Scale in with fade */
+@keyframes anim-scale-in {
+  from {
+    opacity: 0;
+    transform: scale3d(var(--anim-scale-in), var(--anim-scale-in), 1);
+  }
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+/* Pop in with spring */
+@keyframes anim-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale3d(0.9, 0.9, 1);
+  }
+  70% {
+    opacity: 1;
+    transform: scale3d(var(--anim-scale-pop), var(--anim-scale-pop), 1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+/* Combined slide + scale */
+@keyframes anim-slide-scale-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--anim-slide-distance-sm), 0) scale3d(var(--anim-scale-in), var(--anim-scale-in), 1);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+/* ==========================================================================
+   EXIT ANIMATIONS - @keyframes
+   ========================================================================== */
+
+/* Fade out */
+@keyframes anim-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Fade out to top */
+@keyframes anim-slide-out-top {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, calc(-1 * var(--anim-slide-distance-md)), 0);
+  }
+}
+
+/* Fade out to bottom */
+@keyframes anim-slide-out-bottom {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, var(--anim-slide-distance-md), 0);
+  }
+}
+
+/* Scale out with fade */
+@keyframes anim-scale-out {
+  from {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+  to {
+    opacity: 0;
+    transform: scale3d(var(--anim-scale-out), var(--anim-scale-out), 1);
+  }
+}
+
+/* Combined slide + scale out */
+@keyframes anim-slide-scale-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, calc(-1 * var(--anim-slide-distance-sm)), 0) scale3d(var(--anim-scale-out), var(--anim-scale-out), 1);
+  }
+}
+
+/* ==========================================================================
+   ANIMATION UTILITY CLASSES
+   ========================================================================== */
+
+/* Entry animations */
+.animate-fade-in {
+  animation: anim-fade-in var(--anim-duration-normal) var(--anim-ease-out) forwards;
+}
+
+.animate-slide-in-top {
+  animation: anim-slide-in-top var(--anim-duration-normal) var(--anim-ease-out) forwards;
+}
+
+.animate-slide-in-bottom {
+  animation: anim-slide-in-bottom var(--anim-duration-normal) var(--anim-ease-out) forwards;
+}
+
+.animate-slide-in-left {
+  animation: anim-slide-in-left var(--anim-duration-normal) var(--anim-ease-out) forwards;
+}
+
+.animate-slide-in-right {
+  animation: anim-slide-in-right var(--anim-duration-normal) var(--anim-ease-out) forwards;
+}
+
+.animate-scale-in {
+  animation: anim-scale-in var(--anim-duration-normal) var(--anim-ease-out) forwards;
+}
+
+.animate-pop-in {
+  animation: anim-pop-in var(--anim-duration-slow) var(--anim-ease-spring) forwards;
+}
+
+.animate-slide-scale-in {
+  animation: anim-slide-scale-in var(--anim-duration-normal) var(--anim-ease-out) forwards;
+}
+
+/* Exit animations */
+.animate-fade-out {
+  animation: anim-fade-out var(--anim-duration-fast) var(--anim-ease-in) forwards;
+}
+
+.animate-slide-out-top {
+  animation: anim-slide-out-top var(--anim-duration-normal) var(--anim-ease-in) forwards;
+}
+
+.animate-slide-out-bottom {
+  animation: anim-slide-out-bottom var(--anim-duration-normal) var(--anim-ease-in) forwards;
+}
+
+.animate-scale-out {
+  animation: anim-scale-out var(--anim-duration-fast) var(--anim-ease-in) forwards;
+}
+
+.animate-slide-scale-out {
+  animation: anim-slide-scale-out var(--anim-duration-normal) var(--anim-ease-in) forwards;
+}
+
+/* ==========================================================================
+   ANIMATED LIST ITEM CLASSES
+   ========================================================================== */
+
+/* Base list item */
+.animated-list-item {
+  contain: layout style paint;
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  transition: 
+    transform var(--anim-duration-normal) var(--anim-ease-out),
+    opacity var(--anim-duration-normal) var(--anim-ease-out);
+}
+
+/* Entering state */
+.animated-list-item--entering {
+  opacity: 0;
+  transform: translate3d(0, var(--anim-slide-distance-md), 0) scale3d(var(--anim-scale-in), var(--anim-scale-in), 1);
+  transition: none;
+  will-change: transform, opacity;
+}
+
+/* Entered state */
+.animated-list-item--entered {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  will-change: auto;
+}
+
+/* Exiting state */
+.animated-list-item--exiting {
+  opacity: 0;
+  transform: translate3d(0, calc(-1 * var(--anim-slide-distance-md)), 0) scale3d(var(--anim-scale-out), var(--anim-scale-out), 1);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+/* Exited state */
+.animated-list-item--exited {
+  opacity: 0;
+  transform: translate3d(0, -100%, 0) scale3d(0, 0, 1);
+  height: 0;
+  overflow: hidden;
+  transition: none;
+  will-change: auto;
+}
+
+/* ==========================================================================
+   STAGGER DELAY UTILITIES
+   ========================================================================== */
+
+/* Generate stagger delay classes for items 1-20 */
+.stagger-delay-1 { transition-delay: calc(1 * var(--anim-stagger-delay)); }
+.stagger-delay-2 { transition-delay: calc(2 * var(--anim-stagger-delay)); }
+.stagger-delay-3 { transition-delay: calc(3 * var(--anim-stagger-delay)); }
+.stagger-delay-4 { transition-delay: calc(4 * var(--anim-stagger-delay)); }
+.stagger-delay-5 { transition-delay: calc(5 * var(--anim-stagger-delay)); }
+.stagger-delay-6 { transition-delay: calc(6 * var(--anim-stagger-delay)); }
+.stagger-delay-7 { transition-delay: calc(7 * var(--anim-stagger-delay)); }
+.stagger-delay-8 { transition-delay: calc(8 * var(--anim-stagger-delay)); }
+.stagger-delay-9 { transition-delay: calc(9 * var(--anim-stagger-delay)); }
+.stagger-delay-10 { transition-delay: calc(10 * var(--anim-stagger-delay)); }
+
+/* Animation delay variants */
+.anim-delay-1 { animation-delay: calc(1 * var(--anim-stagger-delay)); }
+.anim-delay-2 { animation-delay: calc(2 * var(--anim-stagger-delay)); }
+.anim-delay-3 { animation-delay: calc(3 * var(--anim-stagger-delay)); }
+.anim-delay-4 { animation-delay: calc(4 * var(--anim-stagger-delay)); }
+.anim-delay-5 { animation-delay: calc(5 * var(--anim-stagger-delay)); }
+.anim-delay-6 { animation-delay: calc(6 * var(--anim-stagger-delay)); }
+.anim-delay-7 { animation-delay: calc(7 * var(--anim-stagger-delay)); }
+.anim-delay-8 { animation-delay: calc(8 * var(--anim-stagger-delay)); }
+.anim-delay-9 { animation-delay: calc(9 * var(--anim-stagger-delay)); }
+.anim-delay-10 { animation-delay: calc(10 * var(--anim-stagger-delay)); }
+
+/* ==========================================================================
+   CURSOR ANIMATIONS
+   ========================================================================== */
+
+/* Blinking cursor keyframes */
+@keyframes cursor-blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+/* Smooth cursor blink (less jarring) */
+@keyframes cursor-blink-smooth {
+  0%, 45% {
+    opacity: 1;
+  }
+  50%, 95% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Cursor base styles */
+.streaming-cursor {
+  display: inline-block;
+  width: var(--cursor-width);
+  height: 1.2em;
+  background-color: var(--cursor-color);
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  animation: cursor-blink var(--cursor-blink-duration) step-end infinite;
+  will-change: opacity;
+}
+
+/* Smooth blink variant */
+.streaming-cursor--smooth {
+  animation: cursor-blink-smooth var(--cursor-blink-duration) ease-in-out infinite;
+}
+
+/* Cursor visible (no blink) */
+.streaming-cursor--visible {
+  animation: none;
+  opacity: 1;
+}
+
+/* Cursor hidden */
+.streaming-cursor--hidden {
+  animation: none;
+  opacity: 0;
+}
+
+/* Block cursor style */
+.streaming-cursor--block {
+  width: 0.6em;
+  background-color: var(--cursor-color);
+  opacity: 0.5;
+}
+
+/* Underline cursor style */
+.streaming-cursor--underline {
+  width: 0.6em;
+  height: var(--cursor-width);
+  vertical-align: baseline;
+}
+
+/* ==========================================================================
+   STREAMING TEXT ANIMATIONS
+   ========================================================================== */
+
+/* Streaming text container */
+.streaming-text {
+  contain: content;
+  overflow: hidden;
+}
+
+/* Active streaming state */
+.streaming-text--active {
+  will-change: contents;
+}
+
+/* Character entry animation */
+@keyframes char-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* New text highlight */
+@keyframes text-highlight {
+  0% {
+    background-color: var(--stream-highlight-color);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Apply highlight to newly streamed text */
+.streaming-text-new {
+  animation: text-highlight var(--stream-highlight-duration) var(--anim-ease-out) forwards;
+}
+
+/* Word-by-word animation */
+.streaming-word {
+  display: inline;
+  animation: anim-fade-in var(--anim-duration-instant) var(--anim-ease-out) forwards;
+}
+
+/* ==========================================================================
+   TRANSITION UTILITIES
+   ========================================================================== */
+
+/* Base transition classes */
+.transition-none { transition: none !important; }
+/* Note: .transition-all intentionally kept for utility class - use specific properties in components */
+.transition-all { transition: transform var(--anim-duration-normal) var(--anim-ease-out), opacity var(--anim-duration-normal) var(--anim-ease-out); }
+.transition-colors { transition: color var(--anim-duration-fast) var(--anim-ease-out), background-color var(--anim-duration-fast) var(--anim-ease-out), border-color var(--anim-duration-fast) var(--anim-ease-out); }
+.transition-opacity { transition: opacity var(--anim-duration-normal) var(--anim-ease-out); }
+.transition-transform { transition: transform var(--anim-duration-normal) var(--anim-ease-out); }
+
+/* Duration modifiers */
+.duration-instant { transition-duration: var(--anim-duration-instant); animation-duration: var(--anim-duration-instant); }
+.duration-fast { transition-duration: var(--anim-duration-fast); animation-duration: var(--anim-duration-fast); }
+.duration-normal { transition-duration: var(--anim-duration-normal); animation-duration: var(--anim-duration-normal); }
+.duration-slow { transition-duration: var(--anim-duration-slow); animation-duration: var(--anim-duration-slow); }
+.duration-slower { transition-duration: var(--anim-duration-slower); animation-duration: var(--anim-duration-slower); }
+
+/* Easing modifiers */
+.ease-linear { transition-timing-function: var(--anim-ease-linear); animation-timing-function: var(--anim-ease-linear); }
+.ease-in { transition-timing-function: var(--anim-ease-in); animation-timing-function: var(--anim-ease-in); }
+.ease-out { transition-timing-function: var(--anim-ease-out); animation-timing-function: var(--anim-ease-out); }
+.ease-in-out { transition-timing-function: var(--anim-ease-in-out); animation-timing-function: var(--anim-ease-in-out); }
+.ease-spring { transition-timing-function: var(--anim-ease-spring); animation-timing-function: var(--anim-ease-spring); }
+.ease-bounce { transition-timing-function: var(--anim-ease-bounce); animation-timing-function: var(--anim-ease-bounce); }
+
+/* ==========================================================================
+   GPU ACCELERATION UTILITIES
+   ========================================================================== */
+
+/* Force GPU layer creation */
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Enable will-change for upcoming animations */
+.will-animate {
+  will-change: transform, opacity;
+}
+
+/* Reset will-change (apply after animation) */
+.animation-complete {
+  will-change: auto;
+}
+
+/* ==========================================================================
+   CSS CONTAINMENT UTILITIES
+   ========================================================================== */
+
+/* Content containment (size unknown) */
+.contain-content {
+  contain: content;
+}
+
+/* Layout containment */
+.contain-layout {
+  contain: layout;
+}
+
+/* Paint containment */
+.contain-paint {
+  contain: paint;
+}
+
+/* Size containment */
+.contain-size {
+  contain: size;
+}
+
+/* Strict containment (all properties) */
+.contain-strict {
+  contain: strict;
+}
+
+/* ==========================================================================
+   LOADING & SKELETON ANIMATIONS
+   ========================================================================== */
+
+/* Skeleton loading pulse */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* Skeleton shimmer effect */
+@keyframes skeleton-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Skeleton base */
+.skeleton {
+  background: var(--cortex-surface-raised, #2d2d2d);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Pulse animation */
+.skeleton--pulse {
+  animation: skeleton-pulse 1.5s var(--anim-ease-in-out) infinite;
+}
+
+/* Shimmer animation */
+.skeleton--shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: skeleton-shimmer 1.5s var(--anim-ease-in-out) infinite;
+}
+
+/* ==========================================================================
+   AGENT ACTIVITY ANIMATIONS
+   ========================================================================== */
+
+/* Activity indicator pulse */
+@keyframes activity-pulse {
+  0%, 100% {
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+    opacity: 0.8;
+  }
+}
+
+/* Activity ripple effect */
+@keyframes activity-ripple {
+  0% {
+    transform: scale3d(0.8, 0.8, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale3d(2, 2, 1);
+    opacity: 0;
+  }
+}
+
+/* Activity indicator */
+.activity-indicator {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--cortex-accent, #0078d4);
+  animation: activity-pulse 1.5s var(--anim-ease-in-out) infinite;
+}
+
+/* Activity indicator with ripple */
+.activity-indicator--ripple::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: inherit;
+  animation: activity-ripple 1.5s var(--anim-ease-out) infinite;
+}
+
+/* Typing indicator dots */
+@keyframes typing-bounce {
+  0%, 60%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  30% {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+.typing-indicator {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.typing-indicator__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--cortex-text-secondary, #888);
+  animation: typing-bounce 1.2s var(--anim-ease-in-out) infinite;
+}
+
+.typing-indicator__dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator__dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ==========================================================================
+   AGENT MODE SPLIT VIEW ANIMATIONS
+   ========================================================================== */
+
+/* Agent split container animation */
+@keyframes agent-split-enter {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes agent-split-exit {
+  0% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+}
+
+/* Orange glow pulse for agent mode */
+@keyframes agent-glow-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 0 2px #f97316, inset 0 0 20px rgba(249, 115, 22, 0.2);
+  }
+  50% {
+    box-shadow: inset 0 0 0 2px #fb923c, inset 0 0 30px rgba(249, 115, 22, 0.4);
+  }
+}
+
+/* Agent border shimmer effect */
+@keyframes agent-border-shimmer {
+  0% {
+    border-color: #f97316;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+  }
+  50% {
+    border-color: #fdba74;
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
+  }
+  100% {
+    border-color: #f97316;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+  }
+}
+
+/* Agent active editor styles */
+.agent-mode-active {
+  animation: agent-glow-pulse 2s ease-in-out infinite;
+  border: 2px solid #f97316 !important;
+  border-radius: 4px;
+  transition: 
+    border-color 0.3s ease-out,
+    box-shadow 0.3s ease-out;
+}
+
+/* Agent split panel entering */
+.agent-split-entering {
+  animation: agent-split-enter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Agent split panel exiting */
+.agent-split-exiting {
+  animation: agent-split-exit 0.2s ease-in forwards;
+}
+
+/* Agent mode overlay (orange tint) */
+.agent-mode-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  border: 2px solid #f97316;
+  border-radius: 4px;
+  animation: agent-border-shimmer 2s ease-in-out infinite;
+  background: linear-gradient(
+    135deg,
+    rgba(249, 115, 22, 0.05) 0%,
+    transparent 50%,
+    rgba(249, 115, 22, 0.05) 100%
+  );
+}
+
+/* Agent mode indicator dot */
+.agent-mode-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #f97316;
+  animation: activity-pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+}
+
+/* Agent file read animation */
+@keyframes agent-file-read {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.agent-file-reading {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(249, 115, 22, 0.1) 25%,
+    rgba(249, 115, 22, 0.2) 50%,
+    rgba(249, 115, 22, 0.1) 75%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: agent-file-read 2s linear infinite;
+}
+
+/* ==========================================================================
+   SPINNER ANIMATIONS
+   ========================================================================== */
+
+/* Simple spin animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Notification fade-in animation (static position) */
+@keyframes notification-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes notification-fade-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
+/* ==========================================================================
+   EDITOR GRID ANIMATIONS
+   ========================================================================== */
+
+/* Grid cell resize transition */
+.grid-cell,
+.grid-container {
+  transition: flex-basis 150ms ease-out;
+}
+
+/* Grid sash (resize handle) styles */
+.grid-sash {
+  transition: background-color 150ms ease;
+}
+
+.grid-sash:hover {
+  background-color: var(--accent, #007acc);
+}
+
+.grid-sash[data-dragging="true"] {
+  background-color: var(--accent, #007acc);
+}
+
+/* Grid cell entering animation */
+@keyframes grid-cell-enter {
+  from {
+    opacity: 0;
+    transform: scale3d(0.95, 0.95, 1);
+  }
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+/* Grid cell exiting animation */
+@keyframes grid-cell-exit {
+  from {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+  to {
+    opacity: 0;
+    transform: scale3d(0.95, 0.95, 1);
+  }
+}
+
+.grid-cell-entering {
+  animation: grid-cell-enter 200ms ease-out forwards;
+}
+
+.grid-cell-exiting {
+  animation: grid-cell-exit 150ms ease-in forwards;
+  pointer-events: none;
+}
+
+/* Grid drop indicator animations */
+@keyframes grid-drop-pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.grid-drop-indicator {
+  animation: grid-drop-pulse 1s ease-in-out infinite;
+}
+
+/* Grid equalize animation (double-click sash) */
+@keyframes grid-equalize {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+    background-color: var(--accent-subtle, rgba(0, 122, 204, 0.1));
+  }
+  100% {
+    opacity: 1;
+    background-color: transparent;
+  }
+}
+
+.grid-equalizing > .grid-cell {
+  animation: grid-equalize 300ms ease-out;
+}

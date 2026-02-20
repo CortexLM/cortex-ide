@@ -1,0 +1,823 @@
+/* ============================================================================
+   MODAL/DIALOG STYLING - VS Code Standards
+   Based on VS Code Dialog Modal Component Technical UI/UX Analysis
+   ============================================================================ */
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES - Dialog Design Tokens (VS Code Exact Specs)
+   ============================================================================ */
+:root {
+  /* Core dimensions - VS Code specs */
+  --dialog-min-width: 400px;
+  --dialog-min-width-vertical: 350px;
+  --dialog-max-width: 600px;
+  --dialog-min-height: 75px;
+  --dialog-padding: 10px;
+  --dialog-border-radius: 6px;
+
+  /* VS Code dialog colors */
+  --cortex-bg-elevated: var(--jb-panel);
+  --cortex-border-base: var(--jb-border-default);
+  --cortex-border-subtle: var(--jb-border-divider);
+
+  /* Icon sizes */
+  --dialog-icon-size-horizontal: 48px;
+  --dialog-icon-size-vertical: 64px;
+
+  /* Typography - VS Code: 13px font */
+  --dialog-message-title-font-size: 18px;
+  --dialog-message-line-height: 22px;
+
+  /* Spacing */
+  --dialog-toolbar-height: 22px;
+  --dialog-toolbar-padding-bottom: 4px;
+  --dialog-message-left-padding: 24px;
+  --dialog-buttons-left-margin: 67px;
+  --dialog-buttons-row-padding: 20px 10px 10px;
+  --dialog-button-padding: 4px 10px;
+  --dialog-button-margin: 4px 5px;
+  --dialog-checkbox-input-top-padding: 15px;
+  --dialog-footer-top-margin: 20px;
+  --dialog-message-bottom-margin: 8px;
+
+  /* Header - VS Code: 35px height */
+  --dialog-header-height: 35px;
+  --dialog-header-padding: 0 16px;
+  --dialog-header-font-size: 13px;
+  --dialog-header-font-weight: 600;
+
+  /* Content - VS Code: 16px padding */
+  --dialog-content-padding: 16px;
+
+  /* Footer - VS Code: 12px 16px padding, 8px gap */
+  --dialog-footer-padding: 12px 16px;
+  --dialog-footer-gap: 8px;
+
+  /* Close button - VS Code: 22px, 3px radius */
+  --dialog-close-size: 22px;
+  --dialog-close-radius: 3px;
+
+  /* Z-index layers */
+  --dialog-modal-z-index: 2575;
+  --dialog-dropdown-z-index: 2600;
+
+  /* Overlay - Using Trae/Cortex Dark overlay */
+  --dialog-backdrop-color: var(--jb-overlay-backdrop);
+  --dialog-backdrop-blur: 2px;
+
+  /* Box shadow - Using Trae/Cortex Dark shadow */
+  --dialog-box-shadow: var(--jb-shadow-modal);
+}
+
+/* ============================================================================
+   MODAL BACKDROP - Full viewport overlay
+   ============================================================================ */
+.modal-overlay,
+.monaco-dialog-modal-block {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: var(--dialog-modal-z-index);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Dimmed backdrop variant (default) - VS Code: rgba(0,0,0,0.4) with blur */
+.modal-overlay.dimmed,
+.monaco-dialog-modal-block.dimmed,
+.dialog-backdrop {
+  background: var(--dialog-backdrop-color);
+  backdrop-filter: blur(var(--dialog-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--dialog-backdrop-blur));
+}
+
+/* Non-dimmed backdrop variant */
+.modal-overlay.transparent,
+.monaco-dialog-modal-block:not(.dimmed) {
+  background: transparent;
+  backdrop-filter: none;
+}
+
+/* ============================================================================
+   DIALOG ANIMATIONS - VS Code: 150ms ease-out, scale(0.95) to scale(1)
+   ============================================================================ */
+
+/* Dialog enter animation - VS Code spec */
+.dialog-enter,
+.modal-enter {
+  animation: dialog-fade-in 150ms ease-out forwards;
+}
+
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Backdrop fade-in */
+.dialog-backdrop-enter {
+  animation: dialog-backdrop-fade-in 150ms ease-out forwards;
+}
+
+@keyframes dialog-backdrop-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Dialog exit animation */
+.dialog-exit,
+.modal-exit {
+  animation: dialog-fade-out 150ms ease-in forwards;
+}
+
+@keyframes dialog-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* Legacy animation support */
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ============================================================================
+   DIALOG SHADOW WRAPPER
+   ============================================================================ */
+.dialog-shadow {
+  box-shadow: var(--dialog-shadow, var(--jb-shadow-modal));
+}
+
+/* ============================================================================
+   DIALOG CONTAINER - Main dialog box (VS Code .monaco-dialog-box)
+   ============================================================================ */
+.modal,
+.monaco-dialog-box,
+.dialog {
+  display: flex;
+  flex-direction: column-reverse; /* VS Code uses column-reverse for visual ordering */
+  width: min-content;
+  min-width: var(--dialog-min-width);
+  max-width: var(--dialog-max-width);
+  min-height: var(--dialog-min-height);
+  padding: var(--dialog-padding);
+  border-radius: var(--dialog-border-radius);
+  /* VS Code exact: background #252526, border #454545 */
+  background: var(--cortex-bg-elevated, var(--dialog-background, var(--surface-raised)));
+  color: var(--dialog-foreground, var(--text-base));
+  border: 1px solid var(--cortex-border-base, var(--dialog-border, var(--border-base)));
+  /* VS Code exact: 0 0 8px 2px rgba(0, 0, 0, 0.36) */
+  box-shadow: var(--dialog-box-shadow);
+  transform: translate3d(0px, 0px, 0px); /* GPU layer promotion */
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+/* Standard dialog layout (non-reversed) */
+.dialog-standard,
+.modal-standard {
+  flex-direction: column;
+}
+
+/* Vertical alignment variant */
+.modal.align-vertical,
+.monaco-dialog-box.align-vertical {
+  min-width: var(--dialog-min-width-vertical);
+}
+
+/* ARIA attributes */
+.modal[role="dialog"],
+.monaco-dialog-box[role="dialog"] {
+  outline: none;
+}
+
+/* ============================================================================
+   DIALOG HEADER - VS Code: 35px height, 13px font, font-weight 600
+   ============================================================================ */
+.dialog-header {
+  height: var(--dialog-header-height);
+  padding: var(--dialog-header-padding);
+  font-size: var(--dialog-header-font-size);
+  font-weight: var(--dialog-header-font-weight);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--cortex-border-subtle, var(--border-base));
+  flex-shrink: 0;
+}
+
+.dialog-header-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   DIALOG TOOLBAR ROW - Close button area
+   ============================================================================ */
+.modal-toolbar-row,
+.dialog-toolbar-row {
+  height: var(--dialog-toolbar-height);
+  padding-bottom: var(--dialog-toolbar-padding-bottom);
+}
+
+.modal-toolbar-row .actions-container,
+.dialog-toolbar-row .actions-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Close button - VS Code: 22px, 3px radius */
+.modal-close,
+.dialog-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--dialog-close-size);
+  height: var(--dialog-close-size);
+  border-radius: var(--dialog-close-radius);
+  color: var(--text-weak);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: auto;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.modal-close:hover,
+.dialog-close:hover {
+  background: var(--surface-hover);
+  color: var(--text-base);
+}
+
+.modal-close:focus-visible,
+.dialog-close:focus-visible {
+  outline: 1px solid var(--cortex-focus-color, var(--vscode-focusBorder));
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   DIALOG CONTENT - VS Code: 16px padding, overflow handling
+   ============================================================================ */
+.dialog-content {
+  padding: var(--dialog-content-padding);
+  overflow-y: auto;
+  max-height: calc(80vh - 100px);
+  flex: 1;
+  min-height: 0;
+}
+
+/* Scrollable content variant */
+.dialog-content-scrollable {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ============================================================================
+   DIALOG MESSAGE ROW - Icon and content area
+   ============================================================================ */
+.modal-message-row,
+.dialog-message-row {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  padding: 0 10px;
+}
+
+/* Vertical layout modifier */
+.modal.align-vertical .modal-message-row,
+.monaco-dialog-box.align-vertical .dialog-message-row {
+  flex-direction: column;
+}
+
+/* ============================================================================
+   DIALOG ICON - Type indicator
+   ============================================================================ */
+.modal-icon,
+.dialog-icon {
+  flex: 0 0 var(--dialog-icon-size-horizontal);
+  height: var(--dialog-icon-size-horizontal);
+  font-size: var(--dialog-icon-size-horizontal);
+  align-self: baseline;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Vertical layout icon */
+.modal.align-vertical .modal-icon,
+.monaco-dialog-box.align-vertical .dialog-icon {
+  flex: 0 0 var(--dialog-icon-size-vertical);
+  height: var(--dialog-icon-size-vertical);
+  font-size: var(--dialog-icon-size-vertical);
+}
+
+/* Dialog type icon colors */
+.dialog-icon.dialog-icon-info,
+.modal-icon.modal-icon-info {
+  color: var(--info-icon-foreground, var(--info, var(--jb-border-focus)));
+}
+
+.dialog-icon.dialog-icon-error,
+.modal-icon.modal-icon-error {
+  color: var(--error-icon-foreground, var(--error, var(--cortex-error)));
+}
+
+.dialog-icon.dialog-icon-warning,
+.modal-icon.modal-icon-warning {
+  color: var(--warning-icon-foreground, var(--warning, var(--cortex-warning)));
+}
+
+.dialog-icon.dialog-icon-question,
+.modal-icon.modal-icon-question {
+  color: var(--info-icon-foreground, var(--info, var(--jb-border-focus)));
+}
+
+.dialog-icon.dialog-icon-pending,
+.modal-icon.modal-icon-pending {
+  color: var(--info-icon-foreground, var(--info, var(--jb-border-focus)));
+}
+
+/* Spinning animation for pending state */
+.dialog-icon.dialog-icon-pending .codicon-modifier-spin,
+.modal-icon.modal-icon-pending .icon-spin {
+  animation: codicon-spin 1.5s linear infinite;
+}
+
+@keyframes codicon-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Hidden icon for 'none' type */
+.dialog-icon.dialog-icon-none,
+.modal-icon.modal-icon-none {
+  display: none;
+}
+
+/* ============================================================================
+   DIALOG MESSAGE CONTAINER
+   ============================================================================ */
+.modal-message-container,
+.dialog-message-container {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: text;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+/* Horizontal layout - padding from icon */
+.modal-message-container,
+.dialog-message-container {
+  padding-left: var(--dialog-message-left-padding);
+}
+
+/* Vertical layout */
+.modal.align-vertical .modal-message-container,
+.monaco-dialog-box.align-vertical .dialog-message-container {
+  padding-left: 0;
+  align-items: center;
+  text-align: center;
+}
+
+/* ============================================================================
+   DIALOG MESSAGE TITLE
+   ============================================================================ */
+.modal-title,
+.dialog-message {
+  line-height: var(--dialog-message-line-height);
+  font-size: var(--dialog-message-title-font-size);
+  flex: 1;
+  white-space: normal;
+  word-wrap: break-word;
+  min-height: var(--dialog-icon-size-horizontal);
+  margin-bottom: var(--dialog-message-bottom-margin);
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+/* Legacy modal header support */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: var(--dialog-padding);
+}
+
+/* ============================================================================
+   DIALOG MESSAGE DETAIL
+   ============================================================================ */
+.modal-detail,
+.dialog-message-detail {
+  line-height: var(--dialog-message-line-height);
+  flex: 1;
+  color: var(--text-base);
+  font-size: 14px;
+}
+
+/* ============================================================================
+   DIALOG CHECKBOX ROW
+   ============================================================================ */
+.modal-checkbox-row,
+.dialog-checkbox-row {
+  padding: var(--dialog-checkbox-input-top-padding) 0px 0px;
+  display: flex;
+  align-items: center;
+}
+
+.modal-checkbox-message,
+.dialog-checkbox-message {
+  cursor: pointer;
+  user-select: none;
+  flex: 1;
+  margin-left: 8px;
+  font-size: 13px;
+  color: var(--text-base);
+}
+
+/* ============================================================================
+   DIALOG INPUT ROW
+   ============================================================================ */
+.modal-message-input,
+.dialog-message-input {
+  padding: var(--dialog-checkbox-input-top-padding) 0px 0px;
+  display: flex;
+}
+
+.modal-message-input input,
+.dialog-message-input .monaco-inputbox {
+  flex: 1;
+}
+
+/* ============================================================================
+   DIALOG BUTTONS ROW
+   ============================================================================ */
+.modal-buttons-row,
+.dialog-buttons-row {
+  display: flex;
+  align-items: center;
+  padding-right: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: var(--dialog-buttons-row-padding);
+}
+
+/* ============================================================================
+   DIALOG BUTTONS CONTAINER
+   ============================================================================ */
+.modal-buttons,
+.dialog-buttons {
+  display: flex;
+  width: 100%;
+}
+
+/* Horizontal layout - buttons aligned right */
+.modal-buttons,
+.dialog-buttons {
+  overflow: hidden;
+  justify-content: flex-end;
+  margin-left: var(--dialog-buttons-left-margin);
+}
+
+/* Vertical layout - buttons stacked */
+.modal.align-vertical .modal-buttons,
+.monaco-dialog-box.align-vertical .dialog-buttons {
+  margin-left: 5px;
+  margin-right: 5px;
+  flex-direction: column;
+}
+
+/* Platform-aware button placement */
+/* Windows: Primary first (left), Cancel last (right) */
+.modal-buttons.platform-windows,
+.dialog-buttons.platform-windows {
+  flex-direction: row;
+}
+
+/* macOS/Linux: Cancel first (left), Primary last (right) */
+.modal-buttons.platform-mac,
+.modal-buttons.platform-linux,
+.dialog-buttons.platform-mac,
+.dialog-buttons.platform-linux {
+  flex-direction: row-reverse;
+}
+
+/* ============================================================================
+   DIALOG BUTTON
+   ============================================================================ */
+.modal-button,
+.dialog-button,
+.modal .monaco-button {
+  padding: var(--dialog-button-padding);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: var(--dialog-button-margin);
+  outline-offset: 2px !important;
+  border-radius: var(--dialog-border-radius);
+  font-size: 13px;
+  min-width: 70px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.1s ease, border-color 0.1s ease;
+}
+
+/* Horizontal layout button */
+.modal-button,
+.dialog-button {
+  width: fit-content;
+}
+
+/* Vertical layout button */
+.modal.align-vertical .modal-button,
+.monaco-dialog-box.align-vertical .dialog-button {
+  margin: 4px 0;
+  width: 100%;
+}
+
+/* Primary button styling */
+.modal-button-primary,
+.dialog-button-primary {
+  background: var(--button-primary-background, var(--jb-btn-primary-bg));
+  color: var(--button-primary-foreground, var(--jb-btn-primary-color));
+  border-color: var(--button-primary-border, transparent);
+}
+
+.modal-button-primary:hover,
+.dialog-button-primary:hover {
+  background: var(--button-primary-hover-background, var(--primary-hover));
+}
+
+/* Secondary button styling */
+.modal-button-secondary,
+.dialog-button-secondary {
+  background: var(--button-secondary-background, var(--surface-overlay));
+  color: var(--button-secondary-foreground, var(--text-base));
+  border-color: var(--button-secondary-border, var(--border-base));
+}
+
+.modal-button-secondary:hover,
+.dialog-button-secondary:hover {
+  background: var(--button-secondary-hover-background, var(--surface-hover));
+}
+
+/* Button focus state */
+.modal-button:focus-visible,
+.dialog-button:focus-visible {
+  outline: 1px solid var(--cortex-focus-color, var(--vscode-focusBorder));
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   DIALOG DROPDOWN BUTTON
+   ============================================================================ */
+.modal-button-dropdown,
+.dialog-button-dropdown {
+  display: flex;
+  align-items: stretch;
+}
+
+.modal-button-dropdown:focus-within,
+.dialog-button-dropdown:focus-within {
+  outline-offset: 2px !important;
+  outline-width: 1px;
+  outline-style: solid;
+  outline-color: var(--cortex-focus-color, var(--vscode-focusBorder));
+  border-radius: 2px;
+}
+
+.modal-button-dropdown .modal-text-button,
+.dialog-button-dropdown .monaco-text-button {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.modal-button-dropdown .modal-dropdown-trigger,
+.dialog-button-dropdown .monaco-dropdown-button {
+  padding-left: 5px;
+  padding-right: 5px;
+  border-left: 1px solid var(--border-base);
+}
+
+/* ============================================================================
+   DIALOG FOOTER - VS Code: border-top, 12px 16px padding, 8px gap
+   ============================================================================ */
+.dialog-footer {
+  padding: var(--dialog-footer-padding);
+  border-top: 1px solid var(--cortex-border-subtle, var(--border-base));
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--dialog-footer-gap);
+  flex-shrink: 0;
+}
+
+.modal-footer,
+.dialog-footer-row {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  padding: 0 10px;
+  margin-top: var(--dialog-footer-top-margin);
+}
+
+/* Legacy footer support */
+.modal-footer {
+  border-top: 1px solid var(--cortex-border-subtle, var(--border-base));
+  padding: var(--dialog-footer-padding);
+  gap: var(--dialog-footer-gap);
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+
+/* Footer alignment variants */
+.modal-footer-left,
+.dialog-footer-left {
+  justify-content: flex-start;
+}
+
+.modal-footer-center,
+.dialog-footer-center {
+  justify-content: center;
+}
+
+.modal-footer-space-between,
+.dialog-footer-space-between {
+  justify-content: space-between;
+}
+
+/* ============================================================================
+   MODAL SIZE VARIANTS
+   ============================================================================ */
+.modal-sm {
+  min-width: 320px;
+  max-width: 400px;
+}
+
+.modal-lg {
+  min-width: var(--dialog-min-width);
+  max-width: 800px;
+}
+
+.modal-xl {
+  min-width: 600px;
+  max-width: 1000px;
+}
+
+/* ============================================================================
+   MODAL CONTENT AREA - Legacy support
+   ============================================================================ */
+.modal-content {
+  padding: 0 20px 20px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+/* When modal has header, add top padding to content */
+.modal-header + .modal-content {
+  padding-top: 20px;
+}
+
+/* Modal with scrollable content */
+.modal-scrollable .modal-content {
+  max-height: 400px;
+}
+
+/* ============================================================================
+   CONFIRMATION DIALOG STYLES
+   ============================================================================ */
+.modal-confirm .modal-content {
+  padding-top: 20px;
+}
+
+.modal-confirm-message {
+  font-size: 14px;
+  color: var(--text-base);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.modal-confirm-warning {
+  color: var(--warning);
+}
+
+.modal-confirm-error {
+  color: var(--error);
+}
+
+/* ============================================================================
+   FOCUS TRAPPING STYLES
+   ============================================================================ */
+.modal[data-focus-trap="true"],
+.monaco-dialog-box[data-focus-trap="true"] {
+  /* Focus trap active indicator */
+}
+
+/* Focus visible for all focusable elements within dialog */
+.modal :focus-visible,
+.monaco-dialog-box :focus-visible {
+  outline: 1px solid var(--cortex-focus-color, var(--vscode-focusBorder));
+  outline-offset: 2px;
+}
+
+/* Ensure links in dialog are focusable */
+.modal a[tabindex="0"],
+.monaco-dialog-box a[tabindex="0"] {
+  text-decoration: underline;
+  color: var(--text-link-foreground, var(--primary));
+}
+
+.modal a[tabindex="0"]:hover,
+.monaco-dialog-box a[tabindex="0"]:hover {
+  text-decoration: none;
+}
+
+/* ============================================================================
+   DIALOG TYPE VARIANTS
+   ============================================================================ */
+
+/* Info dialog */
+.modal.dialog-type-info,
+.monaco-dialog-box.dialog-type-info {
+  /* Default styling */
+}
+
+/* Error dialog */
+.modal.dialog-type-error,
+.monaco-dialog-box.dialog-type-error {
+  border-color: var(--error-icon-foreground, var(--error));
+}
+
+/* Warning dialog */
+.modal.dialog-type-warning,
+.monaco-dialog-box.dialog-type-warning {
+  border-color: var(--warning-icon-foreground, var(--warning));
+}
+
+/* Question dialog */
+.modal.dialog-type-question,
+.monaco-dialog-box.dialog-type-question {
+  /* Same as info */
+}
+
+/* Pending dialog */
+.modal.dialog-type-pending,
+.monaco-dialog-box.dialog-type-pending {
+  /* Same as info */
+}
+
+/* None dialog (no icon) */
+.modal.dialog-type-none,
+.monaco-dialog-box.dialog-type-none {
+  /* No special styling */
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+/* Screen reader labels */
+.modal .sr-only,
+.monaco-dialog-box .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

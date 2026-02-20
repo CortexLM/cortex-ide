@@ -1,0 +1,246 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main, develop]
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+      - ".gitignore"
+      - "docs/**"
+  pull_request:
+    branches: [master, main]
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+      - ".gitignore"
+      - "docs/**"
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
+  CARGO_INCREMENTAL: 1
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ==========================================================================
+  # Frontend: typecheck + test + build (uploads dist/ artifact)
+  # ==========================================================================
+  frontend:
+    name: Frontend
+    runs-on: blacksmith-32vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Mount node_modules (sticky disk)
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-node-modules
+          path: ./node_modules
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type check
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+          retention-days: 1
+          if-no-files-found: error
+
+  # ==========================================================================
+  # Rust: fmt + clippy + test (Ubuntu only, downloads dist/ artifact)
+  # ==========================================================================
+  rust-checks:
+    name: Rust Checks
+    runs-on: blacksmith-32vcpu-ubuntu-2404
+    needs: [frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git auth for private dependencies
+        run: git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
+      - name: Mount apt cache (sticky disk)
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-apt-tauri-deps
+          path: /var/cache/apt/archives
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libglib2.0-dev libasound2-dev libxdo-dev mold
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+
+      - name: Install Rust nightly (for fmt)
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Setup Rust cache
+        uses: useblacksmith/rust-cache@v3
+        with:
+          workspaces: src-tauri
+
+      - name: Check formatting
+        run: cargo +nightly fmt --all -- --check
+        working-directory: src-tauri
+
+      - name: Run clippy
+        run: cargo clippy --all-targets -- -D warnings
+        env:
+          RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
+        working-directory: src-tauri
+
+      - name: Run tests
+        run: cargo test
+        env:
+          RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
+        working-directory: src-tauri
+
+  # ==========================================================================
+  # GUI Check - macOS
+  # ==========================================================================
+  gui-check-macos:
+    name: GUI Check (macos)
+    runs-on: macos-latest-xlarge
+    needs: [frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git auth for private dependencies
+        run: git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Rust cache
+        uses: useblacksmith/rust-cache@v3
+        with:
+          workspaces: src-tauri
+
+      - name: Check GUI build
+        run: cargo check
+        working-directory: src-tauri
+
+  # ==========================================================================
+  # GUI Check - Windows
+  # ==========================================================================
+  gui-check-windows:
+    name: GUI Check (windows)
+    runs-on: blacksmith-32vcpu-windows-2025
+    needs: [frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git auth for private dependencies
+        run: git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Rust cache
+        uses: useblacksmith/rust-cache@v3
+        with:
+          workspaces: src-tauri
+
+      - name: Check GUI build
+        run: cargo check
+        working-directory: src-tauri
+
+  # ==========================================================================
+  # Final status check
+  # ==========================================================================
+  ci-success:
+    name: CI Success
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    needs: [frontend, rust-checks, gui-check-macos, gui-check-windows]
+    if: always()
+    steps:
+      - name: Check all jobs
+        run: |
+          if [[ "${{ needs.frontend.result }}" == "failure" || \
+                "${{ needs.rust-checks.result }}" == "failure" || \
+                "${{ needs.gui-check-macos.result }}" == "failure" || \
+                "${{ needs.gui-check-windows.result }}" == "failure" ]]; then
+            echo "One or more jobs failed"
+            exit 1
+          fi
+          echo "All CI checks passed!"
+
+  # ==========================================================================
+  # Release - Semantic versioning (only on push to main/master)
+  # ==========================================================================
+  release:
+    name: Release
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    needs: [ci-success]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Mount node_modules (sticky disk)
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: ${{ github.repository }}-node-modules
+          path: ./node_modules
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release

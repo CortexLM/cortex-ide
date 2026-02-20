@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Font Awesome Kit (junction to kit-a943e80cf4-desktop)
+public/kit-a943e80cf4-desktop/
+
+# Build outputs
+dist/
+src-tauri/target/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Tauri
+src-tauri/WixTools/
+
+.npm
+
+# Build cache
+.cargo/
+.sccache/

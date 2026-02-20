@@ -1,0 +1,2407 @@
+/**
+ * Editor Contrib Features - VS Code Specification Compliance
+ * 
+ * This file contains CSS styles for editor contribution features following
+ * VS Code's exact specifications from the UI analysis document.
+ * 
+ * Z-Index Hierarchy:
+ * - Inline Edits Indicator: 34
+ * - Find Widget: 35
+ * - Parameter Hints: 39
+ * - Inline Suggestions Hints: 39
+ * - Suggest Widget: 40
+ * - Suggest Details Container: 41
+ * - Rename Box: 100
+ */
+
+/* ==========================================================================
+   CSS Variables / Design Tokens
+   ========================================================================== */
+
+:root {
+  /* Widget backgrounds */
+  --editor-widget-background: var(--surface-raised);
+  --editor-suggest-background: var(--surface-raised);
+  --editor-hover-background: var(--surface-raised);
+  --editor-hover-status-bar-background: var(--surface-active);
+  
+  /* Widget foregrounds */
+  --editor-widget-foreground: var(--text-base);
+  --editor-suggest-foreground: var(--text-base);
+  --editor-suggest-selected-foreground: var(--text-base);
+  --editor-suggest-highlight-foreground: var(--accent-primary);
+  
+  /* Borders */
+  --editor-widget-border: var(--border-weak);
+  --editor-suggest-border: var(--border-weak);
+  --editor-hover-border: var(--border-weak);
+  --widget-shadow: rgba(0, 0, 0, 0.36);
+  --focus-border: var(--accent-primary);
+  
+  /* Find/Replace colors */
+  --editor-find-match-background: color-mix(in srgb, var(--cortex-warning) 33%, transparent);
+  --editor-find-match-highlight-background: color-mix(in srgb, var(--cortex-warning) 22%, transparent);
+  --editor-find-match-border: var(--cortex-warning);
+  --editor-find-range-highlight-background: rgba(180, 180, 180, 0.3);
+  
+  /* Light bulb colors */
+  --editor-lightbulb-foreground: var(--cortex-warning);
+  --editor-lightbulb-autofix-foreground: var(--cortex-info);
+  --editor-lightbulb-ai-foreground: var(--accent-primary);
+  
+  /* Ghost text / Inline completions */
+  --editor-ghost-text-foreground: var(--text-weak);
+  --editor-ghost-text-background: transparent;
+  --editor-ghost-text-border: transparent;
+  --inline-edit-modified-background: rgba(46, 160, 67, 0.15);
+  --inline-edit-original-background: rgba(248, 81, 73, 0.15);
+  --inline-edit-border-radius: 3px;
+  
+  /* Actions/Toolbar */
+  --toolbar-hover-background: rgba(255, 255, 255, 0.1);
+  --button-background: var(--accent-primary);
+  --button-foreground: var(--jb-btn-primary-color);
+  --button-hover-background: var(--accent-hover);
+  
+  /* Status/Error */
+  --error-foreground: var(--cortex-error);
+  --disabled-foreground: var(--text-weaker);
+  --warning-foreground: var(--cortex-warning);
+}
+
+/* ==========================================================================
+   1. Find Widget - z-index: 35, 419px width, 33px height
+   ========================================================================== */
+
+.find-widget {
+  position: fixed;
+  z-index: 35;
+  height: 33px;
+  overflow: hidden;
+  line-height: 19px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  width: 419px;
+  background: var(--editor-widget-background);
+  border: 1px solid var(--editor-widget-border);
+  box-shadow: 0 0 8px 2px var(--widget-shadow);
+  transition: transform 200ms linear;
+  transform: translateY(calc(-100% - 10px));
+}
+
+.find-widget.visible {
+  transform: translateY(0);
+}
+
+.find-widget.with-replace {
+  height: auto;
+}
+
+/* Find widget parts */
+.find-widget .find-part,
+.find-widget .replace-part {
+  margin: 3px 25px 0 17px;
+}
+
+/* Find input area */
+.find-widget .find-input-area {
+  width: 221px;
+  height: 33px;
+}
+
+/* Matches count */
+.find-widget .matches-count {
+  max-width: 69px;
+  margin: 0 0 0 3px;
+  padding: 2px 0 0 2px;
+  line-height: 23px;
+  font-size: 11px;
+}
+
+/* Find widget buttons */
+.find-widget .find-button {
+  width: 16px;
+  height: 16px;
+  padding: 3px;
+  border-radius: 5px;
+  margin-left: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: var(--text-weak);
+  transition: background-color 150ms;
+}
+
+.find-widget .find-button:hover:not(.disabled) {
+  background-color: var(--toolbar-hover-background);
+}
+
+.find-widget .find-button.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Toggle button (expand/collapse replace) */
+.find-widget .button-toggle {
+  position: absolute;
+  top: 0;
+  left: 3px;
+  width: 18px;
+  height: 100%;
+  border-radius: 0;
+}
+
+/* Close button position */
+.find-widget .button-close {
+  position: absolute;
+  top: 5px;
+  right: 4px;
+}
+
+/* Find selection button */
+.find-widget .button-find-selection {
+  width: 22px;
+  height: 22px;
+  padding: 3px;
+  border-radius: 5px;
+}
+
+/* Inputbox */
+.find-widget .find-inputbox {
+  min-height: 25px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+/* Responsive - Reduced state */
+.find-widget.reduced .matches-count {
+  display: none;
+}
+
+/* Responsive - Narrow state */
+.find-widget.narrow {
+  max-width: 257px !important;
+}
+
+/* Responsive - Collapsed state */
+.find-widget.collapsed {
+  max-width: 170px !important;
+}
+
+.find-widget.collapsed .button-previous,
+.find-widget.collapsed .button-next,
+.find-widget.collapsed .button-replace,
+.find-widget.collapsed .button-replace-all,
+.find-widget.collapsed .find-input-controls {
+  display: none;
+}
+
+/* Match highlights */
+.find-match {
+  background-color: var(--editor-find-match-highlight-background);
+}
+
+.find-match-current {
+  background-color: var(--editor-find-match-background);
+  border: 1px solid var(--editor-find-match-border);
+  padding: 1px;
+  box-sizing: border-box;
+}
+
+.find-scope {
+  background-color: var(--editor-find-range-highlight-background);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .find-widget {
+    transition: transform 0ms linear;
+  }
+}
+
+/* ==========================================================================
+   2. Suggest Widget - z-index: 40, 430px width, resizable, flex layout
+   ========================================================================== */
+
+.suggest-widget {
+  width: 430px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  border-radius: 3px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--editor-suggest-border);
+  background-color: color-mix(in srgb, var(--jb-canvas) 95%, transparent);
+  box-shadow: 0 0 8px 2px var(--widget-shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* Fix for subpixel rendering artifacts on rounded corners with backdrop-filter */
+  isolation: isolate;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+/* High contrast mode */
+.high-contrast .suggest-widget {
+  border-width: 1px;
+}
+
+/* Suggest widget status bar */
+.suggest-widget .suggest-status-bar {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  font-size: 80%;
+  padding: 0 4px 0 4px;
+  border-top: 1px solid var(--editor-suggest-border);
+}
+
+/* Suggest list row */
+.suggest-widget .suggest-list-row {
+  display: flex;
+  box-sizing: border-box;
+  padding-right: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.suggest-widget .suggest-list-row.focused {
+  background-color: var(--surface-active);
+  color: var(--editor-suggest-selected-foreground);
+}
+
+/* Suggest icon */
+.suggest-widget .suggest-icon {
+  display: block;
+  height: 16px;
+  width: 16px;
+  margin-left: 2px;
+  background-size: 80%;
+  background-position: center;
+}
+
+.suggest-widget .suggest-icon-container {
+  display: flex;
+  align-items: center;
+  margin-right: 4px;
+}
+
+/* Color icon for color completion */
+.suggest-widget .icon-color .colorspan {
+  margin: 0 0 0 0.3em;
+  border: 0.1em solid #000;
+  width: 0.7em;
+  height: 0.7em;
+}
+
+/* Typography for labels */
+.suggest-widget .signature-label {
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggest-widget .qualifier-label {
+  margin-left: 12px;
+  opacity: 0.4;
+  font-size: 85%;
+  line-height: initial;
+}
+
+.suggest-widget .details-label {
+  font-size: 85%;
+  margin-left: 1.1em;
+  opacity: 0.7;
+}
+
+/* Read more button */
+.suggest-widget .read-more {
+  display: inline-block;
+  position: absolute;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  visibility: hidden;
+}
+
+.suggest-widget .suggest-list-row:hover .read-more {
+  visibility: visible;
+}
+
+/* Deprecated items */
+.suggest-widget .deprecated {
+  opacity: 0.66;
+}
+
+.suggest-widget .deprecated .label-name {
+  text-decoration: line-through;
+}
+
+/* Suggest details panel - z-index: 41 */
+.suggest-details {
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+  z-index: 41;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--editor-suggest-border);
+  background-color: var(--editor-suggest-background);
+  border-radius: 3px;
+}
+
+.suggest-details .type {
+  flex: 2;
+  opacity: 0.7;
+  white-space: pre;
+  margin: 0 24px 0 0;
+  padding: 4px 0 4px 5px;
+}
+
+.suggest-details .docs {
+  margin: 0;
+  padding: 4px 5px;
+  white-space: pre-wrap;
+}
+
+.suggest-details code {
+  border-radius: 3px;
+  padding: 0 0.4em;
+  background: var(--background-base);
+}
+
+.suggest-details ul,
+.suggest-details ol {
+  padding-left: 20px;
+}
+
+/* ==========================================================================
+   3. Hover Widget - 3px border-radius, copy button reveal on hover
+   ========================================================================== */
+
+.hover-widget {
+  border: 1px solid var(--editor-hover-border);
+  border-radius: 3px;
+  color: var(--editor-widget-foreground);
+  background-color: color-mix(in srgb, var(--jb-canvas) 95%, transparent);
+  box-shadow: 0 0 8px 2px var(--widget-shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* Fix for subpixel rendering artifacts on rounded corners with backdrop-filter */
+  isolation: isolate;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+.hover-widget.resizable {
+  box-sizing: content-box;
+}
+
+/* Hover highlight */
+.hover-highlight {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Hover row layout */
+.hover-widget .hover-row {
+  display: flex;
+}
+
+.hover-widget .hover-row.with-copy {
+  position: relative;
+  padding-right: 20px;
+}
+
+.hover-widget .hover-row .hover-contents {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Verbosity actions panel */
+.hover-widget .verbosity-actions {
+  border-right: 1px solid var(--editor-hover-border);
+  width: 22px;
+  overflow-y: clip;
+}
+
+.hover-widget .verbosity-actions-inner {
+  display: flex;
+  flex-direction: column;
+  padding-left: 5px;
+  padding-right: 5px;
+  justify-content: flex-end;
+}
+
+.hover-widget .verbosity-actions-inner .icon {
+  cursor: pointer;
+  font-size: 11px;
+}
+
+/* Copy button - reveals on hover */
+.hover-widget .hover-copy-button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 150ms;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.hover-widget .hover-row.with-copy:hover .hover-copy-button,
+.hover-widget .hover-row.with-copy:focus-within .hover-copy-button {
+  opacity: 1;
+}
+
+.hover-widget .hover-copy-button:hover {
+  background-color: var(--toolbar-hover-background);
+}
+
+.hover-widget .hover-copy-button:focus {
+  outline: 1px solid var(--focus-border);
+  outline-offset: -1px;
+}
+
+.hover-widget .hover-copy-button .icon {
+  font-size: 16px;
+}
+
+/* Action bar */
+.hover-widget .hover-actions {
+  background-color: var(--editor-hover-status-bar-background);
+}
+
+/* ==========================================================================
+   4. Parameter Hints - z-index: 39, 440px max width
+   ========================================================================== */
+
+.parameter-hints-widget {
+  z-index: 39;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5em;
+  cursor: default;
+  color: var(--editor-widget-foreground);
+  background-color: color-mix(in srgb, var(--jb-canvas) 95%, transparent);
+  border: 1px solid var(--editor-hover-border);
+  border-radius: 3px;
+  box-shadow: 0 0 8px 2px var(--widget-shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* Fix for subpixel rendering artifacts on rounded corners with backdrop-filter */
+  isolation: isolate;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+/* High contrast mode */
+.high-contrast .parameter-hints-widget {
+  border-width: 1px;
+}
+
+/* Wrapper layout */
+.parameter-hints-widget .wrapper {
+  max-width: 440px;
+  display: flex;
+  flex-direction: row;
+}
+
+.parameter-hints-widget.multiple {
+  min-height: 3.3em;
+  padding: 0;
+}
+
+/* Body separator (multiple signatures) */
+.parameter-hints-widget.multiple .body::before {
+  content: "";
+  display: block;
+  height: 100%;
+  position: absolute;
+  opacity: 0.5;
+  border-left: 1px solid var(--editor-hover-border);
+}
+
+/* Typography */
+.parameter-hints-widget p,
+.parameter-hints-widget ul {
+  margin: 8px 0;
+}
+
+.parameter-hints-widget .signature {
+  padding: 4px 5px;
+  position: relative;
+}
+
+.parameter-hints-widget .signature.has-docs::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  padding-top: 4px;
+  opacity: 0.5;
+  border-bottom: 1px solid var(--editor-hover-border);
+}
+
+.parameter-hints-widget .code {
+  font-family: var(--font-mono);
+}
+
+.parameter-hints-widget .docs {
+  padding: 0 10px 0 5px;
+  white-space: pre-wrap;
+}
+
+.parameter-hints-widget .docs code {
+  border-radius: 3px;
+  padding: 0 0.4em;
+  background: var(--background-base);
+}
+
+/* Active parameter highlighting */
+.parameter-hints-widget .signature .parameter.active {
+  color: var(--editor-suggest-highlight-foreground);
+  font-weight: bold;
+}
+
+.parameter-hints-widget .documentation-parameter > .parameter {
+  font-weight: bold;
+  margin-right: 0.5em;
+}
+
+/* Navigation controls */
+.parameter-hints-widget .controls {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  min-width: 22px;
+  justify-content: flex-end;
+}
+
+.parameter-hints-widget.multiple .controls {
+  display: flex;
+  padding: 0 2px;
+}
+
+.parameter-hints-widget.multiple .nav-button {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: var(--text-weak);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parameter-hints-widget .overloads {
+  text-align: center;
+  height: 12px;
+  line-height: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* ==========================================================================
+   5. Light Bulb Widget - 3 color variants
+   ========================================================================== */
+
+.lightbulb-widget {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.lightbulb-widget:hover {
+  background-color: rgba(240, 176, 0, 0.2);
+  border-radius: 3px;
+}
+
+/* Standard light bulb */
+.lightbulb-widget.standard {
+  color: var(--editor-lightbulb-foreground);
+}
+
+/* Auto-fix light bulb */
+.lightbulb-widget.autofix {
+  color: var(--editor-lightbulb-autofix-foreground);
+}
+
+/* AI-powered light bulb */
+.lightbulb-widget.ai {
+  color: var(--editor-lightbulb-ai-foreground);
+}
+
+/* Pseudo-element layering */
+.lightbulb-widget::before {
+  position: relative;
+  z-index: 2;
+}
+
+.lightbulb-widget::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+  z-index: 1;
+}
+
+/* Gutter decoration variants */
+.gutter-lightbulb {
+  display: block;
+  cursor: pointer;
+}
+
+.gutter-lightbulb.standard {
+  color: var(--editor-lightbulb-foreground);
+}
+
+.gutter-lightbulb.autofix {
+  color: var(--editor-lightbulb-autofix-foreground);
+}
+
+.gutter-lightbulb.ai {
+  color: var(--editor-lightbulb-ai-foreground);
+}
+
+/* ==========================================================================
+   6. Rename Widget - z-index: 100 (highest)
+   ========================================================================== */
+
+.rename-widget {
+  z-index: 100;
+  color: inherit;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--jb-canvas) 95%, transparent);
+  border: 1px solid var(--editor-widget-border);
+  box-shadow: 0 0 8px 2px var(--widget-shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* Fix for subpixel rendering artifacts on rounded corners with backdrop-filter */
+  isolation: isolate;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+.rename-widget.preview {
+  padding: 4px 4px 0 4px;
+}
+
+/* Input field */
+.rename-widget .rename-input-container {
+  padding: 3px;
+  border-radius: 2px;
+  width: calc(100% - 8px);
+}
+
+.rename-widget .rename-input {
+  width: calc(100% - 8px);
+  padding: 0;
+  background: var(--background-base);
+  border: 1px solid var(--border-weak);
+  border-radius: 2px;
+  color: var(--text-base);
+  font-family: var(--font-mono);
+}
+
+.rename-widget .rename-input:focus {
+  outline: none;
+  border-color: var(--focus-border);
+}
+
+/* Suggestions button */
+.rename-widget .suggestions-button {
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  background-color: transparent;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--text-weak);
+}
+
+.rename-widget .suggestions-button:hover {
+  background-color: var(--toolbar-hover-background);
+}
+
+/* Candidate list */
+.rename-widget .candidate-list .list-row {
+  border-radius: 2px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.rename-widget .candidate-list .list-row:hover,
+.rename-widget .candidate-list .list-row.selected {
+  background: var(--surface-active);
+}
+
+/* Preview label */
+.rename-widget .rename-label {
+  display: none;
+  opacity: 0.8;
+  font-size: 12px;
+  padding: 4px;
+}
+
+.rename-widget.preview .rename-label {
+  display: block;
+}
+
+/* ==========================================================================
+   7. Color Picker - 190px height
+   ========================================================================== */
+
+.colorpicker-widget {
+  height: 190px;
+  user-select: none;
+  background: var(--editor-widget-background);
+  border: 1px solid var(--editor-widget-border);
+  border-radius: 3px;
+  box-shadow: 0 0 8px 2px var(--widget-shadow);
+}
+
+/* Color decoration (inline indicator) */
+.colorpicker-decoration {
+  border: solid 0.1em #000;
+  box-sizing: border-box;
+  margin: 0.1em 0.2em 0 0.2em;
+  width: 0.8em;
+  height: 0.8em;
+  line-height: 0.8em;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* Dark theme decoration */
+.dark .colorpicker-decoration {
+  border-color: var(--jb-text-body-color);
+}
+
+/* Header section */
+.colorpicker-header {
+  display: flex;
+  height: 24px;
+  position: relative;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAKUlEQVQYV2NkYGD4z0AEYGRgZJjAwMDwn5GBEUjABGOAFBAREYmQAABGCAkBH1uA1wAAAABJRU5ErkJggg==");
+  background-size: 9px 9px;
+  image-rendering: pixelated;
+}
+
+.colorpicker-header .picked-color {
+  width: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 24px;
+  cursor: pointer;
+  color: var(--jb-btn-primary-color);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.colorpicker-header .picked-color.light {
+  color: black;
+}
+
+.colorpicker-header .picked-color-presentation {
+  white-space: nowrap;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.colorpicker-header .original-color {
+  width: 74px;
+  z-index: inherit;
+  cursor: pointer;
+}
+
+/* Close button */
+.colorpicker-header .close-button {
+  cursor: pointer;
+  background-color: var(--editor-hover-background);
+  border-left: 1px solid var(--editor-hover-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.colorpicker-header .close-button:hover {
+  background-color: var(--toolbar-hover-background);
+}
+
+.colorpicker-header .close-icon {
+  padding: 3px;
+}
+
+/* Body section */
+.colorpicker-body {
+  display: flex;
+  padding: 8px;
+  position: relative;
+}
+
+.colorpicker-body .saturation-wrap {
+  overflow: hidden;
+  height: 150px;
+  position: relative;
+  min-width: 220px;
+  flex: 1;
+}
+
+.colorpicker-body .saturation-box {
+  height: 150px;
+  position: absolute;
+  width: 100%;
+}
+
+/* Saturation selector */
+.colorpicker-body .saturation-selection {
+  width: 9px;
+  height: 9px;
+  margin: -5px 0 0 -5px;
+  border: 1px solid rgb(255, 255, 255);
+  border-radius: 100%;
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.8);
+  position: absolute;
+}
+
+/* Hue/Opacity strips */
+.colorpicker-body .strip {
+  width: 25px;
+  height: 150px;
+}
+
+.colorpicker-body .hue-strip {
+  position: relative;
+  margin-left: 8px;
+  cursor: grab;
+  background: linear-gradient(to bottom, 
+    #ff0000 0%, #ffff00 17%, #00ff00 33%, 
+    #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+}
+
+.colorpicker-body .opacity-strip {
+  position: relative;
+  margin-left: 8px;
+  cursor: grab;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAKUlEQVQYV2NkYGD4z0AEYGRgZJjAwMDwn5GBEUjABGOAFBAREYmQAABGCAkBH1uA1wAAAABJRU5ErkJggg==");
+  background-size: 9px 9px;
+  image-rendering: pixelated;
+}
+
+.colorpicker-body .strip.grabbing {
+  cursor: grabbing;
+}
+
+/* Slider control */
+.colorpicker-body .slider {
+  position: absolute;
+  top: 0;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: 4px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.71);
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.85);
+}
+
+.colorpicker-body .strip .overlay {
+  height: 150px;
+  pointer-events: none;
+}
+
+/* Insert button */
+.colorpicker-body .insert-button {
+  position: absolute;
+  height: 20px;
+  width: 58px;
+  padding: 0px;
+  right: 8px;
+  bottom: 8px;
+  background: var(--button-background);
+  color: var(--button-foreground);
+  border-radius: 2px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.colorpicker-body .insert-button:hover {
+  background: var(--button-hover-background);
+}
+
+/* ==========================================================================
+   8. Inline Completions - italic, opacity 0.7
+   ========================================================================== */
+
+/* Ghost text styling */
+.ghost-text-hidden {
+  opacity: 0;
+  font-size: 0;
+}
+
+.ghost-text-decoration,
+.ghost-text-preview {
+  font-style: italic;
+}
+
+.ghost-text-decoration.clickable,
+.ghost-text-preview.clickable {
+  cursor: pointer;
+}
+
+.inline-completion-replace {
+  text-decoration: underline;
+  text-underline-position: under;
+}
+
+/* Ghost text appearance */
+.ghost-text-decoration,
+.ghost-text-preview {
+  opacity: 0.7;
+  color: var(--editor-ghost-text-foreground);
+  background-color: var(--editor-ghost-text-background);
+  border: 1px solid var(--editor-ghost-text-border);
+}
+
+.ghost-text-decoration.syntax-highlighted,
+.ghost-text-preview.syntax-highlighted {
+  opacity: 0.7;
+}
+
+/* Warning state */
+.ghost-text-decoration.warning,
+.ghost-text-preview.warning {
+  border-bottom: 4px double var(--warning-foreground);
+}
+
+/* Fadeout decoration */
+.edits-fadeout-decoration {
+  opacity: var(--animation-opacity, 1);
+  background-color: var(--inline-edit-modified-background);
+}
+
+/* Inline suggestions hints widget - z-index: 39 */
+.inline-suggestions-hints {
+  padding: 4px;
+  z-index: 39;
+}
+
+.inline-suggestions-hints.with-border {
+  color: var(--editor-widget-foreground);
+  background-color: var(--editor-hover-background);
+  border: 1px solid var(--editor-hover-border);
+  border-radius: 3px;
+}
+
+.inline-suggestions-hints .warning-message p {
+  margin: 0;
+}
+
+.inline-suggestions-hints a {
+  color: var(--text-base) !important;
+}
+
+.inline-suggestions-hints .keybinding {
+  display: flex;
+  margin-left: 4px;
+  opacity: 0.6;
+}
+
+.inline-suggestions-hints .keybinding .key {
+  font-size: 8px;
+  padding: 2px 3px;
+  background: var(--background-base);
+  border-radius: 2px;
+}
+
+.inline-suggestions-hints .suggestion-count a {
+  display: flex;
+  min-width: 19px;
+  justify-content: center;
+}
+
+/* Inline edits indicator - z-index: 34 */
+.inline-edits-indicator {
+  display: flex;
+  z-index: 34;
+  height: 20px;
+  color: var(--text-base);
+  background-color: var(--surface-active);
+  border: 1px solid var(--border-weak);
+  border-radius: var(--inline-edit-border-radius);
+  align-items: center;
+  padding: 2px;
+  padding-right: 10px;
+  margin: 0 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  transition-delay: 0.4s;
+}
+
+.inline-edits-indicator.visible {
+  opacity: 1;
+}
+
+.inline-edits-indicator .icon {
+  display: flex;
+  align-items: center;
+  margin: 0 2px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.inline-edits-indicator.top .icon {
+  transform: rotate(90deg);
+}
+
+.inline-edits-indicator.bottom .icon {
+  transform: rotate(-90deg);
+}
+
+.inline-edits-indicator .label {
+  margin: 0 2px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Diff decorations */
+.inline-completions-line-insert {
+  background: var(--inline-edit-modified-background);
+}
+
+.inline-completions-line-delete {
+  background: var(--inline-edit-original-background);
+}
+
+.inline-completions-char-insert {
+  background: var(--inline-edit-modified-background);
+  cursor: pointer;
+}
+
+.inline-completions-char-delete {
+  background: var(--inline-edit-original-background);
+}
+
+.inline-completions-char-delete.diff-range-empty {
+  margin-left: -1px;
+  border-left: solid var(--inline-edit-original-background) 3px;
+}
+
+.inline-completions-char-insert.diff-range-empty {
+  border-left: solid var(--inline-edit-modified-background) 3px;
+}
+
+/* Single line inline diff */
+.inline-completions-char-delete.single-line-inline {
+  border: 1px solid var(--editor-hover-border);
+  margin: -2px 0 0 -2px;
+}
+
+.inline-completions-char-insert.single-line-inline {
+  border-top: 1px solid var(--accent-primary);
+  border-bottom: 1px solid var(--accent-primary);
+}
+
+.inline-completions-char-insert.single-line-inline.start {
+  border-top-left-radius: var(--inline-edit-border-radius);
+  border-bottom-left-radius: var(--inline-edit-border-radius);
+  border-left: 1px solid var(--accent-primary);
+}
+
+.inline-completions-char-insert.single-line-inline.end {
+  border-top-right-radius: var(--inline-edit-border-radius);
+  border-bottom-right-radius: var(--inline-edit-border-radius);
+  border-right: 1px solid var(--accent-primary);
+}
+
+/* Line replacement bubbles */
+.inline-completions-modified-bubble {
+  background: var(--inline-edit-modified-background);
+  pointer-events: none;
+  display: inline-block;
+}
+
+.inline-completions-original-bubble {
+  background: var(--inline-edit-original-background);
+  pointer-events: none;
+  display: inline-block;
+}
+
+/* Menu option styling */
+.inline-edit-menu-option {
+  color: var(--text-base);
+  font-size: 13px;
+  padding: 0 4px;
+  line-height: 28px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.inline-edit-menu-option .keybinding-key {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.inline-edit-menu-option.active {
+  background: var(--surface-active);
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+}
+
+/* ==========================================================================
+   9. CodeLens Widget
+   ========================================================================== */
+
+.codelens-decoration {
+  overflow: hidden;
+  display: inline-flex !important;
+  align-items: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-weak);
+  font-size: 12px;
+  padding-right: 6px;
+}
+
+.codelens-decoration > span,
+.codelens-decoration > a {
+  user-select: none;
+  white-space: nowrap;
+  vertical-align: sub;
+  display: inline-flex;
+  align-items: center;
+}
+
+.codelens-decoration > a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.codelens-decoration > a:hover {
+  cursor: pointer;
+  color: var(--accent-primary) !important;
+  text-decoration: underline;
+}
+
+.codelens-decoration .icon {
+  vertical-align: middle;
+  color: currentColor !important;
+}
+
+/* Fade-in animation */
+@keyframes codelens-fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.codelens-decoration.fadein {
+  animation: codelens-fadein 0.1s linear;
+}
+
+/* Code Lens - Reference counts */
+.codelens-decoration .codicon-references {
+  color: var(--accent-indigo);
+  margin-right: 2px;
+}
+
+/* Code Lens - Test actions */
+.codelens-decoration[data-command*="runTest"],
+.codelens-decoration[data-command*="debugTest"] {
+  font-weight: 500;
+}
+
+.codelens-decoration[data-command*="runTest"] > a {
+  color: var(--status-success);
+}
+
+.codelens-decoration[data-command*="debugTest"] > a {
+  color: var(--accent-orange);
+}
+
+/* Code Lens - Implementation counts */
+.codelens-decoration .codicon-implementations {
+  color: var(--accent-blue);
+  margin-right: 2px;
+}
+
+/* Separator between multiple code lenses on same line */
+.codelens-decoration + .codelens-decoration::before {
+  content: "|";
+  margin: 0 6px;
+  color: var(--border-weak);
+}
+
+/* ==========================================================================
+   10. Peek View Widget
+   ========================================================================== */
+
+.peekview-widget .head {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  background: var(--surface-active);
+}
+
+.peekview-widget .head .peekview-title {
+  display: flex;
+  align-items: baseline;
+  font-size: 13px;
+  margin-left: 20px;
+  min-width: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.peekview-widget .head .peekview-title.clickable {
+  cursor: pointer;
+}
+
+.peekview-title .dirname:not(:empty) {
+  font-size: 0.9em;
+  margin-left: 0.5em;
+  opacity: 0.7;
+}
+
+.peekview-title .meta,
+.peekview-title .dirname,
+.peekview-title .filename {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.peekview-title .meta:not(:empty)::before {
+  content: '-';
+  padding: 0 0.3em;
+}
+
+.peekview-title .icon {
+  margin-right: 4px;
+  align-self: center;
+}
+
+.peekview-widget .head .peekview-actions {
+  flex: 1;
+  text-align: right;
+  padding-right: 2px;
+}
+
+.peekview-widget > .body {
+  border-top: 1px solid var(--border-weak);
+  position: relative;
+}
+
+/* ==========================================================================
+   Animation Utilities
+   ========================================================================== */
+
+/* Slide in animation */
+@keyframes editor-widget-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: editor-widget-slide-in 150ms ease-out forwards;
+}
+
+/* Find widget specific slide animation */
+@keyframes find-widget-slide {
+  from {
+    transform: translateY(calc(-100% - 10px));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Spinner animation */
+@keyframes editor-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.editor-spinner {
+  animation: editor-spinner 1s linear infinite;
+}
+
+/* ==========================================================================
+   11. Inline Git Blame Decorations
+   ========================================================================== */
+
+/**
+ * Inline blame shows git blame information at the end of lines.
+ * Similar to GitLens in VS Code.
+ * 
+ * Modes:
+ * - currentLine: Shows blame only for the cursor line (less noisy)
+ * - allLines: Shows blame for all visible lines
+ */
+
+/* Base inline blame decoration style */
+.inline-blame-decoration {
+  color: var(--text-weaker, var(--jb-text-muted-color));
+  font-style: italic;
+  font-size: 12px;
+  opacity: 0.7;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  padding-left: 2em;
+  font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+/* Current line blame - slightly more visible */
+.inline-blame-current {
+  color: var(--text-weak, var(--jb-text-muted-color));
+  opacity: 0.85;
+}
+
+/* Faded blame for non-current lines in "allLines" mode */
+.inline-blame-faded {
+  color: var(--text-weaker, var(--jb-text-muted-color));
+  opacity: 0.5;
+}
+
+/* Hover state for inline blame (when interactive) */
+.inline-blame-decoration:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
+/* Animation for blame appearing */
+@keyframes inline-blame-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  to {
+    opacity: 0.7;
+    transform: translateX(0);
+  }
+}
+
+.inline-blame-decoration {
+  animation: inline-blame-fade-in 0.2s ease-out forwards;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .inline-blame-decoration {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+.high-contrast .inline-blame-decoration {
+  color: var(--text-weak, var(--jb-text-muted-color));
+  opacity: 0.9;
+}
+
+/* Dark theme optimizations */
+.dark .inline-blame-decoration,
+[data-theme="dark"] .inline-blame-decoration {
+  color: var(--jb-text-muted-color);
+}
+
+.dark .inline-blame-current,
+[data-theme="dark"] .inline-blame-current {
+  color: var(--jb-text-muted-color);
+}
+
+/* Light theme optimizations */
+.light .inline-blame-decoration,
+[data-theme="light"] .inline-blame-decoration {
+  color: var(--jb-text-muted-color);
+}
+
+.light .inline-blame-current,
+[data-theme="light"] .inline-blame-current {
+  color: var(--jb-text-muted-color);
+}
+
+/* ==========================================================================
+   12. Blame Hover Widget
+   ========================================================================== */
+
+/**
+ * Enhanced hover widget styles for git blame information.
+ * Shows detailed commit info when hovering over blame annotations.
+ */
+
+/* Blame hover content container */
+.monaco-hover .blame-hover-content {
+  max-width: 500px;
+  font-family: var(--font-mono, 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace);
+  line-height: 1.5;
+}
+
+/* Blame hover header with author info */
+.monaco-hover .blame-hover-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-base);
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-weak);
+}
+
+.monaco-hover .blame-hover-header .author-email {
+  font-weight: 400;
+  color: var(--text-weak);
+  font-size: 12px;
+}
+
+/* Blame hover commit hash */
+.monaco-hover .blame-hover-hash {
+  font-family: var(--font-mono, 'SF Mono', Monaco, monospace);
+  font-size: 12px;
+  background: var(--surface-base);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--accent-primary);
+}
+
+/* Blame hover date */
+.monaco-hover .blame-hover-date {
+  color: var(--text-weak);
+  font-size: 12px;
+}
+
+.monaco-hover .blame-hover-date .relative-time {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* Blame hover commit message */
+.monaco-hover .blame-hover-message {
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--surface-base);
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Blame hover summary line */
+.monaco-hover .blame-hover-summary {
+  font-style: italic;
+  color: var(--text-weak);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-weak);
+}
+
+/* Monaco hover customization for blame hovers */
+.monaco-hover-content hr {
+  border: none;
+  border-top: 1px solid var(--border-weak);
+  margin: 8px 0;
+}
+
+/* Make markdown in hover look better */
+.monaco-hover-content code {
+  font-family: var(--font-mono, 'SF Mono', Monaco, monospace);
+  font-size: 12px;
+  background: var(--surface-base, rgba(0, 0, 0, 0.2));
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: var(--accent-primary, var(--jb-border-focus));
+}
+
+/* Hover content max width for blame */
+.monaco-hover-content .markdown-hover {
+  max-width: 500px;
+}
+
+/* ==========================================================================
+   13. Peek Definition Widget - VS Code Style Inline Preview
+   ========================================================================== */
+
+/**
+ * Peek Definition shows an inline preview of definitions without navigating away.
+ * Supports multiple results with navigation (< 1/5 >).
+ * 
+ * Features:
+ * - Dark header with filename and close button
+ * - Embedded Monaco editor with syntax highlighting
+ * - Resizable widget
+ * - Multiple results navigation
+ */
+
+/* Main widget container */
+.peek-widget {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-raised, var(--jb-canvas));
+  border: 1px solid var(--accent-primary, var(--jb-border-focus));
+  border-radius: 3px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px color-mix(in srgb, var(--jb-border-focus) 30%, transparent);
+  overflow: hidden;
+  z-index: 50;
+  animation: peek-widget-slide-in 150ms ease-out forwards;
+}
+
+@keyframes peek-widget-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header section */
+.peek-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+  min-height: 26px;
+  padding: 0 8px;
+  background-color: var(--surface-active, var(--jb-canvas));
+  border-bottom: 1px solid var(--border-weak);
+  user-select: none;
+}
+
+/* Title section with icon and filename */
+.peek-widget-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.peek-widget-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  flex-shrink: 0;
+}
+
+.peek-widget-filename {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-base, var(--jb-text-body-color));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.peek-widget-dirname {
+  font-size: 11px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 4px;
+}
+
+.peek-widget-line {
+  font-size: 11px;
+  color: var(--text-weaker, var(--jb-text-muted-color));
+  white-space: nowrap;
+  margin-left: 2px;
+}
+
+/* Actions section */
+.peek-widget-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Navigation buttons */
+.peek-widget-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  cursor: pointer;
+  transition: background-color 150ms, color 150ms;
+}
+
+.peek-widget-nav-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-base, var(--jb-text-body-color));
+}
+
+.peek-widget-nav-btn:active {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Results count */
+.peek-widget-count {
+  font-size: 11px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  padding: 0 4px;
+  min-width: 40px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Action button (go to definition) */
+.peek-widget-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  cursor: pointer;
+  transition: background-color 150ms, color 150ms;
+  margin-left: 4px;
+}
+
+.peek-widget-action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--accent-primary, var(--jb-border-focus));
+}
+
+/* Close button */
+.peek-widget-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  cursor: pointer;
+  transition: background-color 150ms, color 150ms;
+  margin-left: 4px;
+}
+
+.peek-widget-close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--error-foreground, var(--cortex-error));
+}
+
+/* Body section - contains embedded editor */
+.peek-widget-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--surface-base, var(--jb-canvas));
+}
+
+/* Embedded editor container */
+.peek-widget-editor {
+  width: 100%;
+  height: 100%;
+}
+
+/* Loading state */
+.peek-widget-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--surface-base, var(--jb-canvas));
+  color: var(--text-weak, var(--jb-text-muted-color));
+  font-size: 12px;
+}
+
+.peek-widget-spinner {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--border-weak);
+  border-top-color: var(--accent-primary, var(--jb-border-focus));
+  border-radius: 50%;
+  animation: peek-widget-spin 0.8s linear infinite;
+}
+
+@keyframes peek-widget-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Resize handle */
+.peek-widget-resize-handle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: transparent;
+  cursor: s-resize;
+  transition: background-color 150ms;
+}
+
+.peek-widget-resize-handle:hover {
+  background-color: var(--accent-primary, var(--jb-border-focus));
+}
+
+/* Definition highlight in embedded editor */
+.peek-definition-highlight-line {
+  background-color: color-mix(in srgb, var(--jb-border-focus) 15%, transparent) !important;
+}
+
+/* Ensure Monaco editor within peek widget has correct styling */
+.peek-widget .monaco-editor {
+  border-radius: 0 !important;
+}
+
+.peek-widget .monaco-editor .margin {
+  background-color: var(--surface-base, var(--jb-canvas)) !important;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .peek-widget {
+    animation: none;
+  }
+  
+  .peek-widget-spinner {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   14. References Panel - Find All References Side Panel
+   ========================================================================== */
+
+/**
+ * References Panel shows all references grouped by file.
+ * Features:
+ * - Tree view of references grouped by file
+ * - Line preview with highlighted match
+ * - Click to navigate to reference
+ * - Reference count display
+ * - Collapse/expand files
+ */
+
+.references-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--surface-base, var(--jb-canvas));
+  border-left: 1px solid var(--border-weak);
+  font-size: 12px;
+  overflow: hidden;
+}
+
+/* Panel header */
+.references-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--surface-active, var(--jb-canvas));
+  border-bottom: 1px solid var(--border-weak);
+  min-height: 36px;
+  flex-shrink: 0;
+}
+
+.references-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.references-panel-icon {
+  display: flex;
+  align-items: center;
+  color: var(--accent-primary, var(--jb-border-focus));
+  flex-shrink: 0;
+}
+
+.references-panel-symbol {
+  font-weight: 600;
+  color: var(--text-base, var(--jb-text-body-color));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.references-panel-count {
+  font-size: 11px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  background-color: var(--surface-base);
+  padding: 2px 6px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.references-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.references-panel-action-btn,
+.references-panel-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  cursor: pointer;
+  transition: background-color 150ms, color 150ms;
+}
+
+.references-panel-action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-base, var(--jb-text-body-color));
+}
+
+.references-panel-close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--error-foreground, var(--cortex-error));
+}
+
+/* Filter input */
+.references-panel-filter {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-weak);
+  flex-shrink: 0;
+}
+
+.references-panel-filter-input {
+  width: 100%;
+  height: 26px;
+  padding: 0 8px;
+  background-color: var(--surface-base);
+  border: 1px solid var(--border-weak);
+  border-radius: 4px;
+  color: var(--text-base, var(--jb-text-body-color));
+  font-size: 12px;
+  outline: none;
+  transition: border-color 150ms;
+}
+
+.references-panel-filter-input:focus {
+  border-color: var(--accent-primary, var(--jb-border-focus));
+}
+
+.references-panel-filter-input::placeholder {
+  color: var(--text-weak, var(--jb-text-muted-color));
+}
+
+/* Content area */
+.references-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Loading state */
+.references-panel-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+}
+
+.references-panel-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-weak);
+  border-top-color: var(--accent-primary, var(--jb-border-focus));
+  border-radius: 50%;
+  animation: references-panel-spin 0.8s linear infinite;
+}
+
+@keyframes references-panel-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error state */
+.references-panel-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  color: var(--error-foreground, var(--cortex-error));
+}
+
+.references-panel-error-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background-color: var(--error-foreground, var(--cortex-error));
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Empty state */
+.references-panel-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+}
+
+/* File group */
+.references-file-group {
+  border-bottom: 1px solid var(--border-weak);
+}
+
+.references-file-group:last-child {
+  border-bottom: none;
+}
+
+/* File header */
+.references-file-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 150ms;
+}
+
+.references-file-header:hover {
+  background-color: var(--surface-active);
+}
+
+.references-file-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  flex-shrink: 0;
+  transition: transform 150ms;
+}
+
+.references-file-chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.references-file-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  flex-shrink: 0;
+}
+
+.references-file-name {
+  font-weight: 500;
+  color: var(--text-base, var(--jb-text-body-color));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.references-file-path {
+  font-size: 11px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 8px;
+}
+
+.references-file-count {
+  font-size: 11px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  background-color: var(--surface-base);
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Reference list */
+.references-list {
+  padding-left: 20px;
+}
+
+/* Reference item */
+.reference-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+  user-select: none;
+  border-left: 2px solid transparent;
+  transition: background-color 150ms, border-color 150ms;
+}
+
+.reference-item:hover {
+  background-color: var(--surface-active);
+}
+
+.reference-item.selected {
+  background-color: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+  border-left-color: var(--accent-primary, var(--jb-border-focus));
+}
+
+.reference-line-number {
+  font-size: 11px;
+  font-family: var(--font-mono, 'SF Mono', Monaco, monospace);
+  color: var(--text-weak, var(--jb-text-muted-color));
+  min-width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.reference-preview {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, 'SF Mono', Monaco, monospace);
+  font-size: 12px;
+  color: var(--text-base, var(--jb-text-body-color));
+}
+
+.reference-text-before,
+.reference-text-after {
+  color: var(--text-weak, var(--jb-text-muted-color));
+}
+
+.reference-text-match {
+  color: var(--accent-primary, var(--jb-border-focus));
+  background-color: color-mix(in srgb, var(--accent-primary) 20%, transparent);
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   15. Peek References Widget - Inline References Preview
+   ========================================================================== */
+
+/**
+ * Peek References shows references inline in the editor.
+ * Features:
+ * - File tabs at top for multiple files
+ * - Reference list with line previews
+ * - Preview editor for selected reference
+ * - Keyboard navigation
+ */
+
+.peek-references-widget {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-raised, var(--jb-canvas));
+  border: 1px solid var(--accent-primary, var(--jb-border-focus));
+  border-radius: 3px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px color-mix(in srgb, var(--jb-border-focus) 30%, transparent);
+  overflow: hidden;
+  z-index: 50;
+  animation: peek-widget-slide-in 150ms ease-out forwards;
+}
+
+/* Header with file tabs */
+.peek-references-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 32px;
+  background-color: var(--surface-active, var(--jb-canvas));
+  border-bottom: 1px solid var(--border-weak);
+  padding: 0 4px;
+}
+
+.peek-references-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.peek-references-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.peek-references-tabs::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-slider-bg);
+  border-radius: 2px;
+}
+
+.peek-references-tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 150ms, color 150ms;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.peek-references-tab:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-base, var(--jb-text-body-color));
+}
+
+.peek-references-tab.active {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: var(--text-base, var(--jb-text-body-color));
+}
+
+.peek-tab-icon {
+  display: flex;
+  align-items: center;
+  color: inherit;
+}
+
+.peek-tab-name {
+  font-weight: 500;
+}
+
+.peek-tab-count {
+  font-size: 10px;
+  padding: 1px 5px;
+  background-color: var(--surface-base);
+  border-radius: 10px;
+  opacity: 0.8;
+}
+
+.peek-references-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+.peek-references-symbol {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-base, var(--jb-text-body-color));
+}
+
+.peek-references-count {
+  font-size: 11px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+}
+
+.peek-references-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.peek-references-action-btn,
+.peek-references-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+  cursor: pointer;
+  transition: background-color 150ms, color 150ms;
+}
+
+.peek-references-action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--accent-primary, var(--jb-border-focus));
+}
+
+.peek-references-close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--error-foreground, var(--cortex-error));
+}
+
+/* Body - split view */
+.peek-references-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Reference list */
+.peek-references-list {
+  width: 260px;
+  min-width: 200px;
+  max-width: 400px;
+  border-right: 1px solid var(--border-weak);
+  overflow-y: auto;
+  background-color: var(--surface-base, var(--jb-canvas));
+}
+
+.peek-references-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  color: var(--text-weak, var(--jb-text-muted-color));
+}
+
+.peek-references-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border-weak);
+  border-top-color: var(--accent-primary, var(--jb-border-focus));
+  border-radius: 50%;
+  animation: references-panel-spin 0.8s linear infinite;
+}
+
+/* Reference item */
+.peek-ref-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: background-color 150ms, border-color 150ms;
+}
+
+.peek-ref-item:hover {
+  background-color: var(--surface-active);
+}
+
+.peek-ref-item.selected {
+  background-color: color-mix(in srgb, var(--accent-primary) 15%, transparent);
+  border-left-color: var(--accent-primary, var(--jb-border-focus));
+}
+
+.peek-ref-line {
+  font-size: 11px;
+  font-family: var(--font-mono, 'SF Mono', Monaco, monospace);
+  color: var(--text-weak, var(--jb-text-muted-color));
+  min-width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.peek-ref-content {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, 'SF Mono', Monaco, monospace);
+  font-size: 12px;
+  color: var(--text-base, var(--jb-text-body-color));
+}
+
+/* Preview editor */
+.peek-references-preview {
+  flex: 1;
+  overflow: hidden;
+  background-color: var(--surface-base, var(--jb-canvas));
+}
+
+.peek-references-editor {
+  width: 100%;
+  height: 100%;
+}
+
+/* Reference highlight in embedded editor */
+.peek-reference-highlight-line {
+  background-color: color-mix(in srgb, var(--jb-border-focus) 15%, transparent) !important;
+}
+
+/* Resize handle */
+.peek-references-resize-handle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: transparent;
+  cursor: s-resize;
+  transition: background-color 150ms;
+}
+
+.peek-references-resize-handle:hover {
+  background-color: var(--accent-primary, var(--jb-border-focus));
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .peek-references-widget {
+    animation: none;
+  }
+  
+  .peek-references-spinner,
+  .references-panel-spinner {
+    animation: none;
+  }
+}

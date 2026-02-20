@@ -1,0 +1,348 @@
+/* =============================================================================
+   FLOATING PANELS - JetBrains Islands Style + Glassmorphism
+   =============================================================================
+   JetBrains New UI "Islands" design with frosted glass effect.
+   
+   Key principles:
+   - NO visible borders between panels - use gaps (2-4px) instead
+   - Semi-transparent backgrounds with backdrop blur
+   - Panels "float" with rounded corners and glass effect
+   - Resize handles are invisible until hovered
+   - Background blur creates visual separation
+   ============================================================================= */
+
+/* =============================================================================
+   0. GLASSMORPHISM BASE - Backdrop Blur Foundation
+   ============================================================================= */
+
+/* Apply glass effect to main app container */
+.layout,
+.app-container,
+[data-tauri-decor] {
+  background: transparent;
+}
+
+/* =============================================================================
+   1. EDITOR AREA - OPAQUE (No glass effect for code readability)
+   ============================================================================= */
+
+/* Main editor container - SOLID OPAQUE background for code contrast */
+.editor-area,
+.editor-panel,
+.editor-group-container {
+  background: var(--jb-canvas);
+  /* NO backdrop-filter - editor must be opaque for text readability */
+  border-radius: var(--jb-floating-panel-radius, 8px);
+  overflow: hidden;
+  border: none;
+}
+
+/* Editor content area - OPAQUE */
+.editor-content,
+.monaco-editor-container {
+  background: var(--jb-canvas);
+  /* NO backdrop-filter */
+  border: none;
+}
+
+/* Editor groups (when split) - OPAQUE */
+.editor-group {
+  background: var(--jb-canvas);
+  /* NO backdrop-filter */
+  border-radius: var(--jb-floating-panel-radius, 8px);
+  overflow: hidden;
+  border: none;
+}
+
+/* =============================================================================
+   2. SIDEBAR PANELS - Floating Glass Cards
+   ============================================================================= */
+
+/* Primary sidebar (file explorer, search, etc.) - inherits from body */
+.sidebar-panel,
+.part.sidebar {
+  background: transparent;
+  border-radius: var(--jb-floating-panel-radius, 8px);
+  overflow: hidden;
+  border: none;
+  /* Fix for subpixel rendering artifacts on rounded corners */
+  isolation: isolate;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+/* Activity bar - inherits from body */
+.activity-bar,
+.part.activitybar {
+  background: transparent;
+  border: none;
+}
+
+/* Activity bar icons - with hover/active background */
+.activity-bar-item {
+  color: var(--jb-icon-color-inactive);
+  opacity: 0.7;
+  background: transparent;
+  border-radius: var(--jb-radius-sm);
+  transition: background-color 0.15s ease, opacity 0.15s ease, color 0.15s ease;
+}
+
+.activity-bar-item:hover {
+  color: #FAFAFA;
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.activity-bar-item.active,
+.activity-bar-item[aria-pressed="true"] {
+  color: #FAFAFA;
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Right sidebar (auxiliary bar) - glass effect */
+.right-sidebar,
+.part.auxiliarybar {
+  background: var(--jb-app-root);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--jb-floating-panel-radius, 8px);
+  overflow: hidden;
+  border: none;
+  /* Fix for subpixel rendering artifacts on rounded corners with backdrop-filter */
+  isolation: isolate;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+/* =============================================================================
+   3. BOTTOM PANEL - Floating Glass Card
+   ============================================================================= */
+
+.bottom-panel,
+.part.panel {
+  background: var(--jb-app-root);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  /* Rounded top corners only - bottom is at edge */
+  border-radius: var(--jb-floating-panel-radius, 8px) var(--jb-floating-panel-radius, 8px) 0 0;
+  overflow: hidden;
+  border: none;
+  /* Fix for subpixel rendering artifacts on rounded corners with backdrop-filter */
+  isolation: isolate;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+/* Terminal container - OPAQUE for text readability */
+.terminal-container,
+.terminal-wrapper {
+  background: var(--jb-canvas);
+  /* NO backdrop-filter - terminal text must be readable */
+  border: none;
+}
+
+/* =============================================================================
+   4. TAB BAR - Seamless Merge with Editor (Trae Style)
+   ============================================================================= */
+
+/* Tab bar container - inherit from parent card */
+.tabs-and-actions-container,
+.tabs-container {
+  background: inherit;
+  border: none;
+  /* NO bottom border - tabs merge directly with editor */
+  border-bottom: none;
+}
+
+/* Active tab - Figma design: seamless merge with editor */
+.tab.active {
+  background: var(--cortex-bg-secondary, #1A1B1F) !important;
+  color: var(--cortex-text-primary, #FFFFFF) !important;
+  /* NO border-radius - flat tab merges seamlessly with editor */
+  border-radius: 0;
+  border: none !important;
+  /* NO box-shadow - clean seamless look */
+  box-shadow: none;
+  z-index: 10;
+}
+
+/* Inactive tabs - transparent with muted text */
+.tab.inactive {
+  background: transparent;
+  color: var(--jb-text-muted-color, #6E7681);
+  border-radius: 6px 6px 0 0;
+  border: none;
+}
+
+/* Inactive tab hover - subtle highlight */
+.tab.inactive:hover {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--jb-text-navbar-hover);
+}
+
+/* =============================================================================
+   5. NAVBAR / MENUBAR - Glassmorphism Style
+   ============================================================================= */
+
+/* Menu bar text - White */
+.menu-bar,
+.menubar,
+.menubar-menu-button,
+[class*="menu-bar"] {
+  color: var(--jb-text-navbar-color) !important;
+  font-weight: 400;
+  text-transform: none;
+}
+
+/* Menu bar text hover - stays white */
+.menubar-menu-button:hover,
+.menu-bar button:hover,
+[class*="menu-bar"] button:hover {
+  color: var(--jb-text-navbar-hover) !important;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Menu bar background - inherits from body */
+.menu-bar-container,
+.menubar-container,
+[class*="menu-bar-container"] {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* =============================================================================
+   6. PANEL HEADERS - Clean, Borderless
+   ============================================================================= */
+
+.panel-header,
+.section-header {
+  background: transparent;
+  border: none;
+  color: var(--jb-text-muted-color, #6E7681);
+}
+
+/* Header dividers - quasi-invisibles */
+.panel-header-divider,
+.section-divider {
+  height: 1px;
+  background: var(--jb-border-divider, #3F3F46);
+  opacity: 0.5;
+  margin: 0 8px;
+}
+
+/* =============================================================================
+   5.5. MAIN CONTENT AREA - JetBrains Islands Gap-Based Separation
+   ============================================================================= */
+
+/* Main content area uses gaps instead of borders */
+.floating-main-area,
+.main-content,
+.layout-content {
+  gap: 2px; /* Small gap creates visual separation between panels */
+}
+
+/* Main editor area within layout */
+.editor-main-area {
+  gap: 2px;
+  padding: 2px;
+}
+
+/* =============================================================================
+   6. RESIZE HANDLES - JetBrains Islands Style (Invisible until Hover)
+   ============================================================================= */
+
+/* Resize handles should be invisible - the gap IS the resize area */
+.resize-handle,
+.sash {
+  background: transparent;
+  /* JetBrains Islands: Handles invisible by default */
+}
+
+.resize-handle:hover,
+.sash:hover {
+  /* Subtle indigo highlight on hover */
+  background: rgba(99, 102, 241, 0.5);
+}
+
+.resize-handle:active,
+.sash:active {
+  /* Slightly stronger on active/drag */
+  background: rgba(99, 102, 241, 0.7);
+}
+
+/* =============================================================================
+   7. SPECIAL CONTAINERS - Consistent Floating Style
+   ============================================================================= */
+
+/* Welcome page */
+.welcome-container {
+  background: var(--jb-floating-editor-bg, var(--jb-canvas));
+  border-radius: var(--jb-floating-panel-radius, 8px);
+}
+
+/* Settings panel */
+.settings-container,
+.settings-panel {
+  background: var(--jb-floating-editor-bg, var(--jb-canvas));
+  border-radius: var(--jb-floating-panel-radius, 8px);
+}
+
+/* Quick input / command palette - already floating by nature */
+.quick-input-widget,
+.command-palette {
+  border-radius: var(--jb-radius-lg, 8px);
+  border: none;
+  box-shadow: var(--jb-shadow-popup);
+}
+
+/* =============================================================================
+   8. SCROLLBARS - Minimal, Floating Style
+   ============================================================================= */
+
+/* Scrollbars should not add visual noise */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--jb-scrollbar-thumb, #43454A);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--jb-scrollbar-thumb-hover, #5A5D63);
+}
+
+/* =============================================================================
+   9. OVERRIDE LEGACY BORDERS
+   ============================================================================= */
+
+/* Remove all legacy borders that conflict with floating style */
+.panel,
+.sidebar,
+.editor,
+.terminal {
+  border: none !important;
+}
+
+/* Remove specific legacy border declarations */
+[style*="border-left"],
+[style*="border-right"],
+[style*="border-top"],
+[style*="border-bottom"] {
+  /* CSS cannot override inline styles, but this documents intent */
+}
+
+/* Use classes to remove borders where possible */
+.no-border {
+  border: none !important;
+}
+
+.floating-panel {
+  border: none !important;
+  border-radius: var(--jb-floating-panel-radius, 8px);
+}
+

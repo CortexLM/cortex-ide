@@ -1,0 +1,705 @@
+/* ============================================================================
+   CORTEX DESKTOP - VS CODE MENU SYSTEM
+   Based on VS Code menu.ts, menubar.ts, contextview.ts specifications
+   ============================================================================ */
+
+/* ==========================================================================
+   CSS CUSTOM PROPERTIES - IMenuStyles Interface (12 color properties)
+   ========================================================================== */
+
+:root {
+  /* Menu shadow and border - VS Code exact specs */
+  --cortex-menu-shadow-color: rgba(0, 0, 0, 0.36);
+  --cortex-menu-border-color: var(--jb-border-default);
+  
+  /* Menu text and background - VS Code exact specs */
+  --cortex-menu-foreground-color: var(--cortex-text-primary);
+  --cortex-menu-background-color: var(--jb-popup);
+  
+  /* Selection/focused item - VS Code exact specs */
+  --cortex-menu-selection-foreground-color: var(--jb-btn-primary-color);
+  --cortex-menu-selection-background-color: var(--jb-surface-selected);
+  --cortex-menu-selection-border-color: transparent;
+  
+  /* Separator - VS Code exact specs */
+  --cortex-menu-separator-color: var(--jb-border-default);
+  
+  /* Scrollbar (4 properties) */
+  --cortex-menu-scrollbar-shadow: rgba(0, 0, 0, 0.3);
+  --cortex-menu-scrollbar-slider-background: var(--cortex-scrollbar-thumb);
+  --cortex-menu-scrollbar-slider-hover-background: var(--cortex-scrollbar-thumb-hover);
+  --cortex-menu-scrollbar-slider-active-background: var(--cortex-text-muted);
+  
+  /* VS Code menu sizing tokens - exact specs */
+  --cortex-menu-min-width: 160px;
+  --cortex-menu-border-radius: 6px;
+  --cortex-menu-item-border-radius: 0;
+  --cortex-menu-font-size: 13px;
+  --cortex-menu-item-height: 26px;
+  --cortex-menu-item-margin: 0;
+  --cortex-menu-padding: 4px 0;
+  
+  /* Check icon */
+  --cortex-menu-check-width: 26px;
+  
+  /* Label - VS Code exact specs */
+  --cortex-menu-label-padding: 0 26px;
+  --cortex-menu-label-font-size: 11px;
+  
+  /* Keybinding - VS Code exact specs */
+  --cortex-menu-keybinding-padding: 0 26px 0 8px;
+  --cortex-menu-keybinding-opacity: 1;
+  --cortex-menu-keybinding-disabled-opacity: 0.4;
+  
+  /* Submenu indicator */
+  --cortex-menu-submenu-indicator-padding: 0 26px;
+  
+  /* Separator - VS Code exact specs */
+  --cortex-menu-separator-margin: 4px 0;
+  
+  /* Z-index stack */
+  --cortex-menu-z-index: 2575;
+  --cortex-menu-items-holder-z-index: 2000;
+  
+  /* Scrollbar */
+  --cortex-menu-scrollbar-size: 8px;
+  
+  /* Timing tokens - VS Code specifications */
+  --cortex-menu-submenu-show-delay: 250ms;
+  --cortex-menu-submenu-hide-delay: 750ms;
+  --cortex-menu-fade-in-duration: 83ms;
+  --cortex-menu-transform-transition: 50ms;
+  --cortex-menu-mouse-up-debounce: 100ms;
+}
+
+/* ==========================================================================
+   ANIMATIONS - VS Code Menu Animations
+   ========================================================================== */
+
+/* Context view fade-in: 83ms linear (VS Code spec) */
+@keyframes cortex-menu-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Menu item transform transition: 50ms ease (VS Code spec) */
+@keyframes cortex-menu-item-transform {
+  from {
+    transform: translateY(-2px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar visibility transitions */
+@keyframes cortex-menu-scrollbar-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   MENU CONTAINER - .monaco-menu-container, .monaco-menu
+   ========================================================================== */
+
+.cortex-menu-container {
+  position: fixed;
+  z-index: var(--cortex-menu-z-index);
+  animation: cortex-menu-fade-in var(--cortex-menu-fade-in-duration) linear;
+}
+
+.cortex-menu {
+  min-width: var(--cortex-menu-min-width);
+  background: var(--cortex-menu-background-color);
+  border: 1px solid var(--cortex-menu-border-color);
+  border-radius: var(--cortex-menu-border-radius);
+  box-shadow: 0 2px 8px var(--cortex-menu-shadow-color);
+  font-size: var(--cortex-menu-font-size);
+  padding: var(--cortex-menu-padding);
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   ACTION BAR - .monaco-action-bar.vertical
+   ========================================================================== */
+
+.cortex-menu-action-bar {
+  display: block;
+  text-align: left;
+}
+
+.cortex-menu-actions-container {
+  display: block;
+}
+
+/* ==========================================================================
+   MENU ITEM - .action-item, .action-menu-item
+   ========================================================================== */
+
+.cortex-menu-item {
+  display: flex;
+  position: relative;
+  transition: transform var(--cortex-menu-transform-transition) ease;
+}
+
+.cortex-menu-item-content {
+  flex: 1 1 auto;
+  display: flex;
+  height: var(--cortex-menu-item-height);
+  line-height: var(--cortex-menu-item-height);
+  align-items: center;
+  margin: var(--cortex-menu-item-margin);
+  border-radius: var(--cortex-menu-item-border-radius);
+  cursor: pointer;
+  color: var(--cortex-menu-foreground-color);
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0 26px;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.cortex-menu-item-content:hover {
+  background: var(--cortex-menu-selection-background-color);
+  color: var(--cortex-menu-selection-foreground-color);
+}
+
+/* Context menu item - VS Code exact specs */
+.context-menu-item {
+  height: 26px;
+  line-height: 26px;
+  padding: 0 26px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.context-menu-item:hover {
+  background: var(--cortex-menu-selection-background-color, var(--jb-surface-selected));
+  color: var(--jb-btn-primary-color);
+}
+
+.context-menu-item.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Focused state with outline */
+.cortex-menu-item.focused .cortex-menu-item-content {
+  background: var(--cortex-menu-selection-background-color);
+  color: var(--cortex-menu-selection-foreground-color);
+  outline: 1px solid var(--cortex-menu-selection-border-color);
+  outline-offset: -1px;
+}
+
+/* Disabled state */
+.cortex-menu-item.disabled .cortex-menu-item-content {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.cortex-menu-item.disabled .cortex-menu-item-content:hover {
+  background: transparent;
+}
+
+/* ==========================================================================
+   CHECK MARK - .menu-item-check
+   ========================================================================== */
+
+.cortex-menu-item-check {
+  position: absolute;
+  left: 0;
+  visibility: hidden;
+  width: var(--cortex-menu-check-width);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cortex-menu-foreground-color);
+}
+
+.cortex-menu-item.checked .cortex-menu-item-check {
+  visibility: visible;
+}
+
+/* Codicon for checkmark */
+.cortex-menu-item-check .codicon-menu-selection::before {
+  content: '\eab2'; /* VS Code check icon */
+}
+
+/* ==========================================================================
+   LABEL - .action-label
+   ========================================================================== */
+
+.cortex-menu-item-label {
+  padding: var(--cortex-menu-label-padding);
+  font-size: inherit;
+  line-height: 1;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   KEYBINDING - .keybinding
+   ========================================================================== */
+
+.cortex-menu-item-keybinding {
+  margin-left: auto;
+  padding: var(--cortex-menu-keybinding-padding);
+  text-align: right;
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--cortex-text-muted);
+}
+
+.cortex-menu-item.disabled .cortex-menu-item-keybinding {
+  opacity: var(--cortex-menu-keybinding-disabled-opacity);
+}
+
+/* Context menu icon - VS Code exact specs */
+.context-menu-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: -22px;
+  margin-right: 6px;
+}
+
+/* Context menu keybinding - VS Code exact specs */
+.context-menu-keybinding {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--cortex-text-muted);
+  font-family: monospace;
+}
+
+/* Context menu separator - VS Code exact specs */
+.context-menu-separator {
+  height: 1px;
+  background: var(--cortex-menu-border-color, var(--jb-border-default));
+  margin: 4px 0;
+}
+
+/* Context menu submenu arrow - VS Code exact specs */
+.context-menu-submenu-arrow {
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+}
+
+/* Context menu submenu - VS Code exact specs */
+.context-menu-submenu {
+  position: absolute;
+  left: 100%;
+  top: -4px;
+}
+
+/* ==========================================================================
+   SUBMENU INDICATOR - .submenu-indicator
+   ========================================================================== */
+
+.cortex-menu-submenu-indicator {
+  padding: var(--cortex-menu-submenu-indicator-padding);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: var(--cortex-text-muted);
+}
+
+.cortex-menu-submenu-indicator svg,
+.cortex-menu-submenu-indicator .codicon {
+  margin-left: auto;
+  margin-right: -20px;
+  font-size: 16px;
+}
+
+/* ==========================================================================
+   SUBMENU - .monaco-submenu
+   ========================================================================== */
+
+.cortex-menu-submenu {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: 4px;
+  z-index: 1;
+  /* Submenu show delay handled via JS: 250ms */
+  /* Submenu hide delay handled via JS: 750ms */
+}
+
+.cortex-menu-submenu .cortex-menu {
+  animation: cortex-menu-fade-in var(--cortex-menu-fade-in-duration) linear;
+}
+
+/* ==========================================================================
+   SEPARATOR - .action-label.separator
+   ========================================================================== */
+
+.cortex-menu-separator {
+  width: 100%;
+  height: 0px;
+  margin: var(--cortex-menu-separator-margin);
+  border: none;
+  border-bottom: 1px solid var(--cortex-menu-separator-color);
+  padding: 0;
+}
+
+.cortex-menu-separator-label {
+  font-size: inherit;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cortex-text-muted);
+  padding: 4px 8px;
+}
+
+/* ==========================================================================
+   MENUBAR - .menubar
+   ========================================================================== */
+
+.cortex-menubar {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.cortex-menubar[role="menubar"] {
+  /* ARIA role styling */
+}
+
+/* Compact mode (hamburger only) */
+.cortex-menubar.compact {
+  width: 100%;
+}
+
+/* ==========================================================================
+   MENUBAR BUTTON - .menubar-menu-button
+   ========================================================================== */
+
+.cortex-menubar-button {
+  display: flex;
+  align-items: center;
+  cursor: default;
+  white-space: nowrap;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ==========================================================================
+   MENU TITLE - .menubar-menu-title
+   ========================================================================== */
+
+.cortex-menubar-title {
+  padding: 0px 8px;
+  border-radius: var(--cortex-menu-border-radius);
+  color: var(--cortex-text-secondary);
+  font-size: var(--cortex-menu-font-size);
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.cortex-menubar-button:hover .cortex-menubar-title {
+  background: var(--jb-surface-hover);
+  color: var(--cortex-text-primary);
+}
+
+.cortex-menubar-button.open .cortex-menubar-title {
+  background: var(--jb-surface-active);
+  color: var(--cortex-text-primary);
+}
+
+/* ==========================================================================
+   MENU ITEMS HOLDER - .menubar-menu-items-holder
+   ========================================================================== */
+
+.cortex-menubar-items-holder {
+  position: fixed;
+  z-index: var(--cortex-menu-items-holder-z-index);
+}
+
+/* ==========================================================================
+   OVERFLOW MENU - .toolbar-toggle-more, .overflow-menu-only
+   ========================================================================== */
+
+.cortex-menubar-overflow {
+  width: 38px;
+}
+
+.cortex-menubar-more-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--cortex-text-secondary);
+}
+
+.cortex-menubar-more-button:hover {
+  color: var(--cortex-text-primary);
+  background: var(--jb-surface-hover);
+}
+
+/* ==========================================================================
+   FULLSCREEN ADJUSTMENTS
+   ========================================================================== */
+
+.cortex-menubar.fullscreen {
+  margin: 0px;
+  padding: 4px 5px;
+}
+
+/* ==========================================================================
+   MNEMONIC SUPPORT - <mnemonic>, underline on Alt
+   ========================================================================== */
+
+.cortex-menu mnemonic,
+.cortex-menubar mnemonic {
+  text-decoration: none;
+}
+
+.cortex-menu.show-mnemonics mnemonic,
+.cortex-menubar.show-mnemonics mnemonic {
+  text-decoration: underline;
+}
+
+/* Alternative using <u> element */
+.cortex-menu u[aria-hidden="true"],
+.cortex-menubar u[aria-hidden="true"] {
+  text-decoration: none;
+}
+
+.cortex-menu.show-mnemonics u[aria-hidden="true"],
+.cortex-menubar.show-mnemonics u[aria-hidden="true"] {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   SCROLLBAR - DomScrollableElement settings
+   ========================================================================== */
+
+.cortex-menu-scrollable {
+  overflow: hidden;
+}
+
+.cortex-menu-scrollable::-webkit-scrollbar {
+  width: var(--cortex-menu-scrollbar-size);
+  height: var(--cortex-menu-scrollbar-size);
+}
+
+.cortex-menu-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cortex-menu-scrollable::-webkit-scrollbar-thumb {
+  background: var(--cortex-menu-scrollbar-slider-background);
+  border-radius: var(--cortex-menu-border-radius);
+}
+
+.cortex-menu-scrollable::-webkit-scrollbar-thumb:hover {
+  background: var(--cortex-menu-scrollbar-slider-hover-background);
+}
+
+.cortex-menu-scrollable::-webkit-scrollbar-thumb:active {
+  background: var(--cortex-menu-scrollbar-slider-active-background);
+}
+
+/* Scrollbar visibility states */
+.cortex-menu-scrollbar.visible {
+  opacity: 1;
+  transition: opacity 100ms linear;
+}
+
+.cortex-menu-scrollbar.invisible {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cortex-menu-scrollbar.invisible.fade {
+  transition: opacity 800ms linear;
+}
+
+/* ==========================================================================
+   HIGH CONTRAST MODE
+   ========================================================================== */
+
+.hc-black .cortex-menu-container,
+.hc-light .cortex-menu-container {
+  box-shadow: none;
+}
+
+.hc-black .cortex-menu-item.focused .cortex-menu-item-content,
+.hc-light .cortex-menu-item.focused .cortex-menu-item-content {
+  background: none;
+}
+
+/* ==========================================================================
+   DROPDOWN - .monaco-dropdown
+   ========================================================================== */
+
+.cortex-dropdown {
+  height: 100%;
+  padding: 0;
+}
+
+.cortex-dropdown-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  cursor: pointer;
+}
+
+.cortex-dropdown.active {
+  /* Active state when dropdown is open */
+}
+
+/* ==========================================================================
+   DROPDOWN WITH PRIMARY BUTTON - .action-dropdown-item
+   ========================================================================== */
+
+.cortex-dropdown-with-primary {
+  display: flex !important;
+  flex-direction: row;
+  border-radius: var(--cortex-menu-border-radius);
+}
+
+.cortex-dropdown-separator {
+  display: flex;
+  align-items: center;
+}
+
+.cortex-dropdown-separator > div {
+  width: 1px;
+  height: 60%;
+  background: var(--cortex-border-base);
+}
+
+.cortex-dropdown-arrow {
+  font-size: 12px;
+  line-height: 16px;
+  margin-left: -3px;
+}
+
+/* ==========================================================================
+   CONTEXT VIEW - .context-view
+   ========================================================================== */
+
+.cortex-context-view {
+  position: absolute; /* or fixed based on ContextViewDOMPosition */
+  z-index: var(--cortex-menu-z-index);
+  animation: cortex-menu-fade-in var(--cortex-menu-fade-in-duration) linear;
+}
+
+.cortex-context-view.fixed {
+  position: fixed;
+}
+
+/* Shadow DOM host styles */
+.cortex-context-view-shadow-host {
+  /* all: initial; - Reset inherited styles in shadow DOM */
+}
+
+/* ==========================================================================
+   PLATFORM-SPECIFIC FONT STACKS
+   ========================================================================== */
+
+/* Windows */
+.windows .cortex-menu,
+.windows .cortex-menubar {
+  font-family: var(--jb-font-ui), 'Inter', sans-serif;
+}
+
+/* macOS */
+.mac .cortex-menu,
+.mac .cortex-menubar {
+  font-family: var(--jb-font-ui), 'Inter', sans-serif;
+}
+
+/* Linux */
+.linux .cortex-menu,
+.linux .cortex-menubar {
+  font-family: var(--jb-font-ui), 'Inter', sans-serif;
+}
+
+/* Linux separator specifics */
+.linux .cortex-menu-separator {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* ==========================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+/* Menu max-height constraint */
+.cortex-menu-constrained {
+  max-height: calc(100vh - 35px);
+  overflow-y: auto;
+}
+
+/* Role-based checkbox/radio styling */
+.cortex-menu-item[role="menuitemcheckbox"] .cortex-menu-item-check,
+.cortex-menu-item[role="menuitemradio"] .cortex-menu-item-check {
+  /* Always reserve space for check */
+  visibility: visible;
+  opacity: 0;
+}
+
+.cortex-menu-item[role="menuitemcheckbox"][aria-checked="true"] .cortex-menu-item-check,
+.cortex-menu-item[role="menuitemradio"][aria-checked="true"] .cortex-menu-item-check {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   LEGACY COMPATIBILITY - Bridge to existing styles
+   ========================================================================== */
+
+/* Support for existing .menu-dropdown class */
+.menu-dropdown {
+  min-width: var(--cortex-menu-min-width);
+  background: var(--cortex-menu-background-color);
+  border: 1px solid var(--cortex-menu-border-color);
+  border-radius: var(--cortex-menu-border-radius);
+  box-shadow: 0 2px 8px var(--cortex-menu-shadow-color);
+  padding: var(--cortex-menu-padding);
+  animation: cortex-menu-fade-in var(--cortex-menu-fade-in-duration) linear;
+}
+
+/* Support for existing context-menu class - VS Code exact specs */
+.context-menu {
+  position: fixed;
+  background: var(--cortex-menu-background-color, var(--jb-popup));
+  border: 1px solid var(--cortex-menu-border-color, var(--jb-border-default));
+  border-radius: 6px;
+  box-shadow: 0 2px 8px var(--cortex-menu-shadow-color);
+  min-width: 160px;
+  padding: 4px 0;
+  z-index: 2575;
+  animation: menu-fade-in 83ms linear;
+}
+
+@keyframes menu-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

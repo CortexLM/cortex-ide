@@ -1,0 +1,1125 @@
+/* ============================================================================
+   CORTEX DESKTOP - VS CODE LIST/TREE COMPONENTS
+   Based on VS Code source analysis from:
+   src/vs/base/browser/ui/list, src/vs/base/browser/ui/tree
+   ============================================================================ */
+
+/* ============================================================================
+   CSS VARIABLES - VS Code List/Tree Design Tokens
+   ============================================================================ */
+
+:root {
+  /* Sidebar design tokens - inherits from centralized --ui-panel-bg */
+  --sidebar-bg: var(--ui-panel-bg);
+  --text-primary: var(--jb-text-body-color);
+  --text-secondary: var(--jb-text-muted-color);
+  --active-selection: var(--jb-tree-selection-bg);
+  --accent-primary: var(--jb-border-focus);
+  
+  /* List/Tree spacing tokens - ultra compact */
+  --list-row-height: 18px;
+  --tree-indent: 6px;
+  --twistie-width: 8px;
+  --twistie-padding-right: 0px;
+  --indent-guide-left: 8px;
+  --tree-font-size: 11px;
+  --tree-icon-size: 12px;
+  
+  /* List background colors - Uses centralized variables */
+  --list-background: var(--sidebar-bg);
+  --list-focus-background: var(--ui-panel-bg-lighter);
+  --list-active-selection-background: var(--ui-panel-bg-lighter);
+  --list-inactive-selection-background: var(--ui-panel-bg-lighter);
+  --list-hover-background: var(--ui-panel-bg-lighter);
+  --list-drop-over-background: var(--ui-panel-bg-lighter);
+  --list-drop-between-background: var(--accent-primary);
+  
+  /* List foreground colors */
+  --list-focus-foreground: var(--text-primary);
+  --list-active-selection-foreground: var(--text-primary);
+  --list-active-selection-icon-foreground: var(--text-primary);
+  --list-inactive-selection-foreground: var(--text-primary);
+  --list-inactive-selection-icon-foreground: var(--text-primary);
+  --list-inactive-focus-foreground: var(--text-primary);
+  --list-hover-foreground: var(--text-primary);
+  
+  /* List outline colors */
+  --list-focus-outline: var(--jb-border-focus);
+  --list-inactive-focus-outline: var(--jb-border-focus);
+  --list-selection-outline: transparent;
+  --list-hover-outline: transparent;
+  --list-focus-and-selection-outline: var(--jb-border-focus);
+  
+  /* Tree-specific colors */
+  --tree-indent-guides-stroke: var(--text-secondary);
+  --tree-inactive-indent-guides-stroke: var(--jb-text-muted-color);
+  --tree-sticky-scroll-background: var(--sidebar-bg);
+  --tree-sticky-scroll-border: rgba(255, 255, 255, 0.1);
+  --tree-sticky-scroll-shadow: rgba(0, 0, 0, 0.3);
+  
+  /* Sticky scroll */
+  --sticky-scroll-z-index: 13;
+  --sticky-scroll-max-items: 7;
+}
+
+/* ============================================================================
+   MONACO LIST BASE STYLES
+   ============================================================================ */
+
+.monaco-list {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.monaco-list.mouse-support {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.monaco-list > .monaco-scrollable-element {
+  height: 100%;
+}
+
+/* ============================================================================
+   LIST ROWS
+   ============================================================================ */
+
+.monaco-list-rows {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.monaco-list-row {
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+  width: 100%;
+  height: var(--list-row-height);
+  line-height: var(--list-row-height);
+  /* Performance: CSS containment for list items */
+  contain: layout style;
+}
+
+.monaco-list.mouse-support .monaco-list-row {
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* ============================================================================
+   LIST SELECTION STATES - VS Code Trait System
+   ============================================================================ */
+
+/* Focused state (list has focus + item is focused) */
+.monaco-list:focus .monaco-list-row.focused {
+  background-color: var(--list-focus-background);
+  color: var(--list-focus-foreground);
+}
+
+/* Focused state (list doesn't have focus + item is focused) */
+.monaco-list .monaco-list-row.focused {
+  outline: 1px dotted var(--list-inactive-focus-outline);
+  outline-offset: -1px;
+}
+
+/* Selected state (list has focus + item is selected) */
+.monaco-list:focus .monaco-list-row.selected {
+  background-color: var(--list-active-selection-background);
+  color: var(--list-active-selection-foreground);
+}
+
+/* Selected state (list doesn't have focus + item is selected) */
+.monaco-list .monaco-list-row.selected {
+  background-color: var(--list-inactive-selection-background);
+  color: var(--list-inactive-selection-foreground);
+}
+
+/* Focus + Selection combined (list has focus) */
+.monaco-list:focus .monaco-list-row.selected.focused {
+  background-color: var(--list-active-selection-background);
+  color: var(--list-active-selection-foreground);
+  outline: 1px solid var(--list-focus-and-selection-outline);
+  outline-offset: -1px;
+}
+
+/* Hover state */
+.monaco-list-row:hover:not(.selected):not(.focused) {
+  background-color: var(--list-hover-background);
+  color: var(--list-hover-foreground);
+}
+
+/* Anchor state (for range selection) */
+.monaco-list-row.anchor {
+  /* Anchor is typically invisible but used for selection calculations */
+}
+
+/* Drop target states */
+.monaco-list-row.drop-target {
+  background-color: var(--list-drop-over-background) !important;
+}
+
+.monaco-list-row.drop-target-before::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--list-drop-between-background);
+}
+
+.monaco-list-row.drop-target-after::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--list-drop-between-background);
+}
+
+/* ============================================================================
+   TREE ROW STRUCTURE
+   ============================================================================ */
+
+.monaco-tl-row {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  position: relative;
+}
+
+.monaco-tl-row.disabled {
+  cursor: default;
+}
+
+/* ============================================================================
+   TREE INDENTATION
+   ============================================================================ */
+
+.monaco-tl-indent {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: var(--indent-guide-left);
+  pointer-events: none;
+}
+
+.monaco-tl-indent > .indent-guide {
+  display: inline-block;
+  box-sizing: border-box;
+  height: 100%;
+  border-left: 1px solid transparent;
+  opacity: 0;
+  transition: opacity 0.1s linear;
+}
+
+/* Indent guides visibility */
+.monaco-list.render-indent-guides-always .monaco-tl-indent > .indent-guide,
+.monaco-list.render-indent-guides-onhover:hover .monaco-tl-indent > .indent-guide {
+  border-color: var(--tree-inactive-indent-guides-stroke);
+  opacity: 1;
+}
+
+/* Active indent guide (when parent is focused/selected) */
+.monaco-tl-indent > .indent-guide.active {
+  border-color: var(--tree-indent-guides-stroke);
+}
+
+/* ============================================================================
+   TREE TWISTIE (EXPAND/COLLAPSE ICON)
+   ============================================================================ */
+
+.monaco-tl-twistie {
+  font-size: 10px;
+  text-align: right;
+  padding-right: var(--twistie-padding-right);
+  flex-shrink: 0;
+  width: var(--twistie-width);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(3px);
+}
+
+/* Twistie icon rotation - collapsed state (points right) */
+.monaco-tl-twistie::before {
+  border-radius: 20px;
+  transition: transform 0.1s ease;
+}
+
+/* Collapsed state - rotate icon -90deg (pointing right) */
+.monaco-tl-twistie.collapsed::before {
+  transform: rotate(-90deg);
+}
+
+/* Expanded state - icon points down (0deg rotation, default) */
+.monaco-tl-twistie.collapsible:not(.collapsed)::before {
+  transform: rotate(0deg);
+}
+
+/* Loading state animation */
+.monaco-tl-twistie.codicon-tree-item-loading::before {
+  animation: codicon-spin 1.25s steps(30) infinite;
+}
+
+@keyframes codicon-spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hide twistie for non-collapsible items */
+.monaco-tl-twistie:not(.collapsible) {
+  visibility: hidden;
+}
+
+/* ============================================================================
+   TREE CONTENTS
+   ============================================================================ */
+
+.monaco-tl-contents {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ============================================================================
+   STICKY SCROLL
+   ============================================================================ */
+
+.monaco-tree-sticky-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--sticky-scroll-z-index);
+  background: var(--tree-sticky-scroll-background);
+  border-bottom: 1px solid var(--tree-sticky-scroll-border);
+}
+
+.monaco-tree-sticky-container-shadow {
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(
+    to bottom,
+    var(--tree-sticky-scroll-shadow),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.monaco-tree-sticky-row {
+  position: absolute;
+  width: 100%;
+}
+
+/* ============================================================================
+   VIRTUAL SCROLLING
+   ============================================================================ */
+
+.monaco-list.horizontal-scrolling .monaco-list-rows {
+  width: auto;
+  min-width: 100%;
+}
+
+/* GPU-accelerated positioning for virtual scroll */
+.monaco-list-rows[style*="transform"] {
+  overflow: hidden;
+  contain: strict;
+}
+
+/* ============================================================================
+   FIND WIDGET
+   ============================================================================ */
+
+.monaco-tree-type-filter {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  padding: 3px;
+  max-width: 200px;
+  border-radius: 0 0 4px 4px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-weak);
+  border-top: none;
+  z-index: 100;
+  transition: top 0.3s;
+}
+
+.monaco-tree-type-filter.disabled {
+  top: -40px !important;
+}
+
+/* ============================================================================
+   ANIMATION SUPPORT
+   ============================================================================ */
+
+.monaco-enable-motion .monaco-tl-indent > .indent-guide {
+  transition: opacity 0.1s linear;
+}
+
+.monaco-enable-motion .monaco-tree-type-filter {
+  transition: top 0.3s;
+}
+
+.monaco-enable-motion .monaco-tl-twistie::before {
+  transition: transform 0.1s ease;
+}
+
+/* ============================================================================
+   CORTEX DESKTOP SPECIFIC TREE OVERRIDES
+   ============================================================================ */
+
+/* File tree item with VS Code selection states */
+.file-tree-item {
+  display: flex;
+  align-items: center;
+  gap: 0px;
+  width: 100%;
+  height: var(--list-row-height);
+  padding: 2px 4px;
+  border-radius: 0;
+  text-align: left;
+  font-size: var(--tree-font-size, 11px);
+  line-height: var(--list-row-height);
+  color: var(--text-primary);
+  background: var(--sidebar-bg);
+  transition: background-color 0.15s ease, border-left-color 0.15s ease;
+  cursor: pointer;
+  /* No left border - RustRover style */
+}
+
+/* Hover state */
+.file-tree-item:hover {
+  background-color: var(--active-selection);
+}
+
+/* Focus state with focus visible */
+.file-tree-item:focus-visible {
+  outline: none;
+  background-color: var(--active-selection);
+}
+
+/* Selected state (inactive - container not focused) */
+.file-tree-item--selected {
+  background-color: var(--active-selection);
+}
+
+.file-tree-item--selected:hover {
+  background-color: var(--active-selection);
+}
+
+/* Selected state (active - container is focused) */
+.file-explorer:focus-within .file-tree-item--selected,
+.virtualized-file-tree:focus-within .file-tree-item--selected {
+  background-color: var(--active-selection);
+  color: var(--text-primary);
+}
+
+/* Focused state */
+.file-tree-item--focused {
+  background-color: var(--active-selection);
+}
+
+/* Drag over styles */
+.file-tree-item--drag-over {
+  background-color: var(--list-drop-over-background) !important;
+  outline: 1px solid var(--list-focus-outline);
+  outline-offset: -1px;
+}
+
+/* Drag copy mode - visual indicator when Ctrl is held */
+.file-tree-item--drag-over.file-tree-item--drag-copy {
+  outline-color: var(--cortex-success);
+  background-color: var(--jb-tree-selection-bg) !important;
+}
+
+.virtual-scroll-container--drag-over {
+  background-color: var(--jb-tree-selection-bg);
+  outline: 1px dashed var(--list-focus-outline);
+  outline-offset: -2px;
+}
+
+/* Drag copy mode for container */
+.virtual-scroll-container--drag-over.virtual-scroll-container--drag-copy {
+  background-color: var(--jb-tree-selection-bg);
+  outline-color: var(--cortex-success);
+}
+
+/* Drop indicator line - shown when dragging between items */
+.drop-indicator-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--jb-border-focus);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.drop-indicator-line--before {
+  top: 0;
+}
+
+.drop-indicator-line--after {
+  bottom: 0;
+}
+
+/* Combined selected + focused */
+.file-explorer:focus-within .file-tree-item--selected.file-tree-item--focused,
+.virtualized-file-tree:focus-within .file-tree-item--selected.file-tree-item--focused {
+  background-color: var(--active-selection);
+  color: var(--text-primary);
+  outline: none;
+}
+
+/* Nested file styling */
+.file-tree-item--nested {
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   FILE TREE ICON
+   ============================================================================ */
+
+.file-tree-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tree-icon-size, 12px);
+  height: var(--tree-icon-size, 12px);
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: color 0.15s ease;
+}
+
+.file-tree-icon svg {
+  width: var(--tree-icon-size, 12px);
+  height: var(--tree-icon-size, 12px);
+}
+
+/* Active/selected icon color */
+.file-tree-item--selected .file-tree-icon,
+.file-tree-item--focused .file-tree-icon,
+.file-tree-item:hover .file-tree-icon {
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   FILE TREE NAME
+   ============================================================================ */
+
+.file-tree-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  line-height: var(--list-row-height);
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   FILE TREE TWISTIE (CHEVRON)
+   ============================================================================ */
+
+.file-tree-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--twistie-width);
+  height: var(--twistie-width);
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: transform 150ms ease, color 150ms ease;
+}
+
+/* Chevron hover state */
+.file-tree-item:hover .file-tree-chevron,
+.file-tree-item--selected .file-tree-chevron,
+.file-tree-item--focused .file-tree-chevron {
+  color: var(--text-primary);
+}
+
+/* Collapsed state - rotated -90deg (pointing right is default, expanded points down) */
+.file-tree-chevron:not(.file-tree-chevron--expanded) {
+  transform: rotate(0deg);
+}
+
+/* Expanded state - rotate 90deg to point down */
+.file-tree-chevron--expanded {
+  transform: rotate(90deg);
+}
+
+/* Hidden state */
+.file-tree-chevron--hidden {
+  visibility: hidden;
+}
+
+/* ============================================================================
+   FILE TREE ITEM ANIMATIONS
+   Smooth expand/collapse animations for folder contents
+   ============================================================================ */
+
+/* Animation for newly appearing items (children of expanded folder) */
+@keyframes file-tree-item-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animation triggers on items with data-depth > 0 (children) when parent expands */
+/* The animation-fill-mode: backwards ensures initial state is applied before animation */
+.file-tree-item--entering {
+  animation: file-tree-item-enter 0.12s ease-out forwards;
+  animation-fill-mode: backwards;
+}
+
+/* Staggered animation delays for cascade effect */
+.file-tree-item--entering[data-depth="1"] { animation-delay: 0ms; }
+.file-tree-item--entering[data-depth="2"] { animation-delay: 20ms; }
+.file-tree-item--entering[data-depth="3"] { animation-delay: 40ms; }
+.file-tree-item--entering[data-depth="4"] { animation-delay: 60ms; }
+.file-tree-item--entering[data-depth="5"] { animation-delay: 80ms; }
+
+/* Folder icon transition when expanding/collapsing */
+.file-tree-icon {
+  transition: transform 0.15s ease-out;
+}
+
+/* Subtle scale effect on folder icon when expanded */
+.file-tree-item[data-expanded="true"] .file-tree-icon {
+  transform: scale(1.05);
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .file-tree-item--entering {
+    animation: none;
+  }
+  .file-tree-chevron {
+    transition: none;
+  }
+  .file-tree-icon {
+    transition: none;
+  }
+}
+
+/* ============================================================================
+   FILE TREE INDENT GUIDES
+   ============================================================================ */
+
+.file-tree-indent-guides {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  pointer-events: none;
+}
+
+.file-tree-indent-guide {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background-color: var(--border-weak, var(--tree-inactive-indent-guides-stroke));
+  opacity: 0.4;
+  transition: opacity 0.1s linear;
+  /* Position is set via inline style: left = (indent-level * 6px + 8px) */
+}
+
+/* Show guides on hover */
+.file-tree-item:hover .file-tree-indent-guide {
+  opacity: 0.7;
+}
+
+/* Highlight guides when item is selected */
+.file-tree-item--selected .file-tree-indent-guide {
+  background-color: var(--tree-indent-guides-stroke);
+  opacity: 0.5;
+}
+
+/* Highlight guides when item is focused */
+.file-tree-item--focused .file-tree-indent-guide {
+  background-color: var(--tree-indent-guides-stroke);
+  opacity: 0.6;
+}
+
+/* Make file-tree-item position relative for absolute positioning of guides */
+.file-tree-item {
+  position: relative;
+}
+
+/* ============================================================================
+   OUTLINE PANEL TREE STYLES
+   ============================================================================ */
+
+.outline-tree-row {
+  display: flex;
+  align-items: center;
+  height: var(--list-row-height);
+  transition: background-color 0.1s;
+  cursor: pointer;
+  color: var(--text-weak);
+}
+
+.outline-tree-row:hover {
+  background-color: var(--list-hover-background);
+}
+
+/* Selected state uses VS Code list classes */
+.outline-tree-row.selected {
+  background-color: var(--list-active-selection-background);
+  color: var(--list-active-selection-foreground);
+}
+
+.outline-tree-row.focused {
+  outline: 1px solid var(--list-focus-and-selection-outline);
+  outline-offset: -1px;
+}
+
+/* Outline twistie - inherits from file-tree-chevron */
+.outline-tree-twistie {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--twistie-width);
+  height: var(--twistie-width);
+  flex-shrink: 0;
+  transition: transform 0.1s ease;
+}
+
+.outline-tree-twistie--collapsed {
+  transform: rotate(0deg);
+}
+
+.outline-tree-twistie--expanded {
+  transform: rotate(90deg);
+}
+
+/* Outline symbol text elements */
+.outline-symbol-name {
+  font-size: 13px;
+  line-height: var(--list-row-height);
+  color: inherit;
+}
+
+.outline-symbol-detail {
+  font-size: 13px;
+  line-height: var(--list-row-height);
+  color: var(--text-weaker);
+}
+
+.outline-tree-row.selected .outline-symbol-detail {
+  color: var(--list-active-selection-foreground);
+}
+
+.outline-symbol-line {
+  font-size: 11px;
+  line-height: var(--list-row-height);
+  color: var(--text-weaker);
+}
+
+.outline-tree-row.selected .outline-symbol-line {
+  color: var(--list-active-selection-foreground);
+}
+
+/* ============================================================================
+   DEPTH-BASED INDENTATION (8px per level)
+   ============================================================================ */
+
+.depth-0 { --depth: 0; padding-left: calc(0 * var(--tree-indent) + 8px); }
+.depth-1 { --depth: 1; padding-left: calc(1 * var(--tree-indent) + 8px); }
+.depth-2 { --depth: 2; padding-left: calc(2 * var(--tree-indent) + 8px); }
+.depth-3 { --depth: 3; padding-left: calc(3 * var(--tree-indent) + 8px); }
+.depth-4 { --depth: 4; padding-left: calc(4 * var(--tree-indent) + 8px); }
+.depth-5 { --depth: 5; padding-left: calc(5 * var(--tree-indent) + 8px); }
+.depth-6 { --depth: 6; padding-left: calc(6 * var(--tree-indent) + 8px); }
+.depth-7 { --depth: 7; padding-left: calc(7 * var(--tree-indent) + 8px); }
+.depth-8 { --depth: 8; padding-left: calc(8 * var(--tree-indent) + 8px); }
+.depth-9 { --depth: 9; padding-left: calc(9 * var(--tree-indent) + 8px); }
+.depth-10 { --depth: 10; padding-left: calc(10 * var(--tree-indent) + 8px); }
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+.monaco-list[role="tree"] .monaco-list-row[role="treeitem"] {
+  /* ARIA tree item styles */
+}
+
+.monaco-list-row[aria-expanded="true"] .monaco-tl-twistie {
+  /* Expanded state indicator */
+}
+
+.monaco-list-row[aria-expanded="false"] .monaco-tl-twistie {
+  /* Collapsed state indicator */
+}
+
+.monaco-list-row[aria-selected="true"] {
+  /* Selected state for screen readers */
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .monaco-list-row.selected {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+  
+  .monaco-list-row.focused {
+    outline: 2px solid Highlight;
+  }
+}
+
+/* ============================================================================
+   GIT STATUS DECORATIONS
+   VS Code-style git status colors for file explorer
+   Exact colors from VS Code source
+   ============================================================================ */
+
+/* Git status color variables - VS Code exact values */
+:root {
+  --git-modified-color: #E2C08D;
+  --git-added-color: #73C991;
+  --git-deleted-color: #F14C4C;
+  --git-untracked-color: #73C991;
+  --git-renamed-color: #73C991;
+  --git-conflict-color: #E51400;
+  --git-ignored-color: #8C8C8C;
+  
+  /* Badge backgrounds */
+  --git-added-badge-bg: rgba(115, 201, 145, 0.15);
+  --git-modified-badge-bg: rgba(226, 192, 141, 0.15);
+  --git-deleted-badge-bg: rgba(241, 76, 76, 0.15);
+  --git-untracked-badge-bg: rgba(115, 201, 145, 0.15);
+  --git-renamed-badge-bg: rgba(115, 201, 145, 0.15);
+  --git-conflict-badge-bg: rgba(229, 20, 0, 0.15);
+}
+
+/* File name decoration colors */
+.file-tree-name--git-modified {
+  color: var(--git-modified-color) !important;
+}
+
+.file-tree-name--git-added {
+  color: var(--git-added-color) !important;
+}
+
+.file-tree-name--git-deleted {
+  color: var(--git-deleted-color) !important;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.file-tree-name--git-untracked {
+  color: var(--git-untracked-color) !important;
+}
+
+.file-tree-name--git-renamed {
+  color: var(--git-renamed-color) !important;
+}
+
+.file-tree-name--git-conflict {
+  color: var(--git-conflict-color) !important;
+}
+
+.file-tree-name--git-ignored {
+  color: var(--git-ignored-color) !important;
+  opacity: 0.7;
+}
+
+/* Folder decoration when containing changed files */
+.file-tree-name--git-folder-modified {
+  color: var(--git-modified-color) !important;
+}
+
+.file-tree-name--git-folder-added {
+  color: var(--git-added-color) !important;
+}
+
+.file-tree-name--git-folder-conflict {
+  color: var(--git-conflict-color) !important;
+}
+
+/* Git status badge */
+.file-tree-git-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 14px;
+  padding: 0 4px;
+  margin-left: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-mono, monospace);
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.file-tree-git-badge--modified {
+  color: var(--git-modified-color);
+  background: var(--git-modified-badge-bg);
+}
+
+.file-tree-git-badge--added {
+  color: var(--git-added-color);
+  background: var(--git-added-badge-bg);
+}
+
+.file-tree-git-badge--deleted {
+  color: var(--git-deleted-color);
+  background: var(--git-deleted-badge-bg);
+}
+
+.file-tree-git-badge--untracked {
+  color: var(--git-untracked-color);
+  background: var(--git-untracked-badge-bg);
+}
+
+.file-tree-git-badge--renamed {
+  color: var(--git-renamed-color);
+  background: var(--git-renamed-badge-bg);
+}
+
+.file-tree-git-badge--conflict {
+  color: var(--git-conflict-color);
+  background: var(--git-conflict-badge-bg);
+}
+
+/* Folder badge showing count of changed files */
+.file-tree-git-badge--folder {
+  font-size: 9px;
+  opacity: 0.9;
+}
+
+/* Selected state: override to maintain readability */
+.file-explorer:focus-within .file-tree-item--selected .file-tree-name--git-modified,
+.file-explorer:focus-within .file-tree-item--selected .file-tree-name--git-added,
+.file-explorer:focus-within .file-tree-item--selected .file-tree-name--git-deleted,
+.file-explorer:focus-within .file-tree-item--selected .file-tree-name--git-untracked,
+.file-explorer:focus-within .file-tree-item--selected .file-tree-name--git-renamed,
+.file-explorer:focus-within .file-tree-item--selected .file-tree-name--git-conflict,
+.file-explorer:focus-within .file-tree-item--selected .file-tree-name--git-folder-modified,
+.file-explorer:focus-within .file-tree-item--selected .file-tree-name--git-folder-added,
+.file-explorer:focus-within .file-tree-item--selected .file-tree-name--git-folder-conflict,
+.virtualized-file-tree:focus-within .file-tree-item--selected .file-tree-name--git-modified,
+.virtualized-file-tree:focus-within .file-tree-item--selected .file-tree-name--git-added,
+.virtualized-file-tree:focus-within .file-tree-item--selected .file-tree-name--git-deleted,
+.virtualized-file-tree:focus-within .file-tree-item--selected .file-tree-name--git-untracked,
+.virtualized-file-tree:focus-within .file-tree-item--selected .file-tree-name--git-renamed,
+.virtualized-file-tree:focus-within .file-tree-item--selected .file-tree-name--git-conflict,
+.virtualized-file-tree:focus-within .file-tree-item--selected .file-tree-name--git-folder-modified,
+.virtualized-file-tree:focus-within .file-tree-item--selected .file-tree-name--git-folder-added,
+.virtualized-file-tree:focus-within .file-tree-item--selected .file-tree-name--git-folder-conflict {
+  color: var(--list-active-selection-foreground) !important;
+}
+
+/* ============================================================================
+   WORKSPACE FOLDER STYLES (Multi-root workspace)
+   ============================================================================ */
+
+.workspace-folder-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-folder-header {
+  display: flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 4px 0 0;
+  background: var(--list-background);
+  cursor: pointer;
+  user-select: none;
+  border-left: 3px solid transparent;
+}
+
+.workspace-folder-header:hover {
+  background: var(--list-hover-background);
+}
+
+.workspace-folder-header--active {
+  background: var(--list-active-selection-background);
+}
+
+.workspace-folder-header--expanded {
+  /* No special style needed */
+}
+
+.workspace-folder-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.workspace-folder-toggle:hover {
+  color: var(--text-primary);
+}
+
+.workspace-folder-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.workspace-folder-name {
+  font-size: var(--tree-font-size);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-folder-rename-input {
+  flex: 1;
+  height: 18px;
+  padding: 0 4px;
+  font-size: var(--tree-font-size);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+  background: var(--list-background);
+  border: 1px solid var(--accent-primary);
+  border-radius: 2px;
+  outline: none;
+}
+
+.workspace-folder-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.workspace-folder-header:hover .workspace-folder-actions {
+  opacity: 1;
+}
+
+.workspace-folder-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.workspace-folder-action:hover {
+  background: var(--list-hover-background);
+  color: var(--text-primary);
+}
+
+.workspace-folder-action--remove:hover {
+  color: var(--jb-error-text);
+}
+
+/* Workspace folder menu */
+.workspace-folder-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  min-width: 160px;
+  padding: 4px 0;
+  background: var(--ui-panel-bg);
+  border: 1px solid var(--jb-border-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.workspace-folder-menu-item {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  font-size: 12px;
+  text-align: left;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.workspace-folder-menu-item:hover {
+  background: var(--list-hover-background);
+}
+
+.workspace-folder-menu-item--danger {
+  color: var(--jb-error-text);
+}
+
+.workspace-folder-menu-divider {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--jb-border-color);
+}
+
+/* Color picker */
+.workspace-folder-color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 12px;
+}
+
+.workspace-folder-color-swatch {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.workspace-folder-color-swatch:hover {
+  border-color: var(--text-secondary);
+}
+
+.workspace-folder-color-swatch--selected {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 1px var(--text-primary);
+}
+
+/* Folder contents */
+.workspace-folder-contents {
+  flex: 1;
+  min-height: 0;
+}
+
+.workspace-folder-contents--indented {
+  /* Slight indent when in multi-root mode */
+  padding-left: 0;
+}

@@ -1,0 +1,818 @@
+/**
+ * Quick Input / Command Palette Styles
+ * Based on VS Code UI Analysis (14_quick_input_palette.md)
+ * Updated to use JetBrains UI tokens
+ * 
+ * Specifications:
+ * - Container: 600px max width, golden ratio responsive, z-index 2550
+ * - Input: uses JetBrains typography tokens
+ * - Results: 22px line-height per item (44px with detail), max 440px height
+ * - Keybinding labels: uses JetBrains radius tokens
+ * - Match highlighting: bold with theme colors
+ * - Busy state: 2px progress bar, 4s animation, 800ms delay
+ */
+
+/* ==========================================================================
+   1. Main Widget Container
+   ========================================================================== */
+
+.quick-input-widget {
+  position: fixed;
+  top: 20%;
+  width: 600px;
+  max-width: calc(100vw - 32px);
+  z-index: 2550;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: var(--jb-radius-lg);
+  font-size: var(--jb-font-size-base);
+  -webkit-app-region: no-drag;
+  background: var(--jb-popup);
+  color: var(--jb-text-body-color);
+  border: 1px solid var(--jb-border-default);
+  box-shadow: var(--jb-shadow-popup);
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* Fix for subpixel rendering artifacts on rounded corners with backdrop-filter */
+  isolation: isolate;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+/* Backdrop overlay */
+.quick-input-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2549;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+   2. Title Bar (optional, draggable)
+   ========================================================================== */
+
+.quick-input-titlebar {
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  background: var(--quick-input-title-background, rgba(255, 255, 255, 0.105));
+}
+
+.quick-input-title {
+  cursor: grab;
+  padding: 3px 0;
+  text-align: center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  flex: 1;
+}
+
+.quick-input-left-action-bar {
+  display: flex;
+  margin-left: 4px;
+}
+
+.quick-input-right-action-bar {
+  display: flex;
+  margin-right: 4px;
+}
+
+.quick-input-right-action-bar > .actions-container {
+  justify-content: flex-end;
+}
+
+.quick-input-right-action-bar > .actions-container > .action-item {
+  margin-left: 4px;
+}
+
+/* ==========================================================================
+   3. Header Area (Input Container)
+   ========================================================================== */
+
+.quick-input-header {
+  cursor: grab;
+  display: flex;
+  padding: 8px 8px 4px 8px;
+  border-bottom: 1px solid var(--jb-border-default);
+}
+
+.quick-input-header.hidden-input {
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.quick-input-filter {
+  flex-grow: 1;
+  display: flex;
+  position: relative;
+}
+
+.quick-input-description {
+  margin: 6px 6px 6px 11px;
+}
+
+.quick-input-header .quick-input-description {
+  margin: 4px 2px;
+  flex: 1;
+}
+
+/* ==========================================================================
+   4. Input Box Specifications
+   ========================================================================== */
+
+.quick-input-box {
+  flex-grow: 1;
+}
+
+.quick-input-box .monaco-inputbox {
+  position: relative;
+  display: block;
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: var(--jb-radius-sm);
+  font-size: inherit;
+  background: var(--jb-canvas);
+  border: 1px solid var(--jb-border-default);
+}
+
+.quick-input-box .monaco-inputbox:focus-within {
+  border-color: var(--jb-border-focus);
+}
+
+.quick-input-box input,
+.quick-input-input {
+  padding: 0 12px;
+  display: inline-block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 28px;
+  line-height: 28px;
+  border: none;
+  font-family: inherit;
+  font-size: var(--jb-font-size-base);
+  color: var(--jb-text-body-color);
+  text-overflow: ellipsis;
+  background: transparent;
+  outline: none;
+}
+
+.quick-input-input::placeholder {
+  color: var(--jb-text-muted-color);
+  opacity: 0.7;
+}
+
+/* Multi-select mode checkbox spacing */
+.quick-input-widget.show-checkboxes .quick-input-box {
+  margin-left: 5px;
+}
+
+/* ==========================================================================
+   5. Progress Bar / Busy State
+   ========================================================================== */
+
+.quick-input-progress {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  overflow: hidden;
+}
+
+.quick-input-progress .progress-bit {
+  width: 2%;
+  height: 2px;
+  position: absolute;
+  left: 0;
+  display: none;
+  background: var(--jb-border-focus);
+}
+
+.quick-input-progress.active .progress-bit {
+  display: inherit;
+}
+
+.quick-input-progress.infinite .progress-bit {
+  animation-name: quick-input-progress;
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+  transform: translate3d(0px, 0px, 0px);
+  animation-timing-function: linear;
+}
+
+/* Long-running optimization (reduces GPU usage) */
+.quick-input-progress.infinite-long-running .progress-bit {
+  animation-timing-function: steps(100);
+}
+
+/* 800ms delay before showing */
+.quick-input-progress.delayed {
+  animation: quick-input-progress-delay 800ms forwards;
+}
+
+@keyframes quick-input-progress {
+  from { transform: translateX(0%) scaleX(1); }
+  50%  { transform: translateX(2500%) scaleX(3); }
+  to   { transform: translateX(4900%) scaleX(1); }
+}
+
+@keyframes quick-input-progress-delay {
+  0%, 99% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ==========================================================================
+   6. Result List Specifications
+   ========================================================================== */
+
+.quick-input-list {
+  line-height: 22px;
+}
+
+.quick-input-list .list-container {
+  overflow: hidden;
+  max-height: calc(20 * 22px); /* 440px - 20 items visible */
+  padding-bottom: 5px;
+}
+
+.quick-input-list .scrollable-element {
+  padding: 0 6px;
+}
+
+/* List Entry */
+.quick-input-list-entry {
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  padding: 0 6px;
+  border-radius: var(--jb-radius-sm);
+}
+
+/* Standard item height */
+.quick-input-list-row {
+  height: 22px;
+  border-radius: var(--jb-radius-sm);
+}
+
+/* Item with detail (two rows) */
+.quick-input-list-row.has-detail {
+  height: 44px;
+}
+
+/* Separator item */
+.quick-input-list-row.separator {
+  height: 30px;
+}
+
+/* ==========================================================================
+   7. List Item Layout
+   ========================================================================== */
+
+.quick-input-list-label {
+  overflow: hidden;
+  display: flex;
+  height: 100%;
+  flex: 1;
+}
+
+/* Icon Area */
+.quick-input-list-icon {
+  background-size: 16px;
+  background-position: left center;
+  background-repeat: no-repeat;
+  padding-right: 6px;
+  width: 16px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Rows Container */
+.quick-input-list-rows {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+  margin-left: 5px;
+}
+
+/* Single Row */
+.quick-input-list-row-content {
+  display: flex;
+  align-items: center;
+}
+
+/* Meta/Description Label */
+.quick-input-list-label-meta {
+  opacity: 0.7;
+  line-height: normal;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   8. Keybinding Labels
+   ========================================================================== */
+
+.quick-input-keybinding {
+  display: flex;
+  align-items: center;
+  line-height: 10px;
+  margin-left: auto;
+  font-size: var(--jb-font-size-small);
+  color: var(--jb-text-muted-color);
+  font-family: monospace;
+}
+
+.quick-input-list-entry .quick-input-keybinding {
+  margin-right: 8px;
+  margin-left: auto;
+}
+
+.quick-input-keybinding-key {
+  display: inline-flex;
+  align-items: center;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: var(--jb-radius-sm);
+  justify-content: center;
+  min-width: 12px;
+  font-size: var(--jb-font-size-small);
+  padding: 3px 5px;
+  margin: 0 2px;
+  font-family: inherit;
+}
+
+.quick-input-keybinding-key:first-child {
+  margin-left: 0;
+}
+
+.quick-input-keybinding-key:last-child {
+  margin-right: 0;
+}
+
+/* Key Separator */
+.quick-input-keybinding-separator {
+  display: inline-block;
+}
+
+.quick-input-keybinding-chord-separator {
+  width: 6px;
+}
+
+/* Keybinding key styling using JetBrains tokens */
+.quick-input-keybinding-key {
+  background-color: var(--jb-canvas);
+  border-color: var(--jb-border-default);
+  color: var(--jb-text-body-color);
+}
+
+/* High Contrast Dark Keys */
+[data-theme="hc-dark"] .quick-input-keybinding-key {
+  background-color: transparent;
+  border-color: rgb(111, 195, 223);
+  box-shadow: none;
+  color: var(--jb-btn-primary-color);
+}
+
+/* High Contrast Light Keys */
+[data-theme="hc-light"] .quick-input-keybinding-key {
+  background-color: transparent;
+  border-color: var(--jb-border-focus);
+  box-shadow: none;
+  color: var(--jb-canvas);
+}
+
+/* Focused/Hovered Key State */
+.quick-input-list-row.focused .quick-input-keybinding-key,
+.quick-input-list-row:hover .quick-input-keybinding-key {
+  background: none;
+  border-color: var(--jb-border-focus);
+}
+
+/* ==========================================================================
+   9. Match Highlighting
+   ========================================================================== */
+
+.quick-input-highlight {
+  font-weight: 600;
+  color: var(--jb-border-focus);
+}
+
+/* Light Theme Highlight */
+[data-theme="light"] .quick-input-highlight {
+  color: var(--jb-border-focus);
+}
+
+/* Dark Theme Highlight */
+[data-theme="dark"] .quick-input-highlight,
+.dark .quick-input-highlight {
+  color: var(--jb-border-focus);
+}
+
+/* High Contrast Dark Highlight */
+[data-theme="hc-dark"] .quick-input-highlight {
+  color: var(--cortex-warning);
+}
+
+/* High Contrast Light Highlight */
+[data-theme="hc-light"] .quick-input-highlight {
+  color: var(--jb-border-focus);
+}
+
+/* Focused Row Highlight - Light Theme */
+.quick-input-list-row.focused .quick-input-highlight {
+  color: var(--jb-surface-hover);
+}
+
+/* List-specific override */
+.quick-input-list .quick-input-list-row .quick-input-highlight {
+  font-weight: bold;
+  background-color: unset;
+  color: var(--jb-border-focus) !important;
+}
+
+.quick-input-list .quick-input-list-row.focused .quick-input-highlight {
+  color: var(--jb-surface-hover) !important;
+}
+
+/* ==========================================================================
+   10. Focus and Selection States
+   ========================================================================== */
+
+.quick-input-list-row.focused {
+  outline: none;
+  background: var(--jb-surface-selected);
+  color: var(--jb-text-body-color);
+}
+
+.quick-input-list-row:hover:not(.focused) {
+  background: var(--jb-surface-hover);
+}
+
+.quick-input-list-row.selected {
+  background: var(--jb-surface-selected);
+  color: var(--jb-text-body-color);
+}
+
+/* Separator Border on Focus */
+.quick-input-list-row.focused .quick-input-list-entry.quick-input-list-separator-border {
+  border-color: transparent;
+}
+
+/* ==========================================================================
+   11. Action Bar & Buttons
+   ========================================================================== */
+
+.quick-input-list-entry-action-bar {
+  display: flex;
+  flex: 0;
+  overflow: visible;
+  margin-top: 1px;
+  margin-right: 4px;
+}
+
+/* Hidden by default */
+.quick-input-list-entry-action-bar .action-label {
+  display: none;
+}
+
+/* Shown on interaction */
+.quick-input-list-entry-action-bar .action-label.always-visible,
+.quick-input-list-entry:hover .quick-input-list-entry-action-bar .action-label,
+.quick-input-list-entry.focus-inside .quick-input-list-entry-action-bar .action-label,
+.quick-input-list-row.focused .quick-input-list-entry-action-bar .action-label {
+  display: flex;
+}
+
+.quick-input-list-entry-action-bar .action-label {
+  margin-right: 4px;
+  padding: 2px;
+}
+
+/* OK Button */
+.quick-input-action .button {
+  font-size: var(--jb-font-size-small);
+  padding: 0 6px;
+  display: flex;
+  height: 25px;
+  align-items: center;
+}
+
+/* ==========================================================================
+   12. Category/Group Header
+   ========================================================================== */
+
+.quick-input-group-header {
+  height: 22px;
+  padding: 0 8px;
+  font-size: var(--jb-font-size-small);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--jb-text-muted-color);
+  display: flex;
+  align-items: center;
+}
+
+/* Recent Commands Section */
+.quick-input-recent-header {
+  height: 22px;
+  padding: 0 12px;
+  font-size: var(--jb-font-size-small);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--jb-text-muted-color);
+  display: flex;
+  align-items: center;
+  background: transparent;
+}
+
+.quick-input-section-separator {
+  height: 1px;
+  margin: 4px 8px;
+  background: var(--jb-border-default);
+}
+
+/* ==========================================================================
+   13. Separators
+   ========================================================================== */
+
+.quick-input-list-entry.quick-input-list-separator-border {
+  border-top-width: 1px;
+  border-top-style: solid;
+  border-top-color: var(--jb-border-default);
+}
+
+/* First item never has top border */
+.quick-input-list-row:first-child .quick-input-list-entry.quick-input-list-separator-border {
+  border-top-style: none;
+}
+
+/* Separator as full item */
+.quick-input-list-separator-as-item {
+  padding: 4px 6px;
+  font-size: var(--jb-font-size-base);
+}
+
+.quick-input-list-separator-as-item .label-name {
+  font-weight: 600;
+}
+
+.quick-input-list-separator-as-item .label-description {
+  opacity: 1 !important;
+}
+
+/* Separator Label */
+.quick-input-list-entry .quick-input-list-separator {
+  margin-right: 4px;
+  color: var(--jb-border-focus);
+}
+
+/* ==========================================================================
+   13. Count Badge
+   ========================================================================== */
+
+.quick-input-count {
+  align-self: center;
+  position: absolute;
+  right: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.quick-input-count-badge {
+  padding: 3px 5px;
+  border-radius: var(--jb-radius-sm);
+  font-size: var(--jb-font-size-small);
+  min-width: 18px;
+  min-height: 18px;
+  line-height: var(--jb-font-size-small);
+  font-weight: normal;
+  text-align: center;
+  display: inline-block;
+  box-sizing: border-box;
+  background: var(--jb-surface-selected);
+  color: var(--jb-text-body-color);
+}
+
+/* Quick Input Badge Override */
+.quick-input-count .quick-input-count-badge {
+  vertical-align: middle;
+  padding: 2px 4px;
+  border-radius: var(--jb-radius-sm);
+  min-height: auto;
+  line-height: normal;
+}
+
+/* ==========================================================================
+   14. Icon Label Component
+   ========================================================================== */
+
+.quick-input-icon-label {
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quick-input-icon-label::before {
+  background-size: 16px;
+  background-position: left center;
+  background-repeat: no-repeat;
+  padding-right: 6px;
+  width: 16px;
+  height: 22px;
+  line-height: inherit !important;
+  display: inline-block;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  vertical-align: top;
+  flex-shrink: 0;
+}
+
+.quick-input-icon-label-container {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.quick-input-label-name {
+  color: inherit;
+  white-space: pre;
+}
+
+.quick-input-label-description {
+  color: var(--jb-text-muted-color);
+  margin-left: 0.5em;
+  font-size: var(--jb-font-size-small);
+  white-space: pre;
+}
+
+/* Light theme uses same muted color */
+[data-theme="light"] .quick-input-label-description {
+  color: var(--jb-text-muted-color);
+}
+
+.quick-input-label-suffix {
+  color: var(--jb-text-muted-color);
+  white-space: pre;
+}
+
+/* Special States */
+.quick-input-icon-label.bold .quick-input-label-name {
+  font-weight: bold;
+}
+
+.quick-input-icon-label.italic .quick-input-label-name {
+  font-style: italic;
+}
+
+.quick-input-icon-label.strikethrough .quick-input-label-name {
+  text-decoration: line-through;
+}
+
+.quick-input-icon-label.deprecated {
+  text-decoration: line-through;
+  opacity: 0.66;
+}
+
+/* Deprecated symbol row styling */
+.quick-input-list-row.symbol-deprecated .quick-input-label-name {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.quick-input-icon-label-container.disabled {
+  color: var(--jb-text-muted-color);
+  opacity: 0.6;
+}
+
+/* ==========================================================================
+   15. Message Area
+   ========================================================================== */
+
+.quick-input-message {
+  margin-top: -1px;
+  padding: 5px;
+  overflow-wrap: break-word;
+}
+
+.quick-input-message > .codicon {
+  margin: 0 0.2em;
+  vertical-align: text-bottom;
+}
+
+.quick-input-message a {
+  color: inherit;
+}
+
+/* ==========================================================================
+   16. Animations
+   ========================================================================== */
+
+@keyframes quick-input-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes quick-input-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes quick-input-scale-in {
+  from { 
+    opacity: 0;
+    transform: translateX(-50%) scale(0.95) translateY(-10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
+}
+
+.quick-input-animate-in {
+  animation: quick-input-scale-in 150ms ease-out forwards;
+}
+
+.quick-input-animate-out {
+  animation: quick-input-fade-out 150ms ease-in forwards;
+}
+
+.quick-input-backdrop.animate-in {
+  animation: quick-input-fade-in 150ms ease-out forwards;
+}
+
+/* Find Input Highlight Flash */
+@keyframes quick-input-highlight-flash {
+  0% { background: rgba(253, 255, 0, 0.8); }
+  100% { background: transparent; }
+}
+
+[data-theme="dark"] .quick-input-flash,
+.dark .quick-input-flash {
+  animation: quick-input-highlight-flash-dark 100ms ease-out;
+}
+
+@keyframes quick-input-highlight-flash-dark {
+  0% { background: rgba(255, 255, 255, 0.44); }
+  100% { background: transparent; }
+}
+
+/* ==========================================================================
+   17. CSS Variables / Theme Integration (JetBrains UI Tokens)
+   ========================================================================== */
+
+:root {
+  /* Quick input uses JetBrains UI tokens directly:
+   * - Widget bg: var(--jb-popup)
+   * - Input bg: var(--jb-canvas)
+   * - Input border: var(--jb-border-default), focus: var(--jb-border-focus)
+   * - List item hover: var(--jb-surface-hover)
+   * - List item selected: var(--jb-surface-selected)
+   * - Text: var(--jb-text-body-color)
+   * - Description: var(--jb-text-muted-color)
+   * - Radius: var(--jb-radius-lg) for widget, var(--jb-radius-sm) for items
+   * - Shadow: var(--jb-shadow-popup)
+   */
+  --quick-input-list-focus-background: var(--jb-surface-selected);
+  --quick-input-list-focus-foreground: var(--jb-text-body-color);
+  --quick-input-list-focus-icon-foreground: inherit;
+  --picker-group-foreground: var(--jb-text-body-color);
+  --list-highlight-foreground: var(--jb-border-focus);
+  --list-focus-highlight-foreground: var(--jb-border-focus);
+}
+
+[data-theme="hc-dark"] {
+  --picker-group-foreground: var(--jb-btn-primary-color);
+  --list-highlight-foreground: var(--cortex-warning);
+}
+
+[data-theme="hc-light"] {
+  --picker-group-foreground: var(--jb-border-focus);
+  --list-highlight-foreground: var(--jb-border-focus);
+}
+
+/* ==========================================================================
+   18. Accessibility
+   ========================================================================== */
+
+.quick-input-visible-count {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Screen reader announcements */
+.quick-input-widget [aria-live="polite"] {
+  position: absolute;
+  left: -10000px;
+}

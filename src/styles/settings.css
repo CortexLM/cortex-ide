@@ -1,0 +1,848 @@
+/* ============================================================================
+   SETTINGS UI - VS Code Spec Compliant
+   Based on VS Code settingsEditor2.css, settingsWidgets.css, keybindingsEditor.css
+   ============================================================================ */
+
+/* ==========================================================================
+   CSS Custom Properties (VS Code Theme Variables)
+   ========================================================================== */
+:root {
+  /* Settings-specific colors */
+  --vscode-settings-headerForeground: var(--text-strong);
+  --vscode-settings-headerBorder: var(--border-base);
+  --vscode-settings-modifiedItemIndicator: var(--cortex-primary);
+  --vscode-settings-focusedRowBackground: rgba(255, 255, 255, 0.04);
+  --vscode-settings-rowHoverBackground: rgba(255, 255, 255, 0.03);
+  --vscode-settings-focusedRowBorder: var(--cortex-focus-color);
+  --vscode-settings-checkboxBackground: var(--surface-base);
+  --vscode-settings-checkboxForeground: var(--text-base);
+  --vscode-settings-checkboxBorder: var(--border-base);
+  
+  /* Keybindings-specific colors */
+  --vscode-keybindingTable-rowsBackground: rgba(130, 130, 130, 0.04);
+  --vscode-keybindingTable-headerBackground: var(--surface-raised);
+}
+
+/* ==========================================================================
+   Settings Editor - Main Container
+   ========================================================================== */
+.settings-editor {
+  height: 100%;
+  overflow: hidden;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* ==========================================================================
+   Settings Header
+   ========================================================================== */
+.settings-header {
+  box-sizing: border-box;
+  margin: auto;
+  overflow: hidden;
+  margin-top: 11px;
+  padding-top: 3px;
+  padding-left: 24px;
+  padding-right: 24px;
+  max-width: 1200px;
+}
+
+.settings-header-controls {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: solid 1px var(--vscode-settings-headerBorder);
+  margin-top: 10px;
+}
+
+/* ==========================================================================
+   Settings Body Layout
+   ========================================================================== */
+.settings-body {
+  position: relative;
+}
+
+.settings-body > .settings-split-view {
+  margin-top: 14px;
+}
+
+/* ==========================================================================
+   Table of Contents (TOC)
+   ========================================================================== */
+.settings-toc-container {
+  width: 100%;
+  pointer-events: none;
+  z-index: 10;
+  position: absolute;
+}
+
+.settings-toc-container .settings-toc-list {
+  pointer-events: initial;
+}
+
+.settings-toc-wrapper {
+  padding-left: 24px;
+  height: 100%;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.settings-toc-entry {
+  line-height: 22px;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  display: flex;
+}
+
+.settings-toc-entry:not(.selected) {
+  opacity: 0.9;
+  color: var(--text-base);
+}
+
+.settings-toc-entry.selected {
+  font-weight: bold;
+}
+
+/* ==========================================================================
+   Settings Row / Item Container (VS Code spec)
+   ========================================================================== */
+.setting-item-contents {
+  position: relative;
+  padding: 12px 14px 18px;
+  white-space: normal;
+  outline-offset: -1px;
+}
+
+/* Boolean & List Items - Extra bottom padding */
+.setting-item-bool .setting-item-contents,
+.setting-item-list .setting-item-contents {
+  padding-bottom: 26px;
+}
+
+/* Focus/Hover States */
+.setting-item-contents.focused {
+  background-color: var(--vscode-settings-focusedRowBackground);
+}
+
+.setting-item-contents:hover:not(.focused) {
+  background-color: var(--vscode-settings-rowHoverBackground);
+}
+
+.setting-item-contents.focused.list-focused {
+  outline: 1px solid var(--vscode-settings-focusedRowBorder);
+}
+
+/* ==========================================================================
+   Modified Indicator (VS Code spec)
+   ========================================================================== */
+.setting-item-modified-indicator {
+  display: none;
+  border-color: var(--vscode-settings-modifiedItemIndicator);
+}
+
+.setting-item-contents.is-configured .setting-item-modified-indicator {
+  display: block;
+  content: ' ';
+  position: absolute;
+  width: 6px;
+  border-left-width: 2px;
+  border-left-style: solid;
+  left: 5px;
+  top: 15px;
+  bottom: 18px;
+}
+
+/* Bool/List items have different bottom offset */
+.setting-item-bool .setting-item-contents.is-configured .setting-item-modified-indicator,
+.setting-item-list .setting-item-contents.is-configured .setting-item-modified-indicator {
+  bottom: 23px;
+}
+
+/* ==========================================================================
+   Boolean Controls - Checkbox (VS Code spec: 18x18px)
+   ========================================================================== */
+.setting-value-checkbox {
+  height: 18px;
+  width: 18px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  margin-right: 9px;
+  margin-left: 0px;
+  padding: 0px;
+  background-color: var(--vscode-settings-checkboxBackground);
+  color: var(--vscode-settings-checkboxForeground);
+  border-color: var(--vscode-settings-checkboxBorder);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.setting-value-checkbox:hover {
+  border-color: var(--cortex-focus-color);
+}
+
+.setting-value-checkbox:focus {
+  outline: 1px solid var(--cortex-focus-color);
+  outline-offset: 1px;
+}
+
+.setting-value-checkbox.checked {
+  background-color: var(--cortex-primary);
+  border-color: var(--cortex-primary);
+}
+
+.setting-value-checkbox .checkbox-icon {
+  width: 12px;
+  height: 12px;
+  color: white;
+}
+
+.setting-value-checkbox:not(.checked) .checkbox-icon {
+  opacity: 0;
+}
+
+/* ==========================================================================
+   Dropdown / Select Controls (VS Code spec: 26px height, 320px width)
+   ========================================================================== */
+.setting-item-select {
+  width: initial;
+  font: inherit;
+  height: 26px;
+  padding: 2px 6px;
+}
+
+.setting-item-enum .setting-item-value > .setting-item-control > select {
+  width: 320px;
+}
+
+/* Cortex-specific select styling with VS Code dimensions */
+.settings-inline-select {
+  height: 26px;
+  min-width: 100px;
+  width: 320px;
+  padding: 2px 28px 2px 6px;
+  background: var(--cortex-surface-base);
+  border: 1px solid var(--cortex-border-base);
+  border-radius: var(--cortex-radius-sm);
+  font-size: 12px;
+  color: var(--cortex-text-primary);
+  cursor: pointer;
+  appearance: none;
+  transition: border-color 0.15s ease;
+}
+
+.settings-inline-select:focus {
+  border-color: var(--cortex-focus-color);
+  outline: none;
+}
+
+.settings-inline-select:hover:not(:focus) {
+  border-color: var(--cortex-border-base);
+}
+
+/* ==========================================================================
+   Text Input Controls (VS Code spec: 420px width, 200px min for numbers)
+   ========================================================================== */
+.setting-item-text .setting-item-control {
+  width: 420px;
+}
+
+.setting-item-number .setting-item-value > .setting-item-control {
+  min-width: 200px;
+}
+
+/* Cortex-specific input styling with VS Code dimensions */
+.settings-inline-input {
+  height: 26px;
+  width: 420px;
+  padding: 2px 8px;
+  border-radius: var(--cortex-radius-sm);
+  border: 1px solid var(--cortex-border-subtle);
+  background: var(--cortex-surface-base);
+  font-size: 13px;
+  color: var(--cortex-text-secondary);
+  transition: border-color 0.15s ease;
+}
+
+.settings-inline-input[type="number"] {
+  min-width: 200px;
+  width: auto;
+}
+
+.settings-inline-input:focus {
+  border-color: var(--cortex-focus-color);
+  outline: none;
+}
+
+.settings-inline-input:hover:not(:focus) {
+  border-color: var(--cortex-border-base);
+}
+
+.settings-inline-input::placeholder {
+  color: var(--cortex-text-disabled);
+}
+
+/* Hide number input arrows (VS Code spec) */
+.settings-inline-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+}
+
+.settings-inline-input[type="number"] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+/* ==========================================================================
+   Group Titles - Typography Hierarchy (VS Code spec: 26px/22px/18px)
+   ========================================================================== */
+.settings-group-title-level-1 {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--vscode-settings-headerForeground);
+  margin-bottom: 16px;
+}
+
+.settings-group-title-level-2 {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--vscode-settings-headerForeground);
+  margin-bottom: 12px;
+}
+
+.settings-group-title-level-3 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--vscode-settings-headerForeground);
+  margin-bottom: 8px;
+}
+
+/* Setting label with 600 weight (VS Code spec) */
+.setting-item-label {
+  font-weight: 600;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.setting-item-category {
+  font-weight: 600;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.setting-item-description {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ==========================================================================
+   Toolbar - Icon Visibility Pattern (VS Code spec: hidden until hover)
+   ========================================================================== */
+.setting-toolbar-container {
+  position: absolute;
+  left: -22px;
+  top: 8px;
+  bottom: 0px;
+  width: 22px;
+  height: 22px;
+}
+
+.setting-toolbar-container > .setting-toolbar .toolbar-icon {
+  opacity: 0;
+}
+
+/* Reveal triggers - show on mouseover, focus, hover, or active */
+.setting-item-contents.mouseover .setting-toolbar-container > .setting-toolbar .toolbar-icon,
+.setting-item-contents.focused .setting-toolbar-container > .setting-toolbar .toolbar-icon,
+.setting-toolbar-container:hover > .setting-toolbar .toolbar-icon,
+.setting-toolbar-container > .setting-toolbar .active .toolbar-icon {
+  opacity: 1;
+}
+
+/* 300ms transition (VS Code spec) with motion preference */
+@media (prefers-reduced-motion: no-preference) {
+  .setting-toolbar-container > .setting-toolbar .toolbar-icon {
+    transition: opacity 0.3s;
+  }
+}
+
+/* ==========================================================================
+   Settings Tabs (VS Code spec)
+   ========================================================================== */
+.settings-tabs-widget .action-label {
+  text-transform: uppercase;
+  font-size: 11px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.settings-header-tab {
+  font-size: 13px;
+  padding-bottom: 6.5px;
+  padding-top: 7px;
+  padding-left: 8px;
+  padding-right: 8px;
+  max-width: 300px;
+  text-overflow: ellipsis;
+  border-radius: 0;
+}
+
+.settings-header-tab:not(.active) {
+  opacity: 0.9;
+  color: var(--text-weak);
+}
+
+.settings-header-tab.active {
+  opacity: 1;
+  color: var(--vscode-settings-headerForeground);
+  border-bottom: 1px solid var(--cortex-primary);
+}
+
+.settings-header-tab:hover {
+  color: var(--text-base);
+  border-bottom: 1px solid var(--text-weak);
+}
+
+.settings-header-tab:focus {
+  border-bottom: 1px solid var(--cortex-focus-color);
+  outline: 1px solid transparent;
+}
+
+.settings-header-tab:hover:not(.active) {
+  outline-style: dashed;
+}
+
+/* Preferences tabs container (VS Code spec) */
+.preferences-tabs-container {
+  height: 32px;
+  display: flex;
+  border-bottom: solid 1px var(--vscode-settings-headerBorder);
+  margin-top: 10px;
+}
+
+/* ==========================================================================
+   Keybindings Editor (VS Code spec)
+   ========================================================================== */
+.keybindings-editor {
+  padding: 11px 0px 0px 27px;
+}
+
+.keybindings-editor > .keybindings-header {
+  padding: 0px 10px 11px 0;
+}
+
+/* Keybindings Table */
+.keybindings-table-container .keybindings-table-header {
+  background-color: var(--vscode-keybindingTable-headerBackground);
+  padding-left: 10px;
+}
+
+.keybindings-table-container .keybindings-table-header[data-col-index="0"],
+.keybindings-table-container .keybindings-table-cell[data-col-index="0"] {
+  padding-left: 20px;
+}
+
+.keybindings-table-row .keybindings-table-cell {
+  align-items: center;
+  display: flex;
+  overflow: hidden;
+  padding-left: 10px;
+}
+
+/* Alternating row colors */
+.keybindings-table-row[data-parity="odd"]:not(.focused):not(.selected):not(:hover) {
+  background-color: var(--vscode-keybindingTable-rowsBackground);
+}
+
+/* Keybindings search actions */
+.keybindings-search-actions-container {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  margin-top: 4px;
+  display: flex;
+}
+
+.keybindings-search-actions-container .recording-badge {
+  margin-right: 8px;
+  padding: 4px;
+}
+
+.keybindings-search-actions-container .action-item {
+  margin-right: 4px;
+}
+
+/* Keybinding code display */
+.keybinding-code {
+  font-family: var(--font-code, "SF Mono", "Fira Code", Consolas, monospace);
+  font-size: 90%;
+  display: flex;
+  overflow: hidden;
+}
+
+.keybinding-code.strong {
+  padding: 1px 4px;
+  background-color: rgba(128, 128, 128, 0.17);
+  border-radius: 4px;
+}
+
+/* Search highlight */
+.keybinding-highlight {
+  font-weight: bold;
+  color: var(--cortex-primary);
+}
+
+/* Actions visibility pattern (hidden until hover/focus/selected) */
+.keybindings-table-row .row-actions .action-bar {
+  display: none;
+  flex: 1;
+}
+
+.keybindings-table-row.selected .row-actions .action-bar,
+.keybindings-table-container.focused .keybindings-table-row.focused .row-actions .action-bar,
+.keybindings-table-row:hover .row-actions .action-bar {
+  display: flex;
+}
+
+/* ==========================================================================
+   List/Array Controls (VS Code spec)
+   ========================================================================== */
+.setting-list-widget,
+.setting-list-include-exclude-widget,
+.setting-list-object-widget {
+  margin-bottom: 1px;
+  padding: 1px;
+}
+
+.setting-list-row,
+.setting-list-row-header {
+  position: relative;
+  max-height: 24px;
+  line-height: 24px;
+  min-height: 24px;
+}
+
+.setting-list-row-header {
+  font-weight: bold;
+}
+
+/* List value widths */
+.setting-list-value {
+  width: 60%;
+}
+
+.setting-list-sibling {
+  width: 40%;
+}
+
+.setting-list-value.no-sibling {
+  width: 100%;
+}
+
+/* List row hover states */
+.setting-list-row:hover {
+  background: var(--vscode-settings-rowHoverBackground);
+}
+
+.setting-list-row.selected.focused {
+  background: var(--cortex-primary-bg);
+}
+
+.setting-list-row.selected:not(.focused) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* List action bar (VS Code spec: hidden by default) */
+.setting-list-row .list-action-bar {
+  display: none;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+}
+
+.setting-list-row:hover .list-action-bar,
+.setting-list-row.selected .list-action-bar {
+  display: block;
+}
+
+/* Action button specs */
+.setting-list-row .list-action-bar .action-button {
+  width: 16px;
+  height: 20px;
+  padding: 2px;
+  margin-right: 2px;
+}
+
+.setting-list-row .list-action-bar .action-button.edit {
+  margin-right: 4px;
+}
+
+/* Add button */
+.setting-list-add-button {
+  display: inline-block;
+  margin-top: 4px;
+  margin-right: 4px;
+}
+
+/* List input fields */
+.setting-list-value-input,
+.setting-list-sibling-input,
+.setting-list-object-input {
+  height: 24px;
+  max-width: 320px;
+  margin-right: 4px;
+}
+
+.setting-list-value-input.no-sibling,
+.setting-list-object-input {
+  max-width: unset;
+  width: 100%;
+}
+
+/* ==========================================================================
+   Validation Messages (VS Code spec)
+   ========================================================================== */
+.setting-item-validation-message {
+  display: none;
+  background-color: var(--cortex-error-bg, rgba(239, 68, 68, 0.1));
+  color: var(--cortex-error);
+  border: solid 1px var(--cortex-error);
+}
+
+.setting-item-contents.invalid-input .setting-item-validation-message {
+  display: block;
+  position: absolute;
+  padding: 5px;
+  box-sizing: border-box;
+  margin-top: -1px;
+  z-index: 1;
+}
+
+.setting-item-text .setting-item-validation-message {
+  width: 420px;
+}
+
+.setting-item-number .setting-item-validation-message {
+  width: 200px;
+}
+
+/* ==========================================================================
+   Responsive Behavior - Narrow Width Mode
+   ========================================================================== */
+.settings-editor.narrow-width > .settings-body .settings-toc-container {
+  display: none;
+}
+
+.settings-editor.narrow-width > .settings-body .settings-tree-container {
+  margin-left: 0px;
+}
+
+.settings-editor.narrow-width > .settings-body .settings-tree-container .settings-row-contents {
+  padding-left: 33px;
+}
+
+/* No results mode */
+.settings-editor.no-results > .settings-body .settings-toc-container,
+.settings-editor.no-results > .settings-body .settings-tree-container {
+  display: none;
+}
+
+.settings-editor.no-results > .settings-body > .no-results-message {
+  display: block;
+}
+
+/* ==========================================================================
+   Special States & Modifiers
+   ========================================================================== */
+
+/* Deprecated settings */
+.setting-item-contents.is-deprecated .setting-item-deprecation-message {
+  display: flex;
+}
+
+.setting-item-deprecation-message {
+  margin-top: 3px;
+  user-select: text;
+  -webkit-user-select: text;
+  color: var(--cortex-error);
+}
+
+.setting-item-deprecation-message .deprecation-icon {
+  color: inherit;
+  margin-right: 4px;
+}
+
+/* Preview badge */
+.setting-indicator.setting-item-preview {
+  color: var(--cortex-badge-foreground, white);
+  background: var(--cortex-badge-background, var(--cortex-primary));
+  font-style: italic;
+  margin-right: 4px;
+  padding: 0px 4px 2px;
+  border-radius: 4px;
+}
+
+/* User-selectable text */
+.setting-item-label,
+.setting-item-category,
+.setting-item-description,
+.setting-item-deprecation-message {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ==========================================================================
+   Define Keybinding Widget (Modal)
+   ========================================================================== */
+.define-keybinding-widget {
+  padding: 10px;
+  position: absolute;
+}
+
+.define-keybinding-widget .message {
+  width: 400px;
+  text-align: center;
+}
+
+.define-keybinding-widget .input-box,
+.define-keybinding-widget .output,
+.define-keybinding-widget .existing {
+  margin-top: 10px;
+  width: 400px;
+  display: block;
+  text-align: center;
+}
+
+.define-keybinding-widget .input {
+  text-align: center;
+}
+
+.define-keybinding-widget .output {
+  display: flex;
+  justify-content: center;
+}
+
+.define-keybinding-widget .output .keybinding {
+  margin: 0px 4px;
+}
+
+.define-keybinding-widget .existing .existing-text {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   High Contrast Theme Support
+   ========================================================================== */
+@media (forced-colors: active) {
+  .setting-item-markdown a > code {
+    color: var(--cortex-text-primary);
+  }
+  
+  .setting-value-checkbox {
+    outline: 1px solid transparent;
+  }
+}
+
+/* ==========================================================================
+   Modified Settings Indicator (VS Code Style)
+   ========================================================================== */
+
+/* Modified count badge in sidebar tree items */
+.modified-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 8px;
+  background-color: var(--vscode-settings-modifiedItemIndicator, var(--cortex-primary));
+  color: white;
+  flex-shrink: 0;
+}
+
+/* Tree item button when it has modifications */
+.settings-tab-button.has-modifications {
+  position: relative;
+}
+
+/* Left border indicator for modified tree items */
+.settings-tab-button.has-modifications::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background-color: var(--vscode-settings-modifiedItemIndicator, var(--cortex-primary));
+  border-radius: 1px;
+}
+
+/* Modified setting row styling */
+.setting-item-contents.is-modified {
+  position: relative;
+}
+
+/* Left border indicator for modified settings (VS Code spec: 2px left border, 6px width) */
+.setting-item-contents.is-modified .setting-item-modified-indicator {
+  display: block;
+  content: ' ';
+  position: absolute;
+  width: 6px;
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-color: var(--vscode-settings-modifiedItemIndicator, var(--cortex-primary));
+  left: 5px;
+  top: 15px;
+  bottom: 18px;
+}
+
+/* Modified indicator dot for inline settings */
+.modified-indicator-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--vscode-settings-modifiedItemIndicator, var(--cortex-primary));
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+/* Reset to default button styling */
+.reset-to-default-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 4px;
+  color: var(--foreground-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.reset-to-default-button:hover {
+  background-color: var(--background-tertiary);
+  color: var(--foreground-base);
+}
+
+/* Show reset button on row hover */
+.setting-item-contents:hover .reset-to-default-button,
+.settings-row:hover .reset-to-default-button,
+.group:hover .reset-to-default-button {
+  opacity: 1;
+}
+
+/* Modified settings highlight on hover */
+.setting-item-contents.is-modified:hover {
+  background-color: rgba(var(--cortex-primary-rgb, 99, 102, 241), 0.05);
+}

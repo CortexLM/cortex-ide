@@ -1,0 +1,376 @@
+// Cortex Extension WIT Interface
+// Defines the contract between the host (Cortex Desktop) and WASM extensions.
+// Provides VS Code-parity capabilities for workspace, documents, window, languages, and terminal.
+
+package cortex:extension;
+
+// Host functions provided to extensions
+interface host {
+    // ========================================================================
+    // Logging
+    // ========================================================================
+
+    log: func(level: u32, message: string);
+
+    // ========================================================================
+    // Configuration
+    // ========================================================================
+
+    get-config: func(key: string) -> option<string>;
+
+    // ========================================================================
+    // Commands
+    // ========================================================================
+
+    register-command: func(command-id: string);
+
+    // ========================================================================
+    // Events
+    // ========================================================================
+
+    emit-event: func(event-name: string, data: string);
+
+    // ========================================================================
+    // UI - Messages
+    // ========================================================================
+
+    show-message: func(level: u32, message: string);
+
+    // ========================================================================
+    // Workspace - File System
+    // ========================================================================
+
+    /// Read the contents of a file at the given path. Returns file content as a string.
+    read-file: func(path: string) -> result<string, string>;
+
+    /// Write content to a file at the given path. Creates the file if it does not exist.
+    write-file: func(path: string, content: string) -> result<string, string>;
+
+    /// Delete a file at the given path.
+    delete-file: func(path: string) -> result<string, string>;
+
+    /// List files matching an optional glob pattern under the given path.
+    /// If pattern is not provided, lists all files under path.
+    /// Returns a JSON array of matching file paths.
+    list-files: func(path: string, pattern: option<string>) -> result<string, string>;
+
+    /// Retrieve file metadata (type, size, timestamps) as a JSON string.
+    stat-file: func(path: string) -> result<string, string>;
+
+    /// Find files matching a glob pattern. Returns a JSON array of matching paths.
+    find-files: func(pattern: string) -> result<string, string>;
+
+    /// Get workspace configuration for a section. Returns the value as a JSON string.
+    get-configuration: func(section: string) -> result<string, string>;
+
+    /// Get the workspace root path, if available.
+    get-workspace-path: func() -> option<string>;
+
+    // ========================================================================
+    // Document - Text Document Operations
+    // ========================================================================
+
+    /// Open a document by URI. Returns a document handle identifier.
+    open-document: func(uri: string) -> result<string, string>;
+
+    /// Save a document identified by URI.
+    save-document: func(uri: string) -> result<string, string>;
+
+    /// Get the full text content of a document identified by URI.
+    get-text: func(uri: string) -> result<string, string>;
+
+    /// Get the text of a specific line in a document. Line is zero-based.
+    line-at: func(uri: string, line: u32) -> result<string, string>;
+
+    /// Translate a byte offset to a line/column position. Returns a JSON object.
+    position-at: func(uri: string, offset: u32) -> result<string, string>;
+
+    /// Apply a set of text edits to a document. Edits are provided as a JSON array.
+    /// Returns the updated document content.
+    apply-edits: func(uri: string, edits-json: string) -> result<string, string>;
+
+    // ========================================================================
+    // Editor - Selection & Text Manipulation
+    // ========================================================================
+
+    /// Get the currently selected text in the active editor, if any.
+    get-selection: func() -> option<string>;
+
+    /// Insert text at the current cursor position in the active editor.
+    insert-text: func(text: string) -> result<string, string>;
+
+    /// Replace the current selection with the given text.
+    replace-selection: func(text: string) -> result<string, string>;
+
+    // ========================================================================
+    // Window - UI Components
+    // ========================================================================
+
+    /// Show a quick-pick menu with a list of items and an optional placeholder.
+    /// Returns the selected item, or none if cancelled.
+    show-quick-pick: func(items-json: string, placeholder: option<string>) -> option<string>;
+
+    /// Show an input box with a prompt and optional default value.
+    /// Returns the entered text, or none if cancelled.
+    show-input-box: func(prompt: string, default-value: option<string>) -> option<string>;
+
+    /// Create a named output channel. Returns a channel handle identifier.
+    create-output-channel: func(name: string) -> result<string, string>;
+
+    /// Append text to an output channel identified by its handle.
+    output-channel-append: func(channel-handle: string, text: string) -> result<string, string>;
+
+    /// Append text to an output channel (alias for output-channel-append).
+    append-to-output: func(channel-id: string, text: string) -> result<string, string>;
+
+    /// Create a tree view with the given id and options (JSON). Returns a view handle.
+    create-tree-view: func(view-id: string, options-json: string) -> result<string, string>;
+
+    /// Register a tree view with an id and title. Returns a view handle.
+    register-tree-view: func(id: string, title: string) -> result<string, string>;
+
+    /// Create a webview panel. Options are provided as a JSON string. Returns a panel handle.
+    create-webview-panel: func(view-type: string, title: string, options-json: string) -> result<string, string>;
+
+    /// Create a text editor decoration type. Style is provided as a JSON string.
+    /// Returns a decoration type handle.
+    create-text-editor-decoration-type: func(style-json: string) -> result<string, string>;
+
+    /// Set decorations on a document. Ranges are provided as a JSON array.
+    set-decorations: func(uri: string, decoration-type-handle: string, ranges-json: string) -> result<string, string>;
+
+    /// Set a message in the status bar with an optional timeout in milliseconds.
+    set-status-bar-message: func(text: string, timeout-ms: option<u32>);
+
+    // ========================================================================
+    // Languages - Provider Registration
+    // ========================================================================
+
+    /// Register a language with its id and associated file extensions (JSON array).
+    register-language: func(language-id: string, extensions-list: string);
+
+    /// Register a completion provider for the given language selector (JSON).
+    /// Returns a disposable handle.
+    register-completion-provider: func(selector-json: string, provider-id: string) -> result<string, string>;
+
+    /// Register a hover provider for the given language selector (JSON).
+    /// Returns a disposable handle.
+    register-hover-provider: func(selector-json: string, provider-id: string) -> result<string, string>;
+
+    /// Register a definition provider for the given language selector (JSON).
+    /// Returns a disposable handle.
+    register-definition-provider: func(selector-json: string, provider-id: string) -> result<string, string>;
+
+    /// Register a code actions provider for the given language selector (JSON).
+    /// Returns a disposable handle.
+    register-code-actions-provider: func(selector-json: string, provider-id: string) -> result<string, string>;
+
+    /// Register a code lens provider for the given language selector (JSON).
+    /// Returns a disposable handle.
+    register-code-lens-provider: func(selector-json: string, provider-id: string) -> result<string, string>;
+
+    /// Register diagnostics for a document URI. Diagnostics are provided as a JSON string.
+    register-diagnostic: func(uri: string, diagnostics: string);
+
+    /// Register a code action provider for a language.
+    register-code-action-provider: func(language-id: string);
+
+    // ========================================================================
+    // Terminal
+    // ========================================================================
+
+    /// Create a new terminal instance. Options are provided as a JSON string.
+    /// Returns a terminal handle identifier.
+    create-terminal: func(name: string, options-json: string) -> result<string, string>;
+
+    /// Send text to a terminal identified by its handle.
+    terminal-send-text: func(terminal-handle: string, text: string) -> result<string, string>;
+
+    /// Dispose of a terminal identified by its handle.
+    terminal-dispose: func(terminal-handle: string) -> result<string, string>;
+}
+
+// Filesystem operations provided to extensions
+interface filesystem {
+    record dir-entry {
+        name: string,
+        is-dir: bool,
+        is-file: bool,
+        size: u64,
+    }
+
+    record file-stat {
+        size: u64,
+        is-dir: bool,
+        is-file: bool,
+        is-symlink: bool,
+        created: u64,
+        modified: u64,
+        accessed: u64,
+    }
+
+    read-file: func(path: string) -> result<list<u8>, string>;
+
+    write-file: func(path: string, data: list<u8>) -> result<_, string>;
+
+    list-directory: func(path: string) -> result<list<dir-entry>, string>;
+
+    watch-file: func(path: string) -> result<u64, string>;
+
+    stat: func(path: string) -> result<file-stat, string>;
+
+    delete: func(path: string) -> result<_, string>;
+}
+
+// Editor interaction functions provided to extensions
+interface editor {
+    record position {
+        line: u32,
+        character: u32,
+    }
+
+    record text-range {
+        start: position,
+        end: position,
+    }
+
+    record editor-info {
+        uri: string,
+        language-id: string,
+        version: u32,
+        is-dirty: bool,
+    }
+
+    record decoration {
+        range: text-range,
+        hover-message: string,
+        css-class: string,
+    }
+
+    get-active-editor: func() -> option<editor-info>;
+
+    get-selection: func() -> option<text-range>;
+
+    insert-text: func(position: position, text: string) -> result<_, string>;
+
+    replace-range: func(range: text-range, text: string) -> result<_, string>;
+
+    set-decorations: func(decorations: list<decoration>) -> result<_, string>;
+
+    get-document-text: func(uri: string) -> result<string, string>;
+}
+
+// Workspace management functions provided to extensions
+interface workspace {
+    get-workspace-folders: func() -> list<string>;
+
+    find-files: func(glob-pattern: string, max-results: u32) -> result<list<string>, string>;
+
+    get-configuration: func(section: string) -> option<string>;
+
+    set-configuration: func(section: string, value: string) -> result<_, string>;
+}
+
+// UI components provided to extensions
+interface ui {
+    record quick-pick-item {
+        label: string,
+        description: string,
+        detail: string,
+    }
+
+    record input-box-options {
+        prompt: string,
+        placeholder: string,
+        value: string,
+        password: bool,
+    }
+
+    register-tree-view: func(id: string, title: string) -> result<_, string>;
+
+    register-status-bar-item: func(id: string, text: string, alignment: u32, priority: u32) -> result<_, string>;
+
+    update-status-bar-item: func(id: string, text: string) -> result<_, string>;
+
+    show-quick-pick: func(items: list<quick-pick-item>) -> result<option<string>, string>;
+
+    show-input-box: func(options: input-box-options) -> result<option<string>, string>;
+}
+
+// Language services provided to extensions
+interface language {
+    use editor.{position, text-range};
+
+    enum diagnostic-severity {
+        error,
+        warning,
+        information,
+        hint,
+    }
+
+    record diagnostic {
+        range: text-range,
+        message: string,
+        severity: diagnostic-severity,
+        source: string,
+        code: string,
+    }
+
+    register-completion-provider: func(language-id: string, trigger-chars: list<string>) -> result<u64, string>;
+
+    register-hover-provider: func(language-id: string) -> result<u64, string>;
+
+    register-definition-provider: func(language-id: string) -> result<u64, string>;
+
+    register-diagnostics: func(uri: string, diagnostics: list<diagnostic>) -> result<_, string>;
+}
+
+// Source control management provided to extensions
+interface scm {
+    register-scm-provider: func(id: string, label: string) -> result<_, string>;
+}
+
+// Debug adapter support provided to extensions
+interface debug {
+    register-debug-adapter: func(type-name: string) -> result<_, string>;
+}
+
+// Functions the extension must export
+world extension {
+    import host;
+    import filesystem;
+    import editor;
+    import workspace;
+    import ui;
+    import language;
+    import scm;
+    import debug;
+
+    export activate: func() -> result<string, string>;
+
+    export deactivate: func() -> result;
+
+    export execute-command: func(command-id: string, args: string) -> result<string, string>;
+
+    // ========================================================================
+    // Lifecycle Events
+    // ========================================================================
+
+    /// Called when a file is saved in the workspace.
+    export on-file-save: func(path: string);
+
+    /// Called when a file is opened in the editor.
+    export on-file-open: func(path: string);
+
+    /// Called when the workspace root changes.
+    export on-workspace-change: func(path: string);
+
+    /// Called when the editor selection changes.
+    export on-selection-change: func(text: string);
+
+    export on-completion-request: func(uri: string, position: string) -> result<string, string>;
+
+    export on-hover-request: func(uri: string, position: string) -> result<string, string>;
+
+    export on-definition-request: func(uri: string, position: string) -> result<string, string>;
+}

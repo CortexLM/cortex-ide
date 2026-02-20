@@ -1,0 +1,826 @@
+/* =============================================================================
+   CORTEX UI DESIGN TOKENS - Complete Design System
+   =============================================================================
+   Extracted from Cortex UI designs - 4 screens analysis
+   
+   THEME: Dark mode with Lime accent
+   
+   RULES:
+   1. Components must ONLY use semantic variables (--cortex-surface-*, --cortex-text-*, etc.)
+   2. NEVER use --cortex-palette-* variables directly in components
+   3. NEVER hardcode hex colors in components
+   ============================================================================= */
+
+:root {
+  /* ===========================================================================
+     PALETTE DE BASE - NE PAS UTILISER DIRECTEMENT DANS LES COMPOSANTS
+     =========================================================================== */
+  
+  /* ----- NEUTRAL COLORS (Background Scale) ----- */
+  --cortex-palette-black: #000000;
+  --cortex-palette-gray-950: #0A0A0A;
+  --cortex-palette-gray-900: #0D0D0D;       /* Primary window background */
+  --cortex-palette-gray-850: #111111;
+  --cortex-palette-gray-800: #121212;
+  --cortex-palette-gray-750: #171717;
+  --cortex-palette-gray-700: #1A1A1A;       /* Secondary background (panels) */
+  --cortex-palette-gray-650: #1E1E1E;
+  --cortex-palette-gray-600: #222222;
+  --cortex-palette-gray-550: #262626;       /* Tertiary (inputs, cards) */
+  --cortex-palette-gray-500: #2A2A2A;
+  --cortex-palette-gray-450: #333333;
+  --cortex-palette-gray-400: #404040;       /* Disabled state */
+  --cortex-palette-gray-350: #4D4D4D;
+  --cortex-palette-gray-300: #666666;       /* Tertiary text */
+  --cortex-palette-gray-250: #737373;
+  --cortex-palette-gray-200: #808080;       /* Secondary text */
+  --cortex-palette-gray-150: #999999;
+  --cortex-palette-gray-100: #A0A0A0;
+  --cortex-palette-gray-50: #B3B3B3;
+  --cortex-palette-white: #FFFFFF;
+  
+  /* ----- LIME ACCENT (Primary Accent) ----- */
+  --cortex-palette-lime-50: #F7FFE5;
+  --cortex-palette-lime-100: #EEFFCC;
+  --cortex-palette-lime-200: #DDFF99;
+  --cortex-palette-lime-300: #CCFF66;
+  --cortex-palette-lime-400: #BBFF33;
+  --cortex-palette-lime-500: #B2FF22;       /* Primary accent (Figma exact) */
+  --cortex-palette-lime-600: #A6E600;       /* Hover state */
+  --cortex-palette-lime-700: #8FCC00;       /* Pressed/Active state */
+  --cortex-palette-lime-800: #739900;
+  --cortex-palette-lime-900: #5C7A00;
+  --cortex-palette-lime-muted: rgba(178, 255, 34, 0.15);
+  --cortex-palette-lime-glow: rgba(178, 255, 34, 0.3);
+
+  /* ----- PURPLE ACCENT (Figma Component Stroke) ----- */
+  --cortex-palette-purple-500: #8A38F5;
+  --cortex-palette-purple-muted: rgba(138, 56, 245, 0.15);
+
+  /* ----- FIGMA EXACT NEUTRAL COLORS ----- */
+  --cortex-palette-gray-figma-bg: #141415;
+  --cortex-palette-gray-figma-surface: #1C1C1D;
+  --cortex-palette-gray-figma-elevated: #252628;
+  --cortex-palette-gray-figma-border: #333337;
+  --cortex-palette-gray-figma-border-hover: #3C3D40;
+  --cortex-palette-gray-figma-border-strong: #4C4C4D;
+  --cortex-palette-gray-figma-border-alt: #4E4F54;
+  --cortex-palette-gray-figma-text-secondary: #8C8D8F;
+  --cortex-palette-gray-figma-text-surface: #FCFCFC;
+  --cortex-palette-gray-figma-open-bg: #E9E9EA;
+  
+  /* ----- SEMANTIC COLORS ----- */
+  /* Success (Green) */
+  --cortex-palette-success-50: #ECFDF5;
+  --cortex-palette-success-100: #D1FAE5;
+  --cortex-palette-success-200: #A7F3D0;
+  --cortex-palette-success-300: #6EE7B7;
+  --cortex-palette-success-400: #34D399;
+  --cortex-palette-success-500: #10B981;   /* Primary success */
+  --cortex-palette-success-600: #059669;
+  --cortex-palette-success-700: #047857;
+  --cortex-palette-success-muted: rgba(16, 185, 129, 0.15);
+  
+  /* Error/Destructive (Red) */
+  --cortex-palette-error-50: #FEF2F2;
+  --cortex-palette-error-100: #FEE2E2;
+  --cortex-palette-error-200: #FECACA;
+  --cortex-palette-error-300: #FCA5A5;
+  --cortex-palette-error-400: #F87171;
+  --cortex-palette-error-500: #EF4444;     /* Primary error */
+  --cortex-palette-error-600: #DC2626;
+  --cortex-palette-error-700: #B91C1C;
+  --cortex-palette-error-muted: rgba(239, 68, 68, 0.15);
+  
+  /* Warning (Orange/Yellow) */
+  --cortex-palette-warning-50: #FFFBEB;
+  --cortex-palette-warning-100: #FEF3C7;
+  --cortex-palette-warning-200: #FDE68A;
+  --cortex-palette-warning-300: #FCD34D;
+  --cortex-palette-warning-400: #FBBF24;
+  --cortex-palette-warning-500: #F59E0B;   /* Primary warning */
+  --cortex-palette-warning-600: #D97706;
+  --cortex-palette-warning-700: #B45309;
+  --cortex-palette-warning-muted: rgba(245, 158, 11, 0.15);
+  
+  /* Info (Blue) */
+  --cortex-palette-info-50: #EFF6FF;
+  --cortex-palette-info-100: #DBEAFE;
+  --cortex-palette-info-200: #BFDBFE;
+  --cortex-palette-info-300: #93C5FD;
+  --cortex-palette-info-400: #60A5FA;
+  --cortex-palette-info-500: #3B82F6;      /* Primary info */
+  --cortex-palette-info-600: #2563EB;
+  --cortex-palette-info-700: #1D4ED8;
+  --cortex-palette-info-muted: rgba(59, 130, 246, 0.15);
+
+  /* ===========================================================================
+     SEMANTIC VARIABLES - UTILISER CES VARIABLES DANS LES COMPOSANTS
+     =========================================================================== */
+  
+  /* ---- BACKGROUND COLORS (Figma Exact) ---- */
+  --cortex-bg-primary: #141415;                               /* Main app background, cards, panels */
+  --cortex-bg-secondary: #1C1C1D;                             /* Surface/sidebar background */
+  --cortex-bg-tertiary: var(--cortex-palette-gray-550);        /* #262626 - Inputs, cards */
+  --cortex-bg-elevated: #252628;                              /* Modals, dropdowns, elevated surfaces */
+  --cortex-bg-hover: #252628;                                 /* Hover states */
+  --cortex-bg-active: #252628;                                /* Active/pressed */
+  --cortex-bg-overlay: rgba(0, 0, 0, 0.6);                    /* Overlay for modals */
+  --cortex-bg-backdrop: rgba(0, 0, 0, 0.8);                   /* Stronger overlay */
+  
+  /* ---- TEXT COLORS ---- */
+  --cortex-text-primary: #FCFCFC;                              /* Figma exact - Primary text */
+  --cortex-text-secondary: #8C8D8F;                           /* Secondary text */
+  --cortex-text-tertiary: var(--cortex-palette-gray-300);      /* #666666 - Tertiary text */
+  --cortex-text-muted: var(--cortex-palette-gray-200);         /* #808080 - Muted text */
+  --cortex-text-disabled: var(--cortex-palette-gray-400);      /* #404040 - Disabled text */
+  --cortex-text-placeholder: var(--cortex-palette-gray-300);   /* #666666 - Placeholders */
+  --cortex-text-inverse: var(--cortex-palette-gray-900);       /* For light backgrounds */
+  --cortex-text-link: var(--cortex-palette-lime-500);          /* Link text */
+  --cortex-text-link-hover: var(--cortex-palette-lime-400);    /* Link hover */
+  
+  /* ---- ACCENT COLORS (Figma Exact: #B2FF22) ---- */
+  --cortex-accent-primary: #B2FF22;                           /* Primary accent (home icon, moon, send button) */
+  --cortex-accent-hover: #6C8A2C;                             /* Hover state */
+  --cortex-accent-pressed: var(--cortex-palette-lime-700);     /* Darker for pressed */
+  --cortex-accent-muted: var(--cortex-palette-lime-muted);     /* Muted background */
+  --cortex-accent-glow: var(--cortex-palette-lime-glow);       /* Glow effect */
+  --cortex-accent-disabled: #314214;                          /* Disabled accent state */
+  --cortex-accent-blue: #266FCF;                              /* Vibe toggle accent */
+  --cortex-accent-text: #000000;                              /* Text on accent bg (black) */
+  --cortex-accent-dark-bg: #0F1503;                           /* Dark accent background */
+  --cortex-accent-purple: var(--cortex-palette-purple-500);    /* Purple accent for special elements */
+  
+  /* ---- SEMANTIC STATE COLORS ---- */
+  --cortex-success: var(--cortex-palette-success-500);
+  --cortex-success-hover: var(--cortex-palette-success-600);
+  --cortex-success-bg: var(--cortex-palette-success-muted);
+  
+  --cortex-error: var(--cortex-palette-error-500);
+  --cortex-error-hover: var(--cortex-palette-error-600);
+  --cortex-error-bg: var(--cortex-palette-error-muted);
+  
+  --cortex-warning: var(--cortex-palette-warning-500);
+  --cortex-warning-hover: var(--cortex-palette-warning-600);
+  --cortex-warning-bg: var(--cortex-palette-warning-muted);
+  
+  --cortex-info: var(--cortex-palette-info-500);
+  --cortex-info-hover: var(--cortex-palette-info-600);
+  --cortex-info-bg: var(--cortex-palette-info-muted);
+
+  /* ---- GIT STATUS COLORS ---- */
+  --cortex-git-modified: var(--cortex-warning);
+  --cortex-git-added: var(--cortex-success);
+  --cortex-git-deleted: var(--cortex-error);
+  --cortex-git-renamed: var(--cortex-info);
+  --cortex-git-untracked: var(--cortex-text-inactive);
+  --cortex-git-conflict: var(--cortex-warning);
+  
+  /* ---- BORDER COLORS (Figma Exact) ---- */
+  --cortex-border-default: #333337;                           /* Primary border (Figma exact) */
+  --cortex-border-hover: #3C3D40;                             /* Secondary border */
+  --cortex-border-focus: var(--cortex-palette-lime-500);
+  --cortex-border-error: var(--cortex-palette-error-500);
+  --cortex-border-success: var(--cortex-palette-success-500);
+  --cortex-border-subtle: #333337;                            /* Card border */
+  --cortex-border-strong: #4C4C4D;                            /* Dropdown border */
+  --cortex-border-accent: rgba(255, 255, 255, 0.15);          /* Chat input border */
+  --cortex-border-card: #333337;                              /* Card borders */
+  --cortex-border-internal: rgba(255, 255, 255, 0.04);        /* Icon container internal */
+  
+  /* ===========================================================================
+     TYPOGRAPHY
+     =========================================================================== */
+  
+  /* Font Families (Figma: Figtree, Geist, JetBrains Mono, Habibi) */
+  --cortex-font-sans: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --cortex-font-display: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --cortex-font-mono: 'JetBrains Mono', 'Source Code Pro', 'Fira Code', 'SF Mono', 'Consolas', monospace;
+  --cortex-font-serif: 'Habibi', Georgia, serif;
+  
+  /* Cortex UI Design Colors (Exact from Design) */
+  --cortex-text-inactive: #747577;                            /* Vibe text, muted icons */
+  --cortex-text-secondary-alt: #77787A;
+  --cortex-text-accent-blue: #9CCFFF;                         /* IDE badge text */
+  --cortex-text-line-number: rgba(255, 255, 255, 0.5);        /* Editor line numbers */
+  --cortex-text-on-surface: #FCFCFC;                          /* Text on dark surfaces */
+  --cortex-card-border: rgba(255, 255, 255, 0.15);            /* Standard card border */
+  --cortex-icon-inactive: rgba(116, 117, 119, 1);             /* Inactive sidebar icons */
+  --cortex-icon-active: #000000;                              /* Active icon on accent bg */
+  
+  /* Font Sizes (Figma: 10, 12, 14, 16) */
+  --cortex-text-2xs: 10px;          /* Figma smallest text */
+  --cortex-text-xs: 12px;
+  --cortex-text-sm: 14px;
+  --cortex-text-base: 16px;
+  --cortex-text-lg: 17px;           /* Navigation items */
+  --cortex-text-xl: 20px;
+  --cortex-text-2xl: 24px;
+  --cortex-text-3xl: 32px;          /* Page titles */
+  --cortex-text-4xl: 40px;
+  --cortex-text-5xl: 48px;
+  
+  /* Font Weights */
+  --cortex-font-regular: 400;
+  --cortex-font-medium: 500;
+  --cortex-font-semibold: 600;
+  --cortex-font-bold: 700;
+  
+  /* Line Heights (Figma: 1em, 1.14em, 1.17em, 1.2em, 1.25em, 1.32em, 1.43em) */
+  --cortex-leading-none: 1;
+  --cortex-leading-compact: 1.1428;   /* Figma 16px/14px */
+  --cortex-leading-dense: 1.1667;     /* Figma 14px/12px */
+  --cortex-leading-tight: 1.2;
+  --cortex-leading-firm: 1.25;        /* Figma 20px/16px */
+  --cortex-leading-cozy: 1.32;        /* Figma exact */
+  --cortex-leading-snug: 1.375;
+  --cortex-leading-mid: 1.4286;       /* Figma 20px/14px */
+  --cortex-leading-normal: 1.5;
+  --cortex-leading-relaxed: 1.625;
+  --cortex-leading-loose: 1.75;
+  
+  /* Letter Spacing (Figma: -1.5%) */
+  --cortex-tracking-tighter: -0.05em;
+  --cortex-tracking-tight: -0.025em;
+  --cortex-tracking-figma: -0.015em;  /* Figma exact: -1.5% */
+  --cortex-tracking-normal: 0;
+  --cortex-tracking-wide: 0.025em;
+  --cortex-tracking-wider: 0.05em;
+  
+  /* ===========================================================================
+     SPACING
+     =========================================================================== */
+  --cortex-space-0: 0px;
+  --cortex-space-px: 1px;
+  --cortex-space-0-5: 2px;
+  --cortex-space-1: 4px;
+  --cortex-space-1-5: 6px;
+  --cortex-space-2: 8px;
+  --cortex-space-2-5: 10px;
+  --cortex-space-3: 12px;
+  --cortex-space-3-5: 14px;
+  --cortex-space-4: 16px;
+  --cortex-space-5: 20px;
+  --cortex-space-6: 24px;
+  --cortex-space-7: 28px;
+  --cortex-space-8: 32px;
+  --cortex-space-9: 36px;
+  --cortex-space-10: 40px;
+  --cortex-space-11: 44px;
+  --cortex-space-12: 48px;
+  --cortex-space-14: 56px;
+  --cortex-space-16: 64px;
+  --cortex-space-20: 80px;
+  --cortex-space-24: 96px;
+  --cortex-space-28: 112px;
+  --cortex-space-32: 128px;
+  
+  /* ===========================================================================
+     BORDER RADIUS (Figma: 1, 2, 3, 4, 5, 6, 8, 10, 12, 16px)
+     =========================================================================== */
+  --cortex-radius-none: 0;
+  --cortex-radius-px: 1px;           /* Figma micro radius */
+  --cortex-radius-2xs: 2px;          /* Figma filler/indicator */
+  --cortex-radius-3xs: 3px;          /* Figma compact elements */
+  --cortex-radius-xs: 4px;           /* Figma dropdown item hover, checkbox */
+  --cortex-radius-component: 5px;    /* Figma component set border */
+  --cortex-radius-sm: 6px;
+  --cortex-radius-md: 8px;           /* Figma header item, dropdown, buttons */
+  --cortex-radius-input: 10px;       /* Figma rounded inputs */
+  --cortex-radius-lg: 12px;          /* Figma sidebar container, vibe toggle */
+  --cortex-radius-xl: 16px;          /* Figma send button, panels */
+  --cortex-radius-2xl: 24px;
+  --cortex-radius-3xl: 24px;
+  --cortex-radius-full: 9999px;     /* Pills, circular elements */
+  
+  /* ===========================================================================
+     SHADOWS
+     =========================================================================== */
+  --cortex-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --cortex-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --cortex-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.35);
+  --cortex-shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.4);
+  --cortex-shadow-2xl: 0 20px 40px rgba(0, 0, 0, 0.5);
+  --cortex-shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  
+  /* Elevation shadows (for modals, dropdowns, etc.) */
+  --cortex-elevation-1: 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --cortex-elevation-2: 0 4px 8px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.35);
+  --cortex-elevation-3: 0 8px 16px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.4);
+  --cortex-elevation-4: 0 16px 32px rgba(0, 0, 0, 0.35), 0 8px 16px rgba(0, 0, 0, 0.45);
+  
+  /* Glow effects */
+  --cortex-glow-accent: 0 0 20px var(--cortex-palette-lime-glow);
+  --cortex-glow-success: 0 0 20px var(--cortex-palette-success-muted);
+  --cortex-glow-error: 0 0 20px var(--cortex-palette-error-muted);
+  
+  /* ===========================================================================
+     ICON SIZES
+     =========================================================================== */
+  --cortex-icon-xs: 12px;
+  --cortex-icon-sm: 16px;
+  --cortex-icon-md: 20px;
+  --cortex-icon-lg: 24px;
+  --cortex-icon-xl: 32px;
+  --cortex-icon-2xl: 40px;
+  --cortex-icon-3xl: 48px;
+  
+  /* ===========================================================================
+     Z-INDEX SCALE
+     =========================================================================== */
+  --cortex-z-base: 0;
+  --cortex-z-docked: 10;
+  --cortex-z-dropdown: 100;
+  --cortex-z-sticky: 200;
+  --cortex-z-banner: 300;
+  --cortex-z-overlay: 400;
+  --cortex-z-modal: 500;
+  --cortex-z-popover: 600;
+  --cortex-z-tooltip: 700;
+  --cortex-z-toast: 800;
+  --cortex-z-max: 9999;
+  
+  /* ===========================================================================
+     TRANSITIONS
+     =========================================================================== */
+  --cortex-transition-fast: 100ms ease;
+  --cortex-transition-normal: 150ms ease;
+  --cortex-transition-slow: 300ms ease;
+  --cortex-transition-slower: 500ms ease;
+  
+  /* Easing functions */
+  --cortex-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --cortex-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --cortex-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --cortex-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* ===========================================================================
+     ANIMATION DURATIONS
+     =========================================================================== */
+  --cortex-duration-instant: 50ms;
+  --cortex-duration-fast: 100ms;
+  --cortex-duration-normal: 200ms;
+  --cortex-duration-slow: 300ms;
+  --cortex-duration-slower: 500ms;
+  
+  /* ===========================================================================
+     LAYOUT DIMENSIONS
+     =========================================================================== */
+  --cortex-height-input: 40px;
+  --cortex-height-input-sm: 32px;
+  --cortex-height-input-lg: 48px;
+  --cortex-height-button: 40px;
+  --cortex-height-button-sm: 32px;
+  --cortex-height-button-lg: 48px;
+  --cortex-height-tab: 44px;
+  --cortex-height-titlebar: 40px;
+  --cortex-height-statusbar: 24px;
+  --cortex-height-navbar: 56px;
+  
+  --cortex-width-sidebar: 280px;
+  --cortex-width-sidebar-sm: 220px;
+  --cortex-width-sidebar-lg: 320px;
+  --cortex-width-activitybar: 40px;
+  --cortex-width-modal-sm: 400px;
+  --cortex-width-modal-md: 560px;
+  --cortex-width-modal-lg: 720px;
+  --cortex-width-modal-xl: 900px;
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: INPUT
+     =========================================================================== */
+  --cortex-input-bg: var(--cortex-bg-tertiary);
+  --cortex-input-bg-hover: var(--cortex-bg-hover);
+  --cortex-input-bg-focus: var(--cortex-bg-tertiary);
+  --cortex-input-bg-disabled: var(--cortex-bg-secondary);
+  --cortex-input-border: var(--cortex-border-default);
+  --cortex-input-border-hover: var(--cortex-border-hover);
+  --cortex-input-border-focus: var(--cortex-accent-primary);
+  --cortex-input-border-error: var(--cortex-error);
+  --cortex-input-text: var(--cortex-text-primary);
+  --cortex-input-placeholder: var(--cortex-text-placeholder);
+  --cortex-input-radius: var(--cortex-radius-md);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: BUTTON
+     =========================================================================== */
+  /* Primary Button (Lime accent) */
+  --cortex-btn-primary-bg: var(--cortex-accent-primary);
+  --cortex-btn-primary-bg-hover: var(--cortex-accent-hover);
+  --cortex-btn-primary-bg-active: var(--cortex-accent-pressed);
+  --cortex-btn-primary-text: var(--cortex-accent-text);
+  --cortex-btn-primary-border: transparent;
+  
+  /* Secondary Button */
+  --cortex-btn-secondary-bg: transparent;
+  --cortex-btn-secondary-bg-hover: var(--cortex-bg-hover);
+  --cortex-btn-secondary-bg-active: var(--cortex-bg-active);
+  --cortex-btn-secondary-text: var(--cortex-text-primary);
+  --cortex-btn-secondary-border: var(--cortex-border-default);
+  
+  /* Ghost Button */
+  --cortex-btn-ghost-bg: transparent;
+  --cortex-btn-ghost-bg-hover: var(--cortex-bg-hover);
+  --cortex-btn-ghost-bg-active: var(--cortex-bg-active);
+  --cortex-btn-ghost-text: var(--cortex-text-primary);
+  --cortex-btn-ghost-border: transparent;
+  
+  /* Danger/Destructive Button */
+  --cortex-btn-danger-bg: var(--cortex-error);
+  --cortex-btn-danger-bg-hover: var(--cortex-error-hover);
+  --cortex-btn-danger-bg-active: var(--cortex-palette-error-700);
+  --cortex-btn-danger-text: var(--cortex-palette-white);
+  --cortex-btn-danger-border: transparent;
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: CARD
+     =========================================================================== */
+  --cortex-card-bg: var(--cortex-bg-primary);
+  --cortex-card-bg-hover: var(--cortex-bg-hover);
+  --cortex-card-border: var(--cortex-border-default);
+  --cortex-card-border-hover: var(--cortex-border-hover);
+  --cortex-card-radius: var(--cortex-radius-lg);
+  --cortex-card-shadow: var(--cortex-shadow-md);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: MODAL
+     =========================================================================== */
+  --cortex-modal-bg: var(--cortex-bg-elevated);
+  --cortex-modal-border: var(--cortex-border-default);
+  --cortex-modal-radius: var(--cortex-radius-xl);
+  --cortex-modal-shadow: var(--cortex-elevation-4);
+  --cortex-modal-overlay: var(--cortex-bg-backdrop);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: DROPDOWN
+     =========================================================================== */
+  --cortex-dropdown-bg: #252628;
+  --cortex-dropdown-border: #3C3D40;
+  --cortex-dropdown-radius: var(--cortex-radius-md);
+  --cortex-dropdown-shadow: var(--cortex-elevation-3);
+  --cortex-dropdown-item-hover: var(--cortex-bg-hover);
+  --cortex-dropdown-item-active: var(--cortex-bg-active);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: TOOLTIP
+     =========================================================================== */
+  --cortex-tooltip-bg: var(--cortex-bg-elevated);
+  --cortex-tooltip-border: var(--cortex-border-default);
+  --cortex-tooltip-text: var(--cortex-text-primary);
+  --cortex-tooltip-radius: var(--cortex-radius-sm);
+  --cortex-tooltip-shadow: var(--cortex-shadow-md);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: TOAST/NOTIFICATION
+     =========================================================================== */
+  --cortex-toast-bg: var(--cortex-bg-elevated);
+  --cortex-toast-border: var(--cortex-border-default);
+  --cortex-toast-radius: var(--cortex-radius-lg);
+  --cortex-toast-shadow: var(--cortex-elevation-3);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: TAB
+     =========================================================================== */
+  --cortex-tab-bg: transparent;
+  --cortex-tab-bg-hover: var(--cortex-bg-hover);
+  --cortex-tab-bg-active: var(--cortex-bg-active);
+  --cortex-tab-text: var(--cortex-text-muted);
+  --cortex-tab-text-hover: var(--cortex-text-secondary);
+  --cortex-tab-text-active: var(--cortex-text-primary);
+  --cortex-tab-indicator: var(--cortex-accent-primary);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: SCROLLBAR
+     =========================================================================== */
+  --cortex-scrollbar-track: transparent;
+  --cortex-scrollbar-thumb: var(--cortex-palette-gray-400);
+  --cortex-scrollbar-thumb-hover: var(--cortex-palette-gray-350);
+  --cortex-scrollbar-width: 8px;
+  --cortex-scrollbar-radius: var(--cortex-radius-full);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: BADGE
+     =========================================================================== */
+  --cortex-badge-bg: var(--cortex-accent-primary);
+  --cortex-badge-text: var(--cortex-accent-text);
+  --cortex-badge-radius: var(--cortex-radius-full);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: AVATAR
+     =========================================================================== */
+  --cortex-avatar-bg: var(--cortex-bg-tertiary);
+  --cortex-avatar-border: var(--cortex-border-default);
+  --cortex-avatar-radius: var(--cortex-radius-full);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: DIVIDER
+     =========================================================================== */
+  --cortex-divider-color: var(--cortex-border-default);
+  --cortex-divider-strong: var(--cortex-border-strong);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: SWITCH/TOGGLE
+     =========================================================================== */
+  --cortex-switch-bg-off: var(--cortex-bg-tertiary);
+  --cortex-switch-bg-on: var(--cortex-accent-primary);
+  --cortex-switch-thumb: var(--cortex-palette-white);
+  --cortex-switch-border: var(--cortex-border-default);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: CHECKBOX/RADIO
+     =========================================================================== */
+  --cortex-checkbox-bg: transparent;
+  --cortex-checkbox-bg-checked: var(--cortex-accent-primary);
+  --cortex-checkbox-border: var(--cortex-border-hover);
+  --cortex-checkbox-border-checked: var(--cortex-accent-primary);
+  --cortex-checkbox-check: var(--cortex-accent-text);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: PROGRESS
+     =========================================================================== */
+  --cortex-progress-bg: var(--cortex-bg-tertiary);
+  --cortex-progress-fill: var(--cortex-accent-primary);
+  --cortex-progress-radius: var(--cortex-radius-full);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: SKELETON
+     =========================================================================== */
+  --cortex-skeleton-base: var(--cortex-bg-tertiary);
+  --cortex-skeleton-highlight: var(--cortex-bg-hover);
+  
+  /* ===========================================================================
+     COMPONENT TOKENS: DIFF / CODE CHANGES
+     =========================================================================== */
+  --cortex-diff-added-bg: var(--cortex-success-bg);
+  --cortex-diff-added-text: var(--cortex-success);
+  --cortex-diff-added-border: rgba(16, 185, 129, 0.3);
+  --cortex-diff-removed-bg: var(--cortex-error-bg);
+  --cortex-diff-removed-text: var(--cortex-error);
+  --cortex-diff-removed-border: rgba(239, 68, 68, 0.3);
+  --cortex-undo-color: #9491FF;
+  --cortex-interactive-hover: rgba(255, 255, 255, 0.05);
+
+  /* ===========================================================================
+     CODE/SYNTAX HIGHLIGHTING - Cortex UI Design Exact Colors
+     =========================================================================== */
+  --cortex-syntax-keyword: #FEAB78;        /* const, typeof, if, false, true */
+  --cortex-syntax-string: #8EFF96;         /* "object", template literals, numbers */
+  --cortex-syntax-number: #8EFF96;         /* 0, 1, numeric values */
+  --cortex-syntax-comment: rgba(255,255,255,0.5);  /* Comments, line numbers */
+  --cortex-syntax-function: #66BFFF;       /* useTranslation, useState, Object.keys */
+  --cortex-syntax-variable: #FFFFFF;       /* Default text, variables */
+  --cortex-syntax-type: #FEAB78;           /* <boolean>, type annotations */
+  --cortex-syntax-constant: #FEAB78;       /* false, true, null */
+  --cortex-syntax-operator: #FFFFFF;       /* =, ===, &&, || */
+  --cortex-syntax-bracket: #FFFFFF;        /* (), {}, [] */
+  --cortex-syntax-property: #FFB7FA;       /* .length, .household, .members */
+  --cortex-syntax-parameter: #FFFFFF;      /* Function parameters */
+  --cortex-syntax-line-number: rgba(255,255,255,0.5);
+  --cortex-syntax-type-hint-bg: rgba(255,255,255,0.05);
+  --cortex-syntax-type-hint-text: rgba(255,255,255,0.5);
+
+  /* ===========================================================================
+     FIGMA-SPECIFIC LAYOUT TOKENS
+     =========================================================================== */
+  --cortex-sidebar-bg: #1C1C1D;
+  --cortex-sidebar-border: #3C3D40;
+  --cortex-sidebar-selected: #252628;
+  --cortex-sidebar-radius: 12px;
+  --cortex-panel-radius: 16px;
+  --cortex-container-radius: 24px;
+  --cortex-panel-shadow: 0px 4px 26px 15px rgba(38, 36, 37, 0.38), inset 0px 0px 13.1px 6px rgba(26, 24, 25, 0.2);
+  --cortex-dropdown-width: 243px;
+  --cortex-icon-button-hover-bg: rgba(252, 252, 252, 0.08);
+  --cortex-small-btn-bg: #1A1B1F;
+  --cortex-small-btn-border: #3C3D40;
+  --cortex-open-project-bg: #1C1C1D;
+  --cortex-open-project-border: #4C4C4D;
+  --cortex-open-project-open-bg: #E9E9EA;
+  --cortex-model-selector-bg: #141415;
+  --cortex-model-selector-border: #3C3D40;
+  --cortex-pause-color: #FF7070;
+  --cortex-window-close: #FF5F57;
+  --cortex-window-minimize: #FEBC2E;
+  --cortex-window-maximize: #28C840;
+
+  /* ===========================================================================
+     COMPONENT TOKENS: CHAT
+     =========================================================================== */
+  --cortex-chat-user-msg-bg: rgba(255, 255, 255, 0.05);
+  --cortex-chat-code-header-bg: rgba(0, 0, 0, 0.2);
+  --cortex-action-destructive: #FF6B46;
+
+  /* ===========================================================================
+     FOCUS RING
+     =========================================================================== */
+  --cortex-focus-ring: 0 0 0 2px var(--cortex-accent-primary);
+  --cortex-focus-ring-offset: 0 0 0 2px var(--cortex-bg-primary), 0 0 0 4px var(--cortex-accent-primary);
+  --cortex-focus-ring-error: 0 0 0 2px var(--cortex-error);
+
+  /* ===========================================================================
+     COMPONENT TOKENS: CHECKBOX (Figma Exact)
+     =========================================================================== */
+  --cortex-checkbox-bg-checked-blue: #008CFF;               /* Figma checkbox checked fill */
+  --cortex-checkbox-bg-unchecked: rgba(255, 255, 255, 0.05); /* Figma checkbox unchecked fill */
+
+  /* ===========================================================================
+     FIGMA COMPONENT STATE COLORS
+     =========================================================================== */
+  --cortex-open-project-open-text: #000000;                  /* Text on open project bg */
+  --cortex-config-selected-bg: #252628;                      /* Config selected state */
+  --cortex-config-variant-bg: #1C1C1D;                       /* Config variant bg */
+
+  /* ===========================================================================
+     LEGACY VARIABLE ALIASES
+     Maps widely-used legacy variable names to cortex equivalents.
+     These enable components using --text-weak, --surface-raised, etc.
+     to resolve correctly without individual migration.
+     =========================================================================== */
+  --text-strong: var(--cortex-text-primary);
+  --text-base: var(--cortex-text-primary);
+  --text-weak: var(--cortex-text-secondary);
+  --text-weaker: var(--cortex-text-tertiary);
+  --text-on-accent: var(--cortex-accent-text);
+  --surface-raised: var(--cortex-bg-secondary);
+  --surface-raised-hover: var(--cortex-bg-hover);
+  --surface-sunken: var(--cortex-bg-primary);
+  --surface-border: var(--cortex-border-default);
+  --border-base: var(--cortex-border-default);
+  --border-weak: var(--cortex-border-default);
+  --border-primary: var(--cortex-accent-primary);
+  --accent: var(--cortex-accent-primary);
+  --accent-alpha: rgba(178, 255, 34, 0.15);
+  --accent-primary: var(--cortex-accent-primary);
+  --error: var(--cortex-error);
+  --text-tertiary: var(--cortex-text-tertiary);
+
+  /* ===========================================================================
+     COMPONENT TOKENS: VIBE MODE
+     =========================================================================== */
+  --cortex-vibe-status-running: #9491FF;
+  --cortex-vibe-status-running-bg: rgba(148, 145, 255, 0.15);
+  --cortex-vibe-status-idle: var(--cortex-text-secondary);
+  --cortex-vibe-status-completed: #5DCF3B;
+  --cortex-vibe-status-completed-bg: rgba(34, 197, 94, 0.15);
+  --cortex-vibe-status-error: #F83737;
+  --cortex-vibe-status-error-bg: rgba(239, 68, 68, 0.15);
+  --cortex-vibe-status-error-border: rgba(239, 68, 68, 0.3);
+  --cortex-vibe-status-merged: #266FCF;
+  --cortex-vibe-status-merged-bg: rgba(59, 130, 246, 0.15);
+  --cortex-vibe-branch-color: #D28B39;
+  --cortex-vibe-branch-bg: rgba(141, 95, 42, 0.22);
+  --cortex-vibe-code-highlight: #7BC2EE;
+  --cortex-vibe-text-dim: #6C6C6E;
+  --cortex-vibe-text-subtle: #AFAFB1;
+  --cortex-vibe-addition-text: #5DCF3B;
+  --cortex-vibe-deletion-text: #FEAB78;
+  --cortex-vibe-badge-bg: rgba(252, 252, 252, 0.08);
+  --cortex-vibe-hover-bg: rgba(255, 255, 255, 0.05);
+  --cortex-vibe-tool-bg: rgba(255, 255, 255, 0.03);
+  --cortex-vibe-diff-addition-bg: rgba(72, 177, 40, 0.15);
+  --cortex-vibe-diff-addition-num-bg: rgba(72, 177, 40, 0.25);
+  --cortex-vibe-diff-deletion-bg: rgba(255, 255, 255, 0.15);
+  --cortex-vibe-diff-deletion-num-bg: rgba(255, 255, 255, 0.25);
+  --cortex-vibe-resize-hover: rgba(255, 255, 255, 0.15);
+}
+
+/* ===========================================================================
+   DARK MODE OVERRIDES (if needed for light mode support)
+   =========================================================================== */
+@media (prefers-color-scheme: light) {
+  :root.auto-theme {
+    /* Override with light mode values if needed */
+    /* Currently this design system is dark-mode only */
+  }
+}
+
+/* ===========================================================================
+   HIGH CONTRAST MODE SUPPORT
+   =========================================================================== */
+@media (prefers-contrast: high) {
+  :root {
+    --cortex-border-default: rgba(255, 255, 255, 0.25);
+    --cortex-border-hover: rgba(255, 255, 255, 0.4);
+    --cortex-text-secondary: var(--cortex-palette-gray-50);
+    --cortex-text-muted: var(--cortex-palette-gray-100);
+  }
+}
+
+/* ===========================================================================
+   REDUCED MOTION SUPPORT
+   =========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --cortex-transition-fast: 0ms;
+    --cortex-transition-normal: 0ms;
+    --cortex-transition-slow: 0ms;
+    --cortex-transition-slower: 0ms;
+    --cortex-duration-instant: 0ms;
+    --cortex-duration-fast: 0ms;
+    --cortex-duration-normal: 0ms;
+    --cortex-duration-slow: 0ms;
+    --cortex-duration-slower: 0ms;
+  }
+}
+
+/* ===========================================================================
+   CORTEX COLOR THEMES - 5 Background Theme Variants
+   Theme 01: #141415 (default, uses :root values)
+   Theme 02: #111112 (darker)
+   Theme 03: #0A0A0B (darkest)
+   Theme 04: #1D1D1D (lighter)
+   Theme 05: #131217 (purple-tinted dark)
+   =========================================================================== */
+
+[data-cortex-theme='02'] {
+  --cortex-bg-primary: #111112;
+  --cortex-bg-secondary: #191919;
+  --cortex-bg-tertiary: #222222;
+  --cortex-bg-elevated: #212123;
+  --cortex-bg-hover: #212123;
+  --cortex-bg-active: #212123;
+  --cortex-border-default: #2A2A2C;
+  --cortex-border-hover: #38383A;
+  --cortex-border-subtle: #2E2E30;
+  --cortex-border-card: #2E2E30;
+  --cortex-border-strong: #484849;
+  --cortex-sidebar-bg: #191919;
+  --cortex-sidebar-selected: #212123;
+  --cortex-sidebar-border: #38383A;
+  --cortex-model-selector-bg: #111112;
+  --cortex-open-project-bg: #191919;
+  --cortex-dropdown-bg: #212123;
+  --cortex-dropdown-border: #38383A;
+  --cortex-small-btn-bg: #161618;
+  --cortex-card-bg: #111112;
+}
+
+[data-cortex-theme='03'] {
+  --cortex-bg-primary: #0A0A0B;
+  --cortex-bg-secondary: #121213;
+  --cortex-bg-tertiary: #1A1A1B;
+  --cortex-bg-elevated: #18181A;
+  --cortex-bg-hover: #18181A;
+  --cortex-bg-active: #18181A;
+  --cortex-border-default: #232325;
+  --cortex-border-hover: #313133;
+  --cortex-border-subtle: #272729;
+  --cortex-border-card: #272729;
+  --cortex-border-strong: #414143;
+  --cortex-sidebar-bg: #121213;
+  --cortex-sidebar-selected: #18181A;
+  --cortex-sidebar-border: #313133;
+  --cortex-model-selector-bg: #0A0A0B;
+  --cortex-open-project-bg: #121213;
+  --cortex-dropdown-bg: #18181A;
+  --cortex-dropdown-border: #313133;
+  --cortex-small-btn-bg: #0F0F10;
+  --cortex-card-bg: #0A0A0B;
+}
+
+[data-cortex-theme='04'] {
+  --cortex-bg-primary: #1D1D1D;
+  --cortex-bg-secondary: #252525;
+  --cortex-bg-tertiary: #2E2E2E;
+  --cortex-bg-elevated: #2D2D2F;
+  --cortex-bg-hover: #2D2D2F;
+  --cortex-bg-active: #2D2D2F;
+  --cortex-border-default: #373739;
+  --cortex-border-hover: #454547;
+  --cortex-border-subtle: #3B3B3D;
+  --cortex-border-card: #3B3B3D;
+  --cortex-border-strong: #555557;
+  --cortex-sidebar-bg: #252525;
+  --cortex-sidebar-selected: #2D2D2F;
+  --cortex-sidebar-border: #454547;
+  --cortex-model-selector-bg: #1D1D1D;
+  --cortex-open-project-bg: #252525;
+  --cortex-dropdown-bg: #2D2D2F;
+  --cortex-dropdown-border: #454547;
+  --cortex-small-btn-bg: #222224;
+  --cortex-card-bg: #1D1D1D;
+}
+
+[data-cortex-theme='05'] {
+  --cortex-bg-primary: #131217;
+  --cortex-bg-secondary: #1B1A1F;
+  --cortex-bg-tertiary: #242329;
+  --cortex-bg-elevated: #23222A;
+  --cortex-bg-hover: #23222A;
+  --cortex-bg-active: #23222A;
+  --cortex-border-default: #2C2B33;
+  --cortex-border-hover: #3A3942;
+  --cortex-border-subtle: #312F39;
+  --cortex-border-card: #312F39;
+  --cortex-border-strong: #4A4953;
+  --cortex-sidebar-bg: #1B1A1F;
+  --cortex-sidebar-selected: #23222A;
+  --cortex-sidebar-border: #3A3942;
+  --cortex-model-selector-bg: #131217;
+  --cortex-open-project-bg: #1B1A1F;
+  --cortex-dropdown-bg: #23222A;
+  --cortex-dropdown-border: #3A3942;
+  --cortex-small-btn-bg: #181720;
+  --cortex-card-bg: #131217;
+}
+

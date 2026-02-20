@@ -1,0 +1,1468 @@
+/* =============================================================================
+   BASE STYLES - Orion IDE Design System (Consolidated)
+   =============================================================================
+   Foundational styles applied globally.
+   
+   This file consolidates:
+   - base.css (original)
+   - scrollbar.css
+   - animations.css
+   
+   Contents:
+   1. Box Sizing Reset
+   2. Document Base
+   3. Font Loading Optimization
+   4. CSS Containment
+   5. Focus Styles
+   6. Selection Styles
+   7. Reduced Motion Support
+   8. High Contrast Mode Support
+   
+   === SCROLLBAR STYLES ===
+   9. Scrollbar Design Tokens
+   10. Base Scrollbar Styles
+   11. Auto-Hide Scrollbar
+   12. Scroll Shadow Effects
+   13. Sash (Resize Handle) Styles
+   14. Splitview & Gridview Styles
+   15. Cortex Desktop Resize Handle
+   
+   === ANIMATION STYLES ===
+   16. Animation Design Tokens
+   17. Entry Animations
+   18. Exit Animations
+   19. Animation Utility Classes
+   20. Animated List Items
+   21. Cursor Animations
+   22. Streaming Text Animations
+   23. Loading & Skeleton Animations
+   24. Agent Activity Animations
+   25. Agent Mode Split View Animations
+   
+   Dependencies: design-tokens.css
+   ============================================================================= */
+
+/* =============================================================================
+   1. BOX SIZING RESET
+   ============================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* =============================================================================
+   2. DOCUMENT BASE
+   ============================================================================= */
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--cortex-bg-primary, #141415) !important;
+  color: var(--cortex-text-primary, #FCFCFC) !important;
+  font-family: var(--cortex-font-sans, 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif);
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 400;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Force text color inheritance for all elements */
+* {
+  color: inherit;
+}
+
+/* =============================================================================
+   3. FONT LOADING OPTIMIZATION
+   ============================================================================= */
+
+@font-face {
+  font-family: "Figtree";
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Mono";
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fira Code";
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-display: swap;
+}
+
+/* =============================================================================
+   4. CSS CONTAINMENT FOR PERFORMANCE
+   ============================================================================= */
+
+/* Layout style containment for isolated components */
+.panel,
+.sidebar,
+.file-explorer,
+.code-block,
+.message,
+.interactive-item-container,
+.tab-bar,
+.context-menu,
+.modal-content,
+.notification,
+.tooltip-content {
+  contain: layout style;
+}
+
+/* Strict containment for truly isolated components with fixed dimensions */
+.monaco-editor,
+.terminal-outer-container,
+.minimap {
+  contain: strict;
+}
+
+/* Content containment for scrollable areas */
+.file-explorer-content,
+.panel-content,
+.sidebar-section-content,
+.monaco-list-rows {
+  contain: content;
+}
+
+/* Paint containment for off-screen elements */
+.collapsible-panel[data-collapsed="true"],
+.sidebar-section-content.collapsed {
+  contain: size layout paint style;
+}
+
+/* =============================================================================
+   5. FOCUS STYLES
+   ============================================================================= */
+
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* =============================================================================
+   6. SELECTION STYLES
+   ============================================================================= */
+
+::selection {
+  background: var(--surface-hover);
+  color: var(--text-title);
+}
+
+::placeholder {
+  color: var(--cortex-text-disabled);
+}
+
+/* Text selection in inputs */
+input::selection,
+textarea::selection {
+  background: var(--surface-hover);
+}
+
+/* Links */
+a {
+  color: var(--accent-primary);
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+/* Code blocks */
+code, pre {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  color: var(--text-primary);
+}
+
+/* Disabled state */
+[disabled], .disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =============================================================================
+   7. REDUCED MOTION SUPPORT
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =============================================================================
+   8. HIGH CONTRAST MODE SUPPORT
+   ============================================================================= */
+
+@media (prefers-contrast: more) {
+  :root {
+    --cortex-border-base: #ffffff;
+    --cortex-text-primary: #ffffff;
+  }
+}
+
+/* =============================================================================
+   === SCROLLBAR STYLES ===
+   Unified scrollbar and sash (resize handle) component styles.
+   ============================================================================= */
+
+/* =============================================================================
+   9. SCROLLBAR DESIGN TOKENS
+   ============================================================================= */
+
+:root {
+  /* Scrollbar Design Tokens */
+  --cortex-scrollbar-width: 8px;
+  --cortex-scrollbar-height: 8px;
+  --cortex-scrollbar-width-thin: 6px;
+  --cortex-scrollbar-slider-min-size: 20px;
+  
+  /* Scrollbar Colors - JetBrains tokens */
+  --cortex-scrollbar-shadow: rgba(0, 0, 0, 0.35);
+  --cortex-scrollbar-track-bg: transparent;
+  --cortex-scrollbar-thumb-bg: var(--jb-scrollbar-thumb, #43454A);
+  --cortex-scrollbar-thumb-hover-bg: var(--jb-scrollbar-thumb-hover, #5A5D63);
+  --cortex-scrollbar-thumb-active-bg: var(--jb-scrollbar-thumb-hover, #5A5D63);
+  
+  /* Scrollbar Timing */
+  --cortex-scrollbar-hide-timeout: 500ms;
+  --cortex-scrollbar-reveal-transition: 100ms;
+  --cortex-scrollbar-fade-transition: 800ms;
+  
+  /* Sash (Resize Handle) Design Tokens - JetBrains Islands Style */
+  --cortex-sash-size: 0px;
+  --cortex-sash-hover-size: 4px;
+  --cortex-sash-hover-border: rgba(99, 102, 241, 0.5);
+  
+  /* Sash Timing */
+  --cortex-sash-hover-delay: 300ms;
+  --cortex-sash-transition: 100ms;
+}
+
+/* =============================================================================
+   10. BASE SCROLLBAR STYLES
+   ============================================================================= */
+
+/* Default scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* VS Code-style scrollbar classes */
+.scrollbar-vscode::-webkit-scrollbar,
+.monaco-scrollable-element::-webkit-scrollbar {
+  width: var(--cortex-scrollbar-width);
+  height: var(--cortex-scrollbar-height);
+}
+
+.scrollbar-vscode::-webkit-scrollbar-track,
+.monaco-scrollable-element::-webkit-scrollbar-track {
+  background: var(--cortex-scrollbar-track-bg);
+}
+
+.scrollbar-vscode::-webkit-scrollbar-thumb,
+.monaco-scrollable-element::-webkit-scrollbar-thumb {
+  background: var(--cortex-scrollbar-thumb-bg);
+  border-radius: 4px;
+  min-height: var(--cortex-scrollbar-slider-min-size);
+  min-width: var(--cortex-scrollbar-slider-min-size);
+}
+
+.scrollbar-vscode::-webkit-scrollbar-thumb:hover,
+.monaco-scrollable-element::-webkit-scrollbar-thumb:hover {
+  background: var(--cortex-scrollbar-thumb-hover-bg);
+}
+
+.scrollbar-vscode::-webkit-scrollbar-thumb:active,
+.monaco-scrollable-element::-webkit-scrollbar-thumb:active {
+  background: var(--cortex-scrollbar-thumb-active-bg);
+}
+
+.scrollbar-vscode::-webkit-scrollbar-corner,
+.monaco-scrollable-element::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Thin scrollbar variant */
+.scrollbar-thin::-webkit-scrollbar {
+  width: var(--cortex-scrollbar-width-thin);
+  height: var(--cortex-scrollbar-width-thin);
+}
+
+/* No scrollbar utility */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* =============================================================================
+   11. AUTO-HIDE SCROLLBAR
+   ============================================================================= */
+
+.scrollbar-auto-hide {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color var(--cortex-scrollbar-fade-transition) linear;
+}
+
+.scrollbar-auto-hide:hover {
+  scrollbar-color: var(--cortex-scrollbar-thumb-bg) transparent;
+  transition: scrollbar-color var(--cortex-scrollbar-reveal-transition) linear;
+}
+
+/* WebKit auto-hide implementation */
+.scrollbar-auto-hide::-webkit-scrollbar-thumb {
+  background: transparent;
+  transition: background-color var(--cortex-scrollbar-fade-transition) linear;
+}
+
+.scrollbar-auto-hide:hover::-webkit-scrollbar-thumb {
+  background: var(--cortex-scrollbar-thumb-bg);
+  transition: background-color var(--cortex-scrollbar-reveal-transition) linear;
+}
+
+.scrollbar-auto-hide:hover::-webkit-scrollbar-thumb:hover {
+  background: var(--cortex-scrollbar-thumb-hover-bg);
+}
+
+.scrollbar-auto-hide:hover::-webkit-scrollbar-thumb:active {
+  background: var(--cortex-scrollbar-thumb-active-bg);
+}
+
+/* =============================================================================
+   12. SCROLL SHADOW EFFECTS
+   ============================================================================= */
+
+.scroll-shadow {
+  position: relative;
+}
+
+.scroll-shadow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 3px;
+  right: 0;
+  height: 3px;
+  box-shadow: var(--cortex-scrollbar-shadow) 0 6px 6px -6px inset;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+  z-index: 10;
+}
+
+.scroll-shadow.scroll-shadow-top::before {
+  opacity: 1;
+}
+
+.scroll-shadow-left::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  box-shadow: var(--cortex-scrollbar-shadow) 6px 0 6px -6px inset;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* =============================================================================
+   13. SASH (RESIZE HANDLE) STYLES - Monaco Editor Compatible
+   ============================================================================= */
+
+.monaco-sash {
+  position: absolute;
+  z-index: 35;
+  touch-action: none;
+  user-select: none;
+}
+
+/* Vertical sash - left/right resize */
+.monaco-sash.vertical {
+  width: var(--cortex-sash-size);
+  height: 100%;
+  cursor: ew-resize;
+  top: 0;
+}
+
+/* Horizontal sash - up/down resize */
+.monaco-sash.horizontal {
+  width: 100%;
+  height: var(--cortex-sash-size);
+  cursor: ns-resize;
+  left: 0;
+}
+
+/* Hover indicator using ::before pseudo-element */
+.monaco-sash::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  transition: background-color var(--cortex-sash-transition) ease-out;
+}
+
+/* Vertical sash centered indicator */
+.monaco-sash.vertical::before {
+  width: var(--cortex-sash-hover-size);
+  left: calc(50% - (var(--cortex-sash-hover-size) / 2));
+  height: 100%;
+}
+
+/* Horizontal sash centered indicator */
+.monaco-sash.horizontal::before {
+  height: var(--cortex-sash-hover-size);
+  top: calc(50% - (var(--cortex-sash-hover-size) / 2));
+  width: 100%;
+}
+
+/* Hover and active states */
+.monaco-sash.hover::before,
+.monaco-sash.active::before,
+.monaco-sash:hover::before {
+  background: var(--cortex-sash-hover-border);
+}
+
+/* Disabled state */
+.monaco-sash.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.monaco-sash.disabled::before {
+  background: transparent !important;
+}
+
+/* macOS-specific cursor styles */
+.monaco-sash.mac.vertical {
+  cursor: col-resize;
+}
+
+.monaco-sash.mac.horizontal {
+  cursor: row-resize;
+}
+
+/* Constraint states - at min/max */
+.monaco-sash.minimum.vertical {
+  cursor: e-resize;
+}
+
+.monaco-sash.maximum.vertical {
+  cursor: w-resize;
+}
+
+.monaco-sash.minimum.horizontal {
+  cursor: s-resize;
+}
+
+.monaco-sash.maximum.horizontal {
+  cursor: n-resize;
+}
+
+/* =============================================================================
+   14. CORNER DRAG HANDLES (Orthogonal) - 8x8px
+   ============================================================================= */
+
+.monaco-sash:not(.disabled) > .orthogonal-drag-handle {
+  content: " ";
+  height: calc(var(--cortex-sash-size) * 2);
+  width: calc(var(--cortex-sash-size) * 2);
+  z-index: 100;
+  display: block;
+  cursor: all-scroll;
+  position: absolute;
+  background: transparent;
+}
+
+/* Vertical sash corners */
+.monaco-sash.vertical > .orthogonal-drag-handle.start {
+  left: calc(var(--cortex-sash-size) * -0.5);
+  top: calc(var(--cortex-sash-size) * -1);
+}
+
+.monaco-sash.vertical > .orthogonal-drag-handle.end {
+  left: calc(var(--cortex-sash-size) * -0.5);
+  bottom: calc(var(--cortex-sash-size) * -1);
+}
+
+/* Horizontal sash corners */
+.monaco-sash.horizontal > .orthogonal-drag-handle.start {
+  top: calc(var(--cortex-sash-size) * -0.5);
+  left: calc(var(--cortex-sash-size) * -1);
+}
+
+.monaco-sash.horizontal > .orthogonal-drag-handle.end {
+  top: calc(var(--cortex-sash-size) * -0.5);
+  right: calc(var(--cortex-sash-size) * -1);
+}
+
+/* =============================================================================
+   15. SPLITVIEW & GRIDVIEW STYLES
+   ============================================================================= */
+
+.monaco-split-view2 {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.monaco-split-view2 > .sash-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.monaco-split-view2 > .sash-container > .monaco-sash {
+  pointer-events: initial;
+}
+
+.monaco-split-view2 > .monaco-scrollable-element {
+  width: 100%;
+  height: 100%;
+}
+
+.monaco-split-view2 > .monaco-scrollable-element > .split-view-container {
+  width: 100%;
+  height: 100%;
+  white-space: nowrap;
+  position: relative;
+}
+
+/* Split view item positioning */
+.split-view-view {
+  white-space: initial;
+  position: absolute;
+}
+
+.split-view-view:not(.visible) {
+  display: none;
+}
+
+/* Vertical orientation - items stack vertically */
+.monaco-split-view2.vertical > .split-view-container > .split-view-view {
+  width: 100%;
+}
+
+/* Horizontal orientation - items stack horizontally */
+.monaco-split-view2.horizontal > .split-view-container > .split-view-view {
+  height: 100%;
+}
+
+/* Separator border styles */
+.monaco-split-view2.separator-border > .split-view-container > .split-view-view:not(:first-child)::before {
+  content: ' ';
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  pointer-events: none;
+  background-color: var(--glass-sidebar-bg);
+}
+
+/* Horizontal separator - vertical line */
+.monaco-split-view2.separator-border.horizontal > .split-view-container > .split-view-view:not(:first-child)::before {
+  height: 100%;
+  width: 1px;
+}
+
+/* Vertical separator - horizontal line */
+.monaco-split-view2.separator-border.vertical > .split-view-container > .split-view-view:not(:first-child)::before {
+  height: 1px;
+  width: 100%;
+}
+
+/* Grid View */
+.monaco-grid-view {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.monaco-grid-branch-node {
+  width: 100%;
+  height: 100%;
+}
+
+/* =============================================================================
+   16. CORTEX DESKTOP RESIZE HANDLE COMPONENT
+   ============================================================================= */
+
+.resize-handle {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 35;
+  touch-action: none;
+  user-select: none;
+  margin: 0 -2px;
+}
+
+/* Use 4px hit area */
+.resize-handle--horizontal,
+.resize-handle[data-direction="horizontal"] {
+  width: var(--cortex-sash-size);
+  height: 100%;
+  cursor: ew-resize;
+}
+
+.resize-handle--vertical,
+.resize-handle[data-direction="vertical"] {
+  width: 100%;
+  height: var(--cortex-sash-size);
+  cursor: ns-resize;
+}
+
+/* Hover indicator via ::before */
+.resize-handle::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  background: transparent;
+  transition: background-color var(--cortex-sash-transition) ease-out;
+}
+
+/* Horizontal handle - vertical indicator centered */
+.resize-handle--horizontal::before,
+.resize-handle[data-direction="horizontal"]::before {
+  width: var(--cortex-sash-hover-size);
+  height: 100%;
+  left: calc(50% - (var(--cortex-sash-hover-size) / 2));
+  top: 0;
+}
+
+/* Vertical handle - horizontal indicator centered */
+.resize-handle--vertical::before,
+.resize-handle[data-direction="vertical"]::before {
+  width: 100%;
+  height: var(--cortex-sash-hover-size);
+  top: calc(50% - (var(--cortex-sash-hover-size) / 2));
+  left: 0;
+}
+
+/* Hover state */
+.resize-handle:hover::before,
+.resize-handle--hover::before {
+  background: var(--cortex-sash-hover-border);
+}
+
+/* Active/dragging state */
+.resize-handle:active::before,
+.resize-handle--active::before,
+.resize-handle--dragging::before {
+  background: var(--cortex-sash-hover-border);
+}
+
+/* Disabled state */
+.resize-handle--disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.resize-handle--disabled::before {
+  background: transparent !important;
+}
+
+/* Extended hit area for easier grabbing */
+.resize-handle-hitarea {
+  position: absolute;
+  background: transparent;
+}
+
+.resize-handle--horizontal .resize-handle-hitarea,
+.resize-handle[data-direction="horizontal"] .resize-handle-hitarea {
+  top: 0;
+  left: -4px;
+  right: -4px;
+  bottom: 0;
+}
+
+.resize-handle--vertical .resize-handle-hitarea,
+.resize-handle[data-direction="vertical"] .resize-handle-hitarea {
+  top: -4px;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+}
+
+/* Corner Handles */
+.resize-handle-corner {
+  position: absolute;
+  width: calc(var(--cortex-sash-size) * 2);
+  height: calc(var(--cortex-sash-size) * 2);
+  z-index: 100;
+  cursor: all-scroll;
+  background: transparent;
+}
+
+.resize-handle-corner:hover {
+  background: var(--cortex-sash-hover-border);
+  border-radius: 4px;
+}
+
+/* =============================================================================
+   === ANIMATION STYLES ===
+   GPU-accelerated animations for 60+ FPS streaming updates.
+   ============================================================================= */
+
+/* =============================================================================
+   17. ANIMATION DESIGN TOKENS
+   ============================================================================= */
+
+:root {
+  /* Duration tokens */
+  --anim-duration-instant: 50ms;
+  --anim-duration-fast: 100ms;
+  --anim-duration-normal: 200ms;
+  --anim-duration-slow: 300ms;
+  --anim-duration-slower: 400ms;
+  
+  /* Easing tokens */
+  --anim-ease-linear: linear;
+  --anim-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --anim-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --anim-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --anim-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --anim-ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Transform distance tokens */
+  --anim-slide-distance-sm: 8px;
+  --anim-slide-distance-md: 16px;
+  --anim-slide-distance-lg: 24px;
+  
+  /* Scale tokens */
+  --anim-scale-in: 0.95;
+  --anim-scale-out: 0.95;
+  --anim-scale-pop: 1.02;
+  
+  /* Stagger tokens */
+  --anim-stagger-delay: 30ms;
+  --anim-stagger-max: 300ms;
+  
+  /* Cursor animation tokens */
+  --cursor-blink-duration: 1060ms;
+  --cursor-color: var(--cortex-accent-primary, #B2FF22);
+  --cursor-width: 2px;
+  
+  /* Streaming text tokens */
+  --stream-highlight-color: var(--accent-alpha, rgba(178, 255, 34, 0.15));
+  --stream-highlight-duration: 500ms;
+}
+
+/* Reduced motion override for animation tokens */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --anim-duration-instant: 0ms;
+    --anim-duration-fast: 0ms;
+    --anim-duration-normal: 0ms;
+    --anim-duration-slow: 0ms;
+    --anim-duration-slower: 0ms;
+    --anim-stagger-delay: 0ms;
+    --anim-stagger-max: 0ms;
+  }
+}
+
+/* Animation base - apply to elements that will animate */
+.animated {
+  will-change: transform, opacity;
+  contain: layout style paint;
+}
+
+/* Remove will-change after animation completes */
+.animated:not(.animating) {
+  will-change: auto;
+}
+
+/* =============================================================================
+   18. ENTRY ANIMATIONS - @keyframes
+   ============================================================================= */
+
+/* Fade in */
+@keyframes anim-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Fade in from top */
+@keyframes anim-slide-in-top {
+  from {
+    opacity: 0;
+    transform: translate3d(0, calc(-1 * var(--anim-slide-distance-md)), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Fade in from bottom */
+@keyframes anim-slide-in-bottom {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--anim-slide-distance-md), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Fade in from left */
+@keyframes anim-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translate3d(calc(-1 * var(--anim-slide-distance-md)), 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Fade in from right */
+@keyframes anim-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--anim-slide-distance-md), 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Scale in with fade */
+@keyframes anim-scale-in {
+  from {
+    opacity: 0;
+    transform: scale3d(var(--anim-scale-in), var(--anim-scale-in), 1);
+  }
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+/* Pop in with spring */
+@keyframes anim-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale3d(0.9, 0.9, 1);
+  }
+  70% {
+    opacity: 1;
+    transform: scale3d(var(--anim-scale-pop), var(--anim-scale-pop), 1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+/* Combined slide + scale */
+@keyframes anim-slide-scale-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--anim-slide-distance-sm), 0) scale3d(var(--anim-scale-in), var(--anim-scale-in), 1);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+/* =============================================================================
+   19. EXIT ANIMATIONS - @keyframes
+   ============================================================================= */
+
+/* Fade out */
+@keyframes anim-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Fade out to top */
+@keyframes anim-slide-out-top {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, calc(-1 * var(--anim-slide-distance-md)), 0);
+  }
+}
+
+/* Fade out to bottom */
+@keyframes anim-slide-out-bottom {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, var(--anim-slide-distance-md), 0);
+  }
+}
+
+/* Scale out with fade */
+@keyframes anim-scale-out {
+  from {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+  to {
+    opacity: 0;
+    transform: scale3d(var(--anim-scale-out), var(--anim-scale-out), 1);
+  }
+}
+
+/* Combined slide + scale out */
+@keyframes anim-slide-scale-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, calc(-1 * var(--anim-slide-distance-sm)), 0) scale3d(var(--anim-scale-out), var(--anim-scale-out), 1);
+  }
+}
+
+/* =============================================================================
+   20. ANIMATION UTILITY CLASSES
+   ============================================================================= */
+
+/* Entry animations */
+.animate-fade-in { animation: anim-fade-in var(--anim-duration-normal) var(--anim-ease-out) forwards; }
+.animate-slide-in-top { animation: anim-slide-in-top var(--anim-duration-normal) var(--anim-ease-out) forwards; }
+.animate-slide-in-bottom { animation: anim-slide-in-bottom var(--anim-duration-normal) var(--anim-ease-out) forwards; }
+.animate-slide-in-left { animation: anim-slide-in-left var(--anim-duration-normal) var(--anim-ease-out) forwards; }
+.animate-slide-in-right { animation: anim-slide-in-right var(--anim-duration-normal) var(--anim-ease-out) forwards; }
+.animate-scale-in { animation: anim-scale-in var(--anim-duration-normal) var(--anim-ease-out) forwards; }
+.animate-pop-in { animation: anim-pop-in var(--anim-duration-slow) var(--anim-ease-spring) forwards; }
+.animate-slide-scale-in { animation: anim-slide-scale-in var(--anim-duration-normal) var(--anim-ease-out) forwards; }
+
+/* Exit animations */
+.animate-fade-out { animation: anim-fade-out var(--anim-duration-fast) var(--anim-ease-in) forwards; }
+.animate-slide-out-top { animation: anim-slide-out-top var(--anim-duration-normal) var(--anim-ease-in) forwards; }
+.animate-slide-out-bottom { animation: anim-slide-out-bottom var(--anim-duration-normal) var(--anim-ease-in) forwards; }
+.animate-scale-out { animation: anim-scale-out var(--anim-duration-fast) var(--anim-ease-in) forwards; }
+.animate-slide-scale-out { animation: anim-slide-scale-out var(--anim-duration-normal) var(--anim-ease-in) forwards; }
+
+/* =============================================================================
+   21. ANIMATED LIST ITEM CLASSES
+   ============================================================================= */
+
+/* Base list item */
+.animated-list-item {
+  contain: layout style paint;
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  transition: 
+    transform var(--anim-duration-normal) var(--anim-ease-out),
+    opacity var(--anim-duration-normal) var(--anim-ease-out);
+}
+
+/* Entering state */
+.animated-list-item--entering {
+  opacity: 0;
+  transform: translate3d(0, var(--anim-slide-distance-md), 0) scale3d(var(--anim-scale-in), var(--anim-scale-in), 1);
+  transition: none;
+  will-change: transform, opacity;
+}
+
+/* Entered state */
+.animated-list-item--entered {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  will-change: auto;
+}
+
+/* Exiting state */
+.animated-list-item--exiting {
+  opacity: 0;
+  transform: translate3d(0, calc(-1 * var(--anim-slide-distance-md)), 0) scale3d(var(--anim-scale-out), var(--anim-scale-out), 1);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+/* Exited state */
+.animated-list-item--exited {
+  opacity: 0;
+  transform: translate3d(0, -100%, 0) scale3d(0, 0, 1);
+  height: 0;
+  overflow: hidden;
+  transition: none;
+  will-change: auto;
+}
+
+/* Stagger delay utilities */
+.stagger-delay-1 { transition-delay: calc(1 * var(--anim-stagger-delay)); }
+.stagger-delay-2 { transition-delay: calc(2 * var(--anim-stagger-delay)); }
+.stagger-delay-3 { transition-delay: calc(3 * var(--anim-stagger-delay)); }
+.stagger-delay-4 { transition-delay: calc(4 * var(--anim-stagger-delay)); }
+.stagger-delay-5 { transition-delay: calc(5 * var(--anim-stagger-delay)); }
+.stagger-delay-6 { transition-delay: calc(6 * var(--anim-stagger-delay)); }
+.stagger-delay-7 { transition-delay: calc(7 * var(--anim-stagger-delay)); }
+.stagger-delay-8 { transition-delay: calc(8 * var(--anim-stagger-delay)); }
+.stagger-delay-9 { transition-delay: calc(9 * var(--anim-stagger-delay)); }
+.stagger-delay-10 { transition-delay: calc(10 * var(--anim-stagger-delay)); }
+
+/* Animation delay variants */
+.anim-delay-1 { animation-delay: calc(1 * var(--anim-stagger-delay)); }
+.anim-delay-2 { animation-delay: calc(2 * var(--anim-stagger-delay)); }
+.anim-delay-3 { animation-delay: calc(3 * var(--anim-stagger-delay)); }
+.anim-delay-4 { animation-delay: calc(4 * var(--anim-stagger-delay)); }
+.anim-delay-5 { animation-delay: calc(5 * var(--anim-stagger-delay)); }
+.anim-delay-6 { animation-delay: calc(6 * var(--anim-stagger-delay)); }
+.anim-delay-7 { animation-delay: calc(7 * var(--anim-stagger-delay)); }
+.anim-delay-8 { animation-delay: calc(8 * var(--anim-stagger-delay)); }
+.anim-delay-9 { animation-delay: calc(9 * var(--anim-stagger-delay)); }
+.anim-delay-10 { animation-delay: calc(10 * var(--anim-stagger-delay)); }
+
+/* =============================================================================
+   22. CURSOR ANIMATIONS
+   ============================================================================= */
+
+/* Blinking cursor keyframes */
+@keyframes cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Smooth cursor blink (less jarring) */
+@keyframes cursor-blink-smooth {
+  0%, 45% { opacity: 1; }
+  50%, 95% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Cursor base styles */
+.streaming-cursor {
+  display: inline-block;
+  width: var(--cursor-width);
+  height: 1.2em;
+  background-color: var(--cursor-color);
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  animation: cursor-blink var(--cursor-blink-duration) step-end infinite;
+  will-change: opacity;
+}
+
+/* Smooth blink variant */
+.streaming-cursor--smooth {
+  animation: cursor-blink-smooth var(--cursor-blink-duration) ease-in-out infinite;
+}
+
+/* Cursor visible (no blink) */
+.streaming-cursor--visible {
+  animation: none;
+  opacity: 1;
+}
+
+/* Cursor hidden */
+.streaming-cursor--hidden {
+  animation: none;
+  opacity: 0;
+}
+
+/* Block cursor style */
+.streaming-cursor--block {
+  width: 0.6em;
+  background-color: var(--cursor-color);
+  opacity: 0.5;
+}
+
+/* Underline cursor style */
+.streaming-cursor--underline {
+  width: 0.6em;
+  height: var(--cursor-width);
+  vertical-align: baseline;
+}
+
+/* =============================================================================
+   23. STREAMING TEXT ANIMATIONS
+   ============================================================================= */
+
+/* Streaming text container */
+.streaming-text {
+  contain: content;
+  overflow: hidden;
+}
+
+/* Active streaming state */
+.streaming-text--active {
+  will-change: contents;
+}
+
+/* Character entry animation */
+@keyframes char-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* New text highlight */
+@keyframes text-highlight {
+  0% { background-color: var(--stream-highlight-color); }
+  100% { background-color: transparent; }
+}
+
+/* Apply highlight to newly streamed text */
+.streaming-text-new {
+  animation: text-highlight var(--stream-highlight-duration) var(--anim-ease-out) forwards;
+}
+
+/* Word-by-word animation */
+.streaming-word {
+  display: inline;
+  animation: anim-fade-in var(--anim-duration-instant) var(--anim-ease-out) forwards;
+}
+
+/* =============================================================================
+   24. TRANSITION UTILITIES
+   ============================================================================= */
+
+/* Base transition classes */
+.transition-none { transition: none !important; }
+/* Note: .transition-all intentionally kept for utility class - use specific properties in components */
+.transition-all { transition: transform var(--anim-duration-normal) var(--anim-ease-out), opacity var(--anim-duration-normal) var(--anim-ease-out); }
+.transition-colors { transition: color var(--anim-duration-fast) var(--anim-ease-out), background-color var(--anim-duration-fast) var(--anim-ease-out), border-color var(--anim-duration-fast) var(--anim-ease-out); }
+.transition-opacity { transition: opacity var(--anim-duration-normal) var(--anim-ease-out); }
+.transition-transform { transition: transform var(--anim-duration-normal) var(--anim-ease-out); }
+
+/* Duration modifiers */
+.duration-instant { transition-duration: var(--anim-duration-instant); animation-duration: var(--anim-duration-instant); }
+.duration-fast { transition-duration: var(--anim-duration-fast); animation-duration: var(--anim-duration-fast); }
+.duration-normal { transition-duration: var(--anim-duration-normal); animation-duration: var(--anim-duration-normal); }
+.duration-slow { transition-duration: var(--anim-duration-slow); animation-duration: var(--anim-duration-slow); }
+.duration-slower { transition-duration: var(--anim-duration-slower); animation-duration: var(--anim-duration-slower); }
+
+/* Easing modifiers */
+.ease-linear { transition-timing-function: var(--anim-ease-linear); animation-timing-function: var(--anim-ease-linear); }
+.ease-in { transition-timing-function: var(--anim-ease-in); animation-timing-function: var(--anim-ease-in); }
+.ease-out { transition-timing-function: var(--anim-ease-out); animation-timing-function: var(--anim-ease-out); }
+.ease-in-out { transition-timing-function: var(--anim-ease-in-out); animation-timing-function: var(--anim-ease-in-out); }
+.ease-spring { transition-timing-function: var(--anim-ease-spring); animation-timing-function: var(--anim-ease-spring); }
+.ease-bounce { transition-timing-function: var(--anim-ease-bounce); animation-timing-function: var(--anim-ease-bounce); }
+
+/* =============================================================================
+   25. GPU ACCELERATION UTILITIES
+   ============================================================================= */
+
+/* Force GPU layer creation */
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Enable will-change for upcoming animations */
+.will-animate {
+  will-change: transform, opacity;
+}
+
+/* Reset will-change (apply after animation) */
+.animation-complete {
+  will-change: auto;
+}
+
+/* =============================================================================
+   26. CSS CONTAINMENT UTILITIES
+   ============================================================================= */
+
+/* Content containment (size unknown) */
+.contain-content { contain: content; }
+
+/* Layout containment */
+.contain-layout { contain: layout; }
+
+/* Paint containment */
+.contain-paint { contain: paint; }
+
+/* Size containment */
+.contain-size { contain: size; }
+
+/* Strict containment (all properties) */
+.contain-strict { contain: strict; }
+
+/* =============================================================================
+   27. LOADING & SKELETON ANIMATIONS
+   ============================================================================= */
+
+/* Skeleton loading pulse */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Skeleton shimmer effect */
+@keyframes skeleton-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Skeleton base */
+.skeleton {
+  background: var(--cortex-bg-secondary, #1C1C1D);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Pulse animation */
+.skeleton--pulse {
+  animation: skeleton-pulse 1.5s var(--anim-ease-in-out) infinite;
+}
+
+/* Shimmer animation */
+.skeleton--shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: skeleton-shimmer 1.5s var(--anim-ease-in-out) infinite;
+}
+
+/* =============================================================================
+   28. AGENT ACTIVITY ANIMATIONS
+   ============================================================================= */
+
+/* Activity indicator pulse */
+@keyframes activity-pulse {
+  0%, 100% {
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+    opacity: 0.8;
+  }
+}
+
+/* Activity ripple effect */
+@keyframes activity-ripple {
+  0% {
+    transform: scale3d(0.8, 0.8, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale3d(2, 2, 1);
+    opacity: 0;
+  }
+}
+
+/* Activity indicator */
+.activity-indicator {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--cortex-accent-primary, #B2FF22);
+  animation: activity-pulse 1.5s var(--anim-ease-in-out) infinite;
+}
+
+/* Activity indicator with ripple */
+.activity-indicator--ripple::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: inherit;
+  animation: activity-ripple 1.5s var(--anim-ease-out) infinite;
+}
+
+/* Typing indicator dots */
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translate3d(0, 0, 0); }
+  30% { transform: translate3d(0, -4px, 0); }
+}
+
+.typing-indicator {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.typing-indicator__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--cortex-text-secondary, #888);
+  animation: typing-bounce 1.2s var(--anim-ease-in-out) infinite;
+}
+
+.typing-indicator__dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator__dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* =============================================================================
+   29. AGENT MODE SPLIT VIEW ANIMATIONS
+   ============================================================================= */
+
+/* Agent split container animation */
+@keyframes agent-split-enter {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes agent-split-exit {
+  0% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+}
+
+/* Orange glow pulse for agent mode */
+@keyframes agent-glow-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 0 2px #f97316, inset 0 0 20px rgba(249, 115, 22, 0.2);
+  }
+  50% {
+    box-shadow: inset 0 0 0 2px #fb923c, inset 0 0 30px rgba(249, 115, 22, 0.4);
+  }
+}
+
+/* Agent border shimmer effect */
+@keyframes agent-border-shimmer {
+  0% {
+    border-color: #f97316;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+  }
+  50% {
+    border-color: #fdba74;
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
+  }
+  100% {
+    border-color: #f97316;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+  }
+}
+
+/* Agent active editor styles */
+.agent-mode-active {
+  animation: agent-glow-pulse 2s ease-in-out infinite;
+  border: 2px solid #f97316 !important;
+  border-radius: 4px;
+  transition: 
+    border-color 0.3s ease-out,
+    box-shadow 0.3s ease-out;
+}
+
+/* Agent split panel entering */
+.agent-split-entering {
+  animation: agent-split-enter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Agent split panel exiting */
+.agent-split-exiting {
+  animation: agent-split-exit 0.2s ease-in forwards;
+}
+
+/* Agent mode overlay (orange tint) */
+.agent-mode-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  border: 2px solid #f97316;
+  border-radius: 4px;
+  animation: agent-border-shimmer 2s ease-in-out infinite;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.05) 0%, transparent 50%, rgba(249, 115, 22, 0.05) 100%);
+}
+
+/* Agent mode indicator dot */
+.agent-mode-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #f97316;
+  animation: activity-pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+}
+
+/* Agent file read animation */
+@keyframes agent-file-read {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.agent-file-reading {
+  background: linear-gradient(90deg, transparent 0%, rgba(249, 115, 22, 0.1) 25%, rgba(249, 115, 22, 0.2) 50%, rgba(249, 115, 22, 0.1) 75%, transparent 100%);
+  background-size: 200% 100%;
+  animation: agent-file-read 2s linear infinite;
+}
+
+/* =============================================================================
+   30. SCROLLBAR & SASH ACCESSIBILITY - REDUCED MOTION
+   ============================================================================= */
+
+.monaco-enable-motion .monaco-sash::before,
+.monaco-enable-motion .resize-handle::before {
+  transition: background-color var(--cortex-sash-transition) ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .monaco-sash::before,
+  .resize-handle::before {
+    transition: none;
+  }
+  
+  .scrollbar-auto-hide::-webkit-scrollbar-thumb {
+    transition: none;
+  }
+}

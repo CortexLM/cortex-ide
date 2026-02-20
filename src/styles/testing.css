@@ -1,0 +1,240 @@
+/**
+ * Testing styles for code coverage and test decorations
+ */
+
+/* ============================================================================
+ * Coverage Decorations
+ * ============================================================================ */
+
+/* Coverage line backgrounds */
+.coverage-line-covered {
+  background-color: rgba(34, 197, 94, 0.15) !important;
+}
+
+.coverage-line-uncovered {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+.coverage-line-partial {
+  background-color: rgba(234, 179, 8, 0.15) !important;
+}
+
+/* Coverage gutter markers */
+.coverage-gutter-covered {
+  background-color: #22C55E;
+  width: 4px !important;
+  margin-left: 3px;
+  border-radius: 2px;
+}
+
+.coverage-gutter-uncovered {
+  background-color: #EF4444;
+  width: 4px !important;
+  margin-left: 3px;
+  border-radius: 2px;
+}
+
+.coverage-gutter-partial {
+  background-color: #EAB308;
+  width: 4px !important;
+  margin-left: 3px;
+  border-radius: 2px;
+}
+
+/* ============================================================================
+ * Test Decorations
+ * ============================================================================ */
+
+/* Test status indicators */
+.test-decoration-passed::before {
+  content: "\2713"; /* Checkmark */
+  color: #22C55E;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.test-decoration-failed::before {
+  content: "\2717"; /* X mark */
+  color: #EF4444;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.test-decoration-skipped::before {
+  content: "\25CB"; /* Circle outline */
+  color: #EAB308;
+  font-size: 12px;
+}
+
+.test-decoration-running::before {
+  content: "\25CF"; /* Filled circle */
+  color: #3B82F6;
+  font-size: 12px;
+  animation: test-running-pulse 1s ease-in-out infinite;
+}
+
+.test-decoration-pending::before {
+  content: "\25CB"; /* Circle outline */
+  color: #6B7280;
+  font-size: 12px;
+}
+
+/* Run button on hover */
+.test-decoration-run {
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.test-decoration-run::before {
+  content: "\25B6"; /* Play triangle */
+  color: #6B7280;
+  font-size: 10px;
+}
+
+.test-decoration-run:hover::before {
+  color: #22C55E;
+}
+
+/* Show run button on line hover */
+.monaco-editor .margin-view-overlays .line-numbers:hover + .glyph-margin .test-decoration-run,
+.monaco-editor .margin-view-overlays .glyph-margin:hover .test-decoration-run {
+  opacity: 1;
+}
+
+/* ============================================================================
+ * Animations
+ * ============================================================================ */
+
+@keyframes test-running-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes coverage-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================================================
+ * Coverage Summary Badge
+ * ============================================================================ */
+
+.coverage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.coverage-badge--high {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #22C55E;
+}
+
+.coverage-badge--medium {
+  background-color: rgba(234, 179, 8, 0.2);
+  color: #EAB308;
+}
+
+.coverage-badge--low {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #EF4444;
+}
+
+/* ============================================================================
+ * Test Explorer Enhancements
+ * ============================================================================ */
+
+/* Watch mode indicator */
+.test-explorer-watch-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #22C55E;
+  background: rgba(34, 197, 94, 0.1);
+  border-radius: 4px;
+  animation: test-running-pulse 2s ease-in-out infinite;
+}
+
+/* Coverage mode indicator */
+.test-explorer-coverage-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #3B82F6;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 4px;
+}
+
+/* ============================================================================
+ * Test Result Inline Decorations
+ * ============================================================================ */
+
+/* Inline test status */
+.test-inline-status {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  font-size: 11px;
+  font-family: var(--font-family-mono);
+}
+
+.test-inline-status--passed {
+  color: #22C55E;
+}
+
+.test-inline-status--failed {
+  color: #EF4444;
+}
+
+.test-inline-status--skipped {
+  color: #EAB308;
+}
+
+.test-inline-status--running {
+  color: #3B82F6;
+}
+
+/* Test duration inline */
+.test-inline-duration {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  font-size: 10px;
+  color: var(--text-weaker);
+  font-family: var(--font-family-mono);
+}
+
+/* ============================================================================
+ * Monaco Glyph Margin Enhancement
+ * ============================================================================ */
+
+/* Ensure glyph margin is visible for coverage/test decorations */
+.monaco-editor .margin-view-overlays .glyph-margin {
+  width: 20px !important;
+}
+
+/* Hover state for glyph margin items */
+.monaco-editor .margin-view-overlays .glyph-margin > div:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}

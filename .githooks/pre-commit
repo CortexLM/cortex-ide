@@ -1,0 +1,38 @@
+#!/bin/bash
+set -e
+
+if [ "${SKIP_GIT_HOOKS:-0}" = "1" ]; then
+  echo "[githook:pre-commit] Skipping (SKIP_GIT_HOOKS=1)"
+  exit 0
+fi
+
+echo "[githook:pre-commit] Running pre-commit checks..."
+
+# Rust formatting
+if command -v cargo >/dev/null 2>&1; then
+  echo "[githook:pre-commit] Checking Rust formatting..."
+  (cd src-tauri && cargo +nightly fmt --all -- --check) || {
+    echo "[githook:pre-commit] Rust formatting failed. Run: cd src-tauri && cargo +nightly fmt --all"
+    exit 1
+  }
+fi
+
+# TypeScript type checking
+if command -v npx >/dev/null 2>&1 && [ -f "package.json" ]; then
+  echo "[githook:pre-commit] Running TypeScript type check..."
+  npx tsc --noEmit --incremental --tsBuildInfoFile node_modules/.cache/tsbuildinfo || {
+    echo "[githook:pre-commit] TypeScript type check failed."
+    exit 1
+  }
+fi
+
+# Frontend tests (full suite, same as CI)
+if command -v npx >/dev/null 2>&1 && [ -f "package.json" ]; then
+  echo "[githook:pre-commit] Running full frontend test suite..."
+  npm run test || {
+    echo "[githook:pre-commit] Frontend tests failed."
+    exit 1
+  }
+fi
+
+echo "[githook:pre-commit] pre-commit checks passed."

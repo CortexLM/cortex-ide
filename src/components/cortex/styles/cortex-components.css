@@ -1,0 +1,351 @@
+/**
+ * Figma Components - Additional CSS Styles
+ * 
+ * Animations, scrollbar styling, and component-specific styles
+ * that complement the inline JSX styles
+ */
+
+/* =============================================================================
+   ANIMATIONS
+   ============================================================================= */
+
+/* Spin animation for loading states */
+@keyframes figma-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulse animation for logo glow */
+@keyframes figma-pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Fade in animation */
+@keyframes figma-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Slide up animation */
+@keyframes figma-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide in from left */
+@keyframes figma-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scale in animation */
+@keyframes figma-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Shimmer animation for skeleton loading */
+@keyframes figma-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* =============================================================================
+   SCROLLBAR STYLING
+   ============================================================================= */
+
+/* Webkit scrollbar */
+.figma-scrollbar::-webkit-scrollbar {
+  width: var(--cortex-scrollbar-width, 8px);
+  height: var(--cortex-scrollbar-width, 8px);
+}
+
+.figma-scrollbar::-webkit-scrollbar-track {
+  background: var(--cortex-scrollbar-track, transparent);
+}
+
+.figma-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--cortex-scrollbar-thumb, var(--cortex-bg-active));
+  border-radius: var(--cortex-scrollbar-radius, 9999px);
+}
+
+.figma-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--cortex-scrollbar-thumb-hover, var(--cortex-bg-active));
+}
+
+/* Firefox scrollbar */
+.figma-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cortex-scrollbar-thumb, var(--cortex-bg-active)) var(--cortex-scrollbar-track, transparent);
+}
+
+/* Hide scrollbar but keep functionality */
+.figma-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.figma-scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* =============================================================================
+   FOCUS STYLES
+   ============================================================================= */
+
+/* Focus visible for keyboard navigation */
+.figma-focus-visible:focus-visible {
+  outline: 2px solid var(--cortex-accent-primary, var(--cortex-accent-primary));
+  outline-offset: 2px;
+}
+
+/* Remove default focus outline when not using keyboard */
+.figma-focus-visible:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* =============================================================================
+   TRANSITION UTILITIES
+   ============================================================================= */
+
+.figma-transition-colors {
+  transition-property: color, background-color, border-color;
+  transition-timing-function: ease;
+  transition-duration: var(--cortex-duration-normal, 150ms);
+}
+
+.figma-transition-transform {
+  transition-property: transform;
+  transition-timing-function: ease;
+  transition-duration: var(--cortex-duration-normal, 150ms);
+}
+
+.figma-transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: ease;
+  transition-duration: var(--cortex-duration-normal, 150ms);
+}
+
+.figma-transition-all {
+  transition-property: all;
+  transition-timing-function: ease;
+  transition-duration: var(--cortex-duration-normal, 150ms);
+}
+
+/* =============================================================================
+   LAYOUT UTILITIES
+   ============================================================================= */
+
+/* Truncate text with ellipsis */
+.figma-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Line clamp for multi-line truncation */
+.figma-line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.figma-line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* =============================================================================
+   SELECTION STYLING
+   ============================================================================= */
+
+::selection {
+  background: var(--cortex-accent-muted, rgba(191, 255, 0, 0.3));
+  color: var(--cortex-text-primary, var(--cortex-text-primary));
+}
+
+/* =============================================================================
+   DRAG REGION FOR TAURI
+   ============================================================================= */
+
+.figma-drag-region {
+  -webkit-app-region: drag;
+}
+
+.figma-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* =============================================================================
+   SKELETON LOADING
+   ============================================================================= */
+
+.figma-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--cortex-skeleton-base, var(--cortex-bg-hover)) 0%,
+    var(--cortex-skeleton-highlight, var(--cortex-bg-hover)) 50%,
+    var(--cortex-skeleton-base, var(--cortex-bg-hover)) 100%
+  );
+  background-size: 200% 100%;
+  animation: figma-shimmer 1.5s infinite;
+  border-radius: var(--cortex-radius-sm, 4px);
+}
+
+/* =============================================================================
+   ACTIVITY BAR SPECIFIC
+   ============================================================================= */
+
+.figma-activity-bar-nav {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.figma-activity-bar-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.figma-activity-bar-item:hover {
+  transform: scale(1.02);
+}
+
+.figma-activity-bar-item:active {
+  transform: scale(0.98);
+}
+
+/* =============================================================================
+   TREE VIEW SPECIFIC
+   ============================================================================= */
+
+.figma-tree-item:hover .figma-tree-actions {
+  opacity: 1;
+}
+
+.figma-tree-actions {
+  opacity: 0;
+  transition: opacity var(--cortex-duration-fast, 100ms) ease;
+}
+
+/* =============================================================================
+   TAB BAR SPECIFIC
+   ============================================================================= */
+
+.figma-tab-bar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.figma-tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+/* =============================================================================
+   CHAT PANEL SPECIFIC
+   ============================================================================= */
+
+.figma-chat-messages {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cortex-scrollbar-thumb, var(--cortex-bg-active)) transparent;
+}
+
+.figma-chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.figma-chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.figma-chat-messages::-webkit-scrollbar-thumb {
+  background: var(--cortex-scrollbar-thumb, var(--cortex-bg-active));
+  border-radius: var(--cortex-radius-sm);
+}
+
+/* =============================================================================
+   CODE EDITOR SPECIFIC
+   ============================================================================= */
+
+.figma-editor-content {
+  font-family: var(--cortex-font-mono, 'JetBrains Mono', monospace);
+  font-size: 16px;
+  line-height: 24px;
+  tab-size: 2;
+}
+
+.figma-line-number {
+  font-family: var(--cortex-font-mono, 'JetBrains Mono', monospace);
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--cortex-text-muted, var(--cortex-text-inactive));
+  text-align: right;
+  user-select: none;
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =============================================================================
+   HIGH CONTRAST MODE
+   ============================================================================= */
+
+@media (prefers-contrast: high) {
+  .figma-focus-visible:focus-visible {
+    outline-width: 3px;
+  }
+  
+  .figma-border {
+    border-width: 2px;
+  }
+}
+

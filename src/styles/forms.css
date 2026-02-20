@@ -1,0 +1,912 @@
+/* =============================================================================
+   FORMS - Orion IDE Design System
+   =============================================================================
+   Form components and input styles.
+   
+   Contents:
+   1. Base Input Resets
+   2. Text Inputs
+   3. Select
+   4. Checkbox
+   5. Toggle Switch
+   6. Radio
+   7. Form Field Layout
+   8. Form Sections
+   9. Option Cards
+   10. Info Box
+   11. Keyboard Shortcut
+   
+   Dependencies: design-tokens.css
+   ============================================================================= */
+
+/* =============================================================================
+   1. BASE INPUT RESETS
+   ============================================================================= */
+
+input,
+textarea {
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+  transition: border-color 0.15s ease;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* =============================================================================
+   2. TEXT INPUTS
+   ============================================================================= */
+
+input[type="text"],
+input[type="number"],
+input[type="search"],
+input[type="password"] {
+  height: var(--cortex-height-input);
+  padding: var(--cortex-space-input-y) var(--cortex-space-input-x);
+  border: 1px solid var(--cortex-border-base);
+  border-radius: var(--cortex-radius-sm);
+  background: var(--cortex-bg-overlay);
+  color: var(--cortex-text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 100ms ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="password"]:focus {
+  border-color: var(--cortex-border-focus);
+}
+
+input[type="text"]::placeholder,
+input[type="number"]::placeholder,
+input[type="search"]::placeholder,
+input[type="password"]::placeholder {
+  color: rgba(204, 204, 204, 0.5);
+}
+
+/* Form Input (styled variant) */
+.form-input {
+  width: 100%;
+  height: var(--cortex-height-input);
+  padding: var(--cortex-space-input-y) var(--cortex-space-input-x);
+  background: var(--cortex-surface-base);
+  border: 1px solid var(--cortex-border-base);
+  border-radius: var(--cortex-radius-sm);
+  font-size: 13px;
+  color: var(--cortex-text-primary);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.form-input::placeholder {
+  color: var(--cortex-text-disabled);
+}
+
+.form-input:focus {
+  border-color: var(--cortex-focus-color);
+  background: var(--cortex-surface-raised);
+  outline: none;
+  box-shadow: none;
+}
+
+.form-input:hover:not(:focus):not(:disabled) {
+  border-color: var(--cortex-border-base);
+  background: var(--cortex-surface-raised);
+}
+
+.form-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-input-error {
+  border-color: var(--cortex-error);
+}
+
+.form-input-error:focus {
+  border-color: var(--cortex-error);
+  outline: none;
+  box-shadow: none;
+}
+
+/* Input Wrapper with Icon */
+.form-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form-input-icon {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cortex-text-disabled);
+  pointer-events: none;
+}
+
+.form-input-with-icon {
+  padding-left: 36px;
+}
+
+.form-input-suffix {
+  position: absolute;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-input-with-suffix {
+  padding-right: 36px;
+}
+
+/* Password Toggle */
+.form-password-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--cortex-radius-sm);
+  color: var(--cortex-text-disabled);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.form-password-toggle:hover {
+  color: var(--cortex-text-secondary);
+  background: var(--cortex-surface-hover);
+}
+
+/* =============================================================================
+   3. SELECT
+   ============================================================================= */
+
+select {
+  height: var(--cortex-height-input);
+  padding: 2px 23px 2px 8px;
+  border: 1px solid var(--cortex-border-base);
+  border-radius: var(--cortex-radius-sm);
+  background: var(--cortex-bg-overlay);
+  color: var(--cortex-text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 4.5L6 8L9.5 4.5' stroke='%23CCCCCC' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 100ms ease;
+}
+
+select:focus {
+  border-color: var(--cortex-border-focus);
+}
+
+select:hover:not(:focus):not(:disabled) {
+  border-color: var(--cortex-border-base);
+}
+
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Form Select (styled variant) */
+.form-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form-select {
+  width: 100%;
+  height: var(--cortex-height-input);
+  padding: var(--cortex-space-input-y) 32px var(--cortex-space-input-y) var(--cortex-space-input-x);
+  background: var(--cortex-surface-base);
+  border: 1px solid var(--cortex-border-base);
+  border-radius: var(--cortex-radius-sm);
+  font-size: 13px;
+  color: var(--cortex-text-primary);
+  cursor: pointer;
+  appearance: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.form-select:focus {
+  border-color: var(--cortex-focus-color);
+  background: var(--cortex-surface-raised);
+  outline: none;
+}
+
+.form-select:hover:not(:focus):not(:disabled) {
+  border-color: var(--cortex-border-base);
+  background: var(--cortex-surface-raised);
+}
+
+.form-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-select-error {
+  border-color: var(--cortex-error);
+}
+
+.form-select-arrow {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cortex-text-disabled);
+  pointer-events: none;
+}
+
+/* =============================================================================
+   4. CHECKBOX
+   ============================================================================= */
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--cortex-border-base);
+  border-radius: 3px;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  background: var(--cortex-bg-overlay);
+  position: relative;
+  transition: background-color 100ms ease, border-color 100ms ease;
+}
+
+input[type="checkbox"]:hover:not(:disabled) {
+  border-color: var(--cortex-border-focus);
+}
+
+input[type="checkbox"]:focus {
+  outline: 1px solid var(--cortex-border-focus);
+  outline-offset: 1px;
+}
+
+input[type="checkbox"]:checked {
+  background: #007ACC;
+  border-color: #007ACC;
+}
+
+input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Form Checkbox (styled variant) */
+.form-checkbox-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.form-checkbox-wrapper.form-checkbox-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: var(--cortex-surface-base);
+  border: 1px solid var(--cortex-border-base);
+  border-radius: var(--cortex-radius-sm);
+  cursor: pointer;
+  transition: 
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--cortex-bg-base);
+}
+
+.form-checkbox:hover:not(:disabled) {
+  border-color: var(--cortex-text-disabled);
+}
+
+.form-checkbox:focus-visible {
+  outline: 1px solid var(--cortex-focus-color);
+  outline-offset: 2px;
+}
+
+.form-checkbox-checked {
+  background: var(--cortex-text-muted);
+  border-color: var(--cortex-text-muted);
+}
+
+.form-checkbox-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.form-checkbox-label {
+  font-size: 13px;
+  color: var(--cortex-text-primary);
+}
+
+/* =============================================================================
+   5. TOGGLE SWITCH
+   ============================================================================= */
+
+.form-toggle-wrapper {
+  display: flex;
+  align-items: flex-start;
+}
+
+.form-toggle-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.form-toggle-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.form-toggle-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cortex-text-primary);
+}
+
+.form-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 36px;
+  height: 20px;
+  padding: 2px;
+  background: var(--cortex-surface-raised);
+  border: 1px solid var(--cortex-border-base);
+  border-radius: var(--cortex-radius-full);
+  cursor: pointer;
+  transition: 
+    background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.form-toggle:hover:not(.form-toggle-disabled) {
+  border-color: var(--cortex-text-disabled);
+}
+
+.form-toggle:focus-visible {
+  outline: 1px solid var(--cortex-focus-color);
+  outline-offset: 2px;
+}
+
+.form-toggle-knob {
+  width: 14px;
+  height: 14px;
+  background: var(--cortex-text-muted);
+  border-radius: 50%;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+}
+
+.form-toggle-checked {
+  background: var(--cortex-text-muted);
+  border-color: var(--cortex-text-muted);
+}
+
+.form-toggle-checked .form-toggle-knob {
+  transform: translateX(16px);
+  background: var(--cortex-bg-base);
+}
+
+.form-toggle-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =============================================================================
+   6. RADIO
+   ============================================================================= */
+
+.form-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  background: var(--cortex-surface-base);
+  border: 1px solid var(--cortex-border-base);
+  border-radius: var(--cortex-radius-lg);
+  cursor: pointer;
+  transition: 
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.form-radio-option:hover:not(:disabled) {
+  border-color: var(--cortex-text-disabled);
+  background: var(--cortex-surface-raised);
+}
+
+.form-radio-option-selected {
+  border-color: var(--cortex-text-muted);
+  background: var(--cortex-surface-raised);
+}
+
+.form-radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: var(--cortex-surface-base);
+  border: 1px solid var(--cortex-border-base);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.form-radio:focus-visible {
+  outline: 1px solid var(--cortex-focus-color);
+  outline-offset: 2px;
+}
+
+.form-radio-checked {
+  border-color: var(--cortex-text-muted);
+}
+
+.form-radio-dot {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+  border-radius: 50%;
+  transition: background-color 0.15s ease;
+}
+
+.form-radio-checked .form-radio-dot {
+  background: var(--cortex-text-muted);
+}
+
+.form-radio-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.form-radio-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cortex-text-primary);
+}
+
+/* =============================================================================
+   7. FORM FIELD LAYOUT
+   ============================================================================= */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cortex-text-muted);
+  letter-spacing: 0.01em;
+}
+
+.form-description {
+  font-size: 12px;
+  color: var(--cortex-text-disabled);
+  line-height: 1.4;
+}
+
+.form-error {
+  font-size: 12px;
+  color: var(--cortex-error);
+  line-height: 1.4;
+}
+
+/* =============================================================================
+   8. FORM SECTIONS
+   ============================================================================= */
+
+.form-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.form-section-header:first-child {
+  margin-top: 0;
+}
+
+.form-section-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-section-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-section-header-title h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cortex-text-primary);
+  margin: 0;
+}
+
+.form-section-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cortex-text-muted);
+}
+
+.form-section-header-description {
+  font-size: 12px;
+  color: var(--cortex-text-disabled);
+  margin: 0;
+}
+
+.form-section-header-action {
+  flex-shrink: 0;
+}
+
+/* Form Group */
+.form-group {
+  background: var(--cortex-surface-base);
+  border: 1px solid var(--cortex-border-subtle);
+  border-radius: var(--cortex-radius-lg);
+  overflow: hidden;
+}
+
+.form-group-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--cortex-border-subtle);
+  background: var(--cortex-surface-raised);
+}
+
+.form-group-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cortex-text-primary);
+}
+
+.form-group-content {
+  padding: 14px;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--cortex-border-subtle);
+}
+
+/* =============================================================================
+   9. OPTION CARDS
+   ============================================================================= */
+
+.form-option-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  background: var(--cortex-surface-base);
+  border: 1px solid var(--cortex-border-base);
+  border-radius: var(--cortex-radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: 
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.form-option-card:hover:not(.form-option-card-disabled) {
+  background: var(--cortex-surface-raised);
+  border-color: var(--cortex-text-disabled);
+}
+
+.form-option-card:focus-visible {
+  outline: 1px solid var(--cortex-focus-color);
+  outline-offset: 2px;
+}
+
+.form-option-card-selected {
+  background: var(--cortex-surface-raised);
+  border-color: var(--cortex-text-muted);
+}
+
+.form-option-card-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-option-card-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: var(--cortex-surface-base);
+  border: 1px solid var(--cortex-border-base);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--cortex-bg-base);
+  transition: 
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.form-option-card-indicator-checked {
+  background: var(--cortex-text-muted);
+  border-color: var(--cortex-text-muted);
+}
+
+.form-option-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.form-option-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-option-card-icon {
+  display: flex;
+  align-items: center;
+  color: var(--cortex-text-muted);
+}
+
+.form-option-card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cortex-text-primary);
+}
+
+.form-option-card-description {
+  font-size: 12px;
+  color: var(--cortex-text-disabled);
+  line-height: 1.4;
+}
+
+/* =============================================================================
+   10. INFO BOX
+   ============================================================================= */
+
+.form-info-box {
+  padding: 12px 14px;
+  border-radius: var(--cortex-radius-lg);
+  border: 1px solid;
+}
+
+.form-info-box-info {
+  background: var(--cortex-surface-base);
+  border-color: var(--cortex-border-base);
+}
+
+.form-info-box-warning {
+  background: rgba(234, 179, 8, 0.1);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+.form-info-box-error {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.form-info-box-success {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.form-info-box-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cortex-text-primary);
+  margin-bottom: 4px;
+}
+
+.form-info-box-content {
+  font-size: 12px;
+  color: var(--cortex-text-secondary);
+  line-height: 1.5;
+}
+
+/* =============================================================================
+   11. KEYBOARD SHORTCUT
+   ============================================================================= */
+
+.form-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 22px;
+  padding: 0 6px;
+  background: var(--cortex-surface-raised);
+  border: 1px solid var(--cortex-border-base);
+  border-radius: var(--cortex-radius-sm);
+  font-family: var(--cortex-font-code);
+  font-size: 11px;
+  color: var(--cortex-text-secondary);
+}
+
+/* =============================================================================
+   12. FORM BUTTONS
+   ============================================================================= */
+
+.form-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cortex-space-6);
+  font-weight: 500;
+  border-radius: var(--cortex-radius-sm);
+  cursor: pointer;
+  transition: 
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  white-space: nowrap;
+  border: none;
+}
+
+.form-button:focus-visible {
+  outline: 1px solid var(--cortex-focus-color);
+  outline-offset: 1px;
+}
+
+.form-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-button-sm {
+  height: var(--cortex-height-button-sm);
+  padding: var(--cortex-space-4) var(--cortex-space-8);
+  font-size: 12px;
+}
+
+.form-button-md {
+  height: var(--cortex-height-button-md);
+  padding: var(--cortex-space-4) var(--cortex-space-12);
+  font-size: 13px;
+}
+
+.form-button-lg {
+  height: var(--cortex-height-button-lg);
+  padding: var(--cortex-space-4) var(--cortex-space-16);
+  font-size: 14px;
+}
+
+.form-button-primary {
+  background: var(--cortex-text-muted);
+  color: var(--cortex-bg-base);
+}
+
+.form-button-primary:hover:not(:disabled) {
+  background: var(--cortex-text-secondary);
+}
+
+.form-button-secondary {
+  background: var(--cortex-surface-raised);
+  border: 1px solid var(--cortex-border-base);
+  color: var(--cortex-text-secondary);
+}
+
+.form-button-secondary:hover:not(:disabled) {
+  background: var(--cortex-surface-hover);
+  border-color: var(--cortex-text-disabled);
+}
+
+.form-button-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.form-button-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.form-button-ghost {
+  background: transparent;
+  color: var(--cortex-text-secondary);
+}
+
+.form-button-ghost:hover:not(:disabled) {
+  background: var(--cortex-surface-raised);
+}
+
+.form-button-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

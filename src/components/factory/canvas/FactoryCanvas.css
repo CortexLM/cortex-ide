@@ -1,0 +1,433 @@
+/* ============================================================================
+   FACTORY CANVAS - Node-based Workflow Editor Styles
+   Orion Agent Factory Canvas Component
+   ============================================================================ */
+
+/* ============================================================================
+   1. MAIN CONTAINER
+   ============================================================================ */
+
+.factory-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--jb-canvas, var(--cortex-bg-secondary));
+  user-select: none;
+  outline: none;
+  touch-action: none; /* Prevent default touch behaviors */
+}
+
+.factory-canvas:focus {
+  outline: none;
+}
+
+.factory-canvas--panning {
+  cursor: grabbing;
+}
+
+.factory-canvas--connecting {
+  cursor: crosshair;
+}
+
+.factory-canvas--selecting {
+  cursor: crosshair;
+}
+
+/* ============================================================================
+   2. BACKGROUND GRID
+   ============================================================================ */
+
+.factory-canvas-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ============================================================================
+   3. NODES LAYER
+   ============================================================================ */
+
+.factory-nodes-layer {
+  pointer-events: auto;
+}
+
+.factory-node {
+  position: relative;
+  background: var(--ui-panel-bg, var(--cortex-bg-secondary));
+  border: 1px solid var(--jb-border-default, rgba(255, 255, 255, 0.08));
+  border-radius: var(--jb-radius-lg, 12px);
+  box-shadow: var(--jb-shadow-popup, 0px 8px 16px rgba(0, 0, 0, 0.45));
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.factory-node:hover {
+  border-color: var(--jb-text-muted-color, var(--cortex-text-inactive));
+}
+
+.factory-node--selected {
+  border: 2px solid var(--accent-primary, var(--cortex-info));
+  box-shadow: 0 0 0 3px var(--accent-muted, rgba(59, 130, 246, 0.3)),
+              var(--jb-shadow-popup, 0px 8px 16px rgba(0, 0, 0, 0.45));
+}
+
+.factory-node--dragging {
+  cursor: grabbing;
+  opacity: 0.9;
+  z-index: 100;
+}
+
+.factory-node__header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--jb-border-default);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--jb-text-body-color, var(--cortex-text-secondary));
+  background: var(--jb-surface-hover, var(--cortex-bg-hover));
+  border-radius: var(--jb-radius-lg, 12px) var(--jb-radius-lg, 12px) 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.factory-node__body {
+  padding: 10px 14px;
+  font-size: 11px;
+  color: var(--jb-text-muted-color, var(--cortex-text-inactive));
+}
+
+/* ============================================================================
+   4. NODE PORTS
+   ============================================================================ */
+
+.factory-port {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  cursor: crosshair;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  z-index: 10;
+}
+
+.factory-port:hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 0 4px var(--accent-muted, rgba(59, 130, 246, 0.3));
+}
+
+.factory-port--input {
+  left: -6px;
+  background: var(--jb-panel, var(--cortex-bg-secondary));
+  border: 2px solid var(--accent-primary, var(--cortex-info));
+}
+
+.factory-port--output {
+  right: -6px;
+  background: var(--accent-primary, var(--cortex-info));
+  border: 2px solid var(--jb-panel, var(--cortex-bg-secondary));
+}
+
+.factory-port--connected {
+  background: var(--accent-primary, var(--cortex-info));
+}
+
+.factory-port--valid-target {
+  transform: scale(1.4);
+  box-shadow: 0 0 0 6px var(--cortex-success, var(--cortex-success));
+  background: var(--cortex-success, var(--cortex-success));
+}
+
+.factory-port--invalid-target {
+  background: var(--cortex-error, var(--cortex-error));
+  border-color: var(--cortex-error, var(--cortex-error));
+}
+
+/* ============================================================================
+   5. EDGES LAYER
+   ============================================================================ */
+
+.factory-edges-layer {
+  pointer-events: none;
+}
+
+.factory-connection-line {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.factory-connection-line:hover path:first-of-type {
+  stroke-width: 3;
+}
+
+.factory-temp-connection {
+  pointer-events: none;
+}
+
+/* ============================================================================
+   6. SELECTION BOX
+   ============================================================================ */
+
+.factory-selection-box {
+  position: absolute;
+  background: var(--accent-muted, rgba(59, 130, 246, 0.15));
+  border: 1px solid var(--accent-primary, var(--cortex-info));
+  border-radius: var(--cortex-radius-sm);
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ============================================================================
+   7. TOOLBAR
+   ============================================================================ */
+
+.factory-canvas-toolbar {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  background: var(--jb-panel, var(--cortex-bg-secondary));
+  border: 1px solid var(--jb-border-default, rgba(255, 255, 255, 0.08));
+  border-radius: var(--jb-radius-md, 10px);
+  box-shadow: var(--jb-shadow-popup, 0px 8px 16px rgba(0, 0, 0, 0.45));
+  z-index: 100;
+  user-select: none;
+}
+
+.factory-canvas-toolbar__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--jb-radius-sm, 6px);
+  color: var(--jb-text-muted-color, var(--cortex-text-inactive));
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.factory-canvas-toolbar__button:hover {
+  background: var(--jb-surface-hover, var(--cortex-bg-hover));
+  color: var(--jb-text-body-color, var(--cortex-text-secondary));
+}
+
+.factory-canvas-toolbar__button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.factory-canvas-toolbar__button--active {
+  background: var(--accent-primary, var(--cortex-info));
+  color: white;
+}
+
+.factory-canvas-toolbar__divider {
+  width: 1px;
+  height: 20px;
+  background: var(--jb-border-default, rgba(255, 255, 255, 0.08));
+  margin: 0 4px;
+}
+
+.factory-canvas-toolbar__zoom {
+  min-width: 48px;
+  text-align: center;
+  font-size: 12px;
+  font-family: var(--jb-font-ui);
+  color: var(--jb-text-body-color, var(--cortex-text-secondary));
+  font-variant-numeric: tabular-nums;
+  padding: 0 4px;
+  cursor: pointer;
+}
+
+.factory-canvas-toolbar__zoom:hover {
+  color: var(--accent-primary, var(--cortex-info));
+}
+
+/* ============================================================================
+   8. MINIMAP
+   ============================================================================ */
+
+.factory-minimap {
+  position: absolute;
+  background: var(--jb-panel, var(--cortex-bg-secondary));
+  border: 1px solid var(--jb-border-default, rgba(255, 255, 255, 0.08));
+  border-radius: var(--jb-radius-md, 10px);
+  box-shadow: var(--jb-shadow-popup, 0px 8px 16px rgba(0, 0, 0, 0.45));
+  overflow: hidden;
+  user-select: none;
+  z-index: 100;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.factory-minimap:hover {
+  opacity: 1;
+}
+
+.factory-minimap__label {
+  position: absolute;
+  top: 4px;
+  left: 8px;
+  font-size: 10px;
+  font-family: var(--jb-font-ui);
+  color: var(--jb-text-muted-color, var(--cortex-text-inactive));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+}
+
+.factory-minimap__viewport {
+  fill: var(--accent-muted, rgba(59, 130, 246, 0.15));
+  stroke: var(--accent-primary, var(--cortex-info));
+  stroke-width: 1.5;
+  cursor: move;
+}
+
+.factory-minimap__node {
+  fill: var(--jb-text-muted-color, var(--cortex-text-inactive));
+  opacity: 0.6;
+}
+
+.factory-minimap__node--selected {
+  fill: var(--accent-primary, var(--cortex-info));
+  opacity: 1;
+}
+
+/* ============================================================================
+   9. ANIMATIONS
+   ============================================================================ */
+
+@keyframes factory-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes factory-flow {
+  0% {
+    stroke-dashoffset: 20;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.factory-edge--animated path {
+  animation: factory-flow 1s linear infinite;
+}
+
+/* ============================================================================
+   10. ACCESSIBILITY
+   ============================================================================ */
+
+.factory-canvas:focus-visible {
+  outline: 2px solid var(--accent-primary, var(--cortex-info));
+  outline-offset: -2px;
+}
+
+.factory-node:focus-visible {
+  outline: 2px solid var(--accent-primary, var(--cortex-info));
+  outline-offset: 2px;
+}
+
+/* Screen reader announcements */
+.factory-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================================
+   11. TOUCH SUPPORT
+   ============================================================================ */
+
+@media (pointer: coarse) {
+  .factory-port {
+    width: 20px;
+    height: 20px;
+    margin: -4px;
+  }
+  
+  .factory-canvas-toolbar__button {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .factory-minimap {
+    width: 150px;
+    height: 100px;
+  }
+}
+
+/* ============================================================================
+   12. HIGH CONTRAST MODE
+   ============================================================================ */
+
+@media (prefers-contrast: more) {
+  .factory-node {
+    border-width: 2px;
+  }
+  
+  .factory-node--selected {
+    border-width: 3px;
+  }
+  
+  .factory-connection-line path {
+    stroke-width: 3px;
+  }
+}
+
+/* ============================================================================
+   13. REDUCED MOTION
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .factory-edge--animated path {
+    animation: none;
+  }
+  
+  .factory-node,
+  .factory-port,
+  .factory-canvas-toolbar__button {
+    transition: none;
+  }
+}
+
+/* ============================================================================
+   14. PRINT STYLES
+   ============================================================================ */
+
+@media print {
+  .factory-canvas-toolbar,
+  .factory-minimap {
+    display: none;
+  }
+  
+  .factory-canvas {
+    background: white;
+  }
+  
+  .factory-node {
+    border-color: #333;
+    box-shadow: none;
+  }
+}
+

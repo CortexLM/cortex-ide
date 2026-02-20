@@ -1,0 +1,710 @@
+/* =============================================================================
+   DESIGN TOKENS - Legacy Orion Color System
+   =============================================================================
+   @deprecated — This file is the LEGACY Orion/blue-accent token system.
+   The canonical design system is cortex-tokens.css (Lime accent, from Figma).
+   
+   All variables defined here are aliased to their --cortex-* equivalents
+   at the bottom of this file. New components should use --cortex-* variables
+   exclusively. Existing components will continue to work via these aliases.
+   
+   Migration: Replace --surface-*, --text-*, --palette-*, --accent-* with
+   their --cortex-* counterparts from cortex-tokens.css.
+   ============================================================================= */
+
+:root {
+  /* ===========================================================================
+     PALETTE DE BASE - NE PAS UTILISER DIRECTEMENT DANS LES COMPOSANTS
+     @deprecated — Use --cortex-palette-* from cortex-tokens.css instead
+     =========================================================================== */
+  
+  /* @deprecated — Use --cortex-bg-primary (#141415) */
+  --palette-graphite: #26292C;
+  /* @deprecated — Use --cortex-bg-secondary (#1C1C1D) */
+  --palette-carbon: #191A1C;
+  /* @deprecated */ --palette-graphite-light: #2f3336;
+  /* @deprecated */ --palette-graphite-lighter: #383c40;
+  /* @deprecated */ --palette-carbon-light: #1f2124;
+  /* @deprecated */ --palette-carbon-dark: #111214;
+  
+  /* @deprecated — Blue accent. Use --cortex-accent-primary (#B2FF22) for lime accent */
+  --palette-blue-400: #60a5fa;
+  /* @deprecated */ --palette-blue-500: #3b82f6;
+  /* @deprecated */ --palette-blue-600: #2563eb;
+  /* @deprecated */ --palette-blue-700: #1d4ed8;
+  /* @deprecated */ --palette-blue-muted: rgba(59, 130, 246, 0.2);
+  /* @deprecated */ --palette-blue-glow: rgba(59, 130, 246, 0.3);
+  
+  /* @deprecated — Text palette. Use --cortex-text-* from cortex-tokens.css */
+  --palette-white: #f8f9fa;
+  /* @deprecated */ --palette-gray-100: #e9ecef;
+  /* @deprecated */ --palette-gray-200: #ced4da;
+  /* @deprecated */ --palette-gray-400: #adb5bd;
+  /* @deprecated */ --palette-gray-500: #6c757d;
+  /* @deprecated */ --palette-gray-600: #495057;
+  
+  /* @deprecated — Semantic palette. Use --cortex-success, --cortex-warning, --cortex-error */
+  --palette-success: #22c55e;
+  /* @deprecated */ --palette-success-muted: rgba(34, 197, 94, 0.15);
+  /* @deprecated */ --palette-warning: #f59e0b;
+  /* @deprecated */ --palette-warning-muted: rgba(245, 158, 11, 0.15);
+  /* @deprecated */ --palette-error: #ef4444;
+  /* @deprecated */ --palette-error-muted: rgba(239, 68, 68, 0.15);
+  
+  /* Neon (pour loader) */
+  --palette-neon-cyan: #00D9FF;
+  --palette-neon-glow: rgba(0, 217, 255, 0.6);
+
+  /* Factory Node Category Colors - Palette */
+  --palette-node-trigger: #E9AA46;
+  --palette-node-agent: #3574F0;
+  --palette-node-supervisor: #9D5BD2;
+  --palette-node-action: #59A869;
+  --palette-node-logic: #CC7832;
+  --palette-node-communication: #C75450;
+  --palette-node-utility: #8B8B8B;
+  
+  /* Factory Port Data Type Colors - Palette */
+  --palette-port-object: #9B59B6;
+  --palette-port-array: #1ABC9C;
+  --palette-port-agent: #3498DB;
+  --palette-port-message: #00BCD4;
+  --palette-port-event: #E91E63;
+
+  /* ===========================================================================
+     VARIABLES SÉMANTIQUES
+     @deprecated — Use --cortex-bg-*, --cortex-text-*, --cortex-accent-* etc.
+     =========================================================================== */
+  
+  /* ---- SURFACES ---- */
+  /* @deprecated — Use --cortex-bg-primary, --cortex-bg-secondary, etc. */
+  --surface-base: var(--palette-graphite);
+  --surface-card: var(--palette-carbon);
+  --surface-panel: var(--palette-carbon);
+  --surface-input: var(--palette-graphite-light);
+  --surface-hover: var(--palette-graphite-light);
+  --surface-active: var(--palette-graphite-lighter);
+  --surface-elevated: var(--palette-graphite-light);
+  --surface-overlay: rgba(0, 0, 0, 0.6);
+  
+  /* ---- TEXTE ---- */
+  /* @deprecated — Use --cortex-text-primary, --cortex-text-secondary, etc. */
+  --text-title: var(--palette-white);
+  --text-primary: var(--palette-gray-100);
+  --text-secondary: var(--palette-gray-200);
+  --text-muted: var(--palette-gray-400);
+  --text-placeholder: var(--palette-gray-500);
+  --text-disabled: var(--palette-gray-500);
+  --text-inverse: var(--palette-carbon);
+  
+  /* ---- ACCENT (Bleu) ---- */
+  /* @deprecated — Use --cortex-accent-primary (#B2FF22 lime) */
+  --accent-primary: var(--palette-blue-500);
+  --accent-hover: var(--palette-blue-600);
+  --accent-active: var(--palette-blue-700);
+  --accent-muted: var(--palette-blue-muted);
+  --accent-glow: var(--palette-blue-glow);
+  --accent-light: var(--palette-blue-400);
+  
+  /* ---- BORDURES ---- */
+  /* @deprecated — Use --cortex-border-default, --cortex-border-hover, etc. */
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --border-focus: var(--palette-blue-500);
+  --border-error: var(--palette-error);
+  --border-success: var(--palette-success);
+  
+  /* ---- ÉTATS SÉMANTIQUES ---- */
+  /* @deprecated — Use --cortex-success, --cortex-warning, --cortex-error, --cortex-info */
+  --state-success: var(--palette-success);
+  --state-success-bg: var(--palette-success-muted);
+  --state-warning: var(--palette-warning);
+  --state-warning-bg: var(--palette-warning-muted);
+  --state-error: var(--palette-error);
+  --state-error-bg: var(--palette-error-muted);
+  --state-info: var(--palette-blue-500);
+  --state-info-bg: var(--palette-blue-muted);
+  
+  /* ---- LOADER NEON ---- */
+  --neon-color: var(--palette-neon-cyan);
+  --neon-glow: var(--palette-neon-glow);
+
+  /* ---- FACTORY NODE COLORS ---- */
+  --node-trigger: var(--palette-node-trigger);
+  --node-agent: var(--palette-node-agent);
+  --node-supervisor: var(--palette-node-supervisor);
+  --node-action: var(--palette-node-action);
+  --node-logic: var(--palette-node-logic);
+  --node-communication: var(--palette-node-communication);
+  --node-utility: var(--palette-node-utility);
+
+  /* ---- FACTORY PORT COLORS ---- */
+  --port-any: var(--text-muted);
+  --port-string: var(--state-success);
+  --port-number: var(--accent-primary);
+  --port-boolean: var(--state-warning);
+  --port-object: var(--palette-port-object);
+  --port-array: var(--palette-port-array);
+  --port-agent: var(--palette-port-agent);
+  --port-message: var(--palette-port-message);
+  --port-event: var(--palette-port-event);
+  --port-error: var(--state-error);
+
+  /* ===========================================================================
+     OMBRES
+     @deprecated — Use --cortex-shadow-*, --cortex-elevation-*
+     =========================================================================== */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-popup: 0px 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0px 16px 48px rgba(0, 0, 0, 0.5);
+
+  /* ===========================================================================
+     RAYONS DE BORDURE
+     @deprecated — Use --cortex-radius-*
+     =========================================================================== */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* ===========================================================================
+     ESPACEMENT
+     @deprecated — Use --cortex-space-*
+     =========================================================================== */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ===========================================================================
+     TYPOGRAPHIE
+     @deprecated — Use --cortex-font-sans, --cortex-font-mono, --cortex-text-*
+     =========================================================================== */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+  
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-lg: 14px;
+  --text-xl: 16px;
+  --text-2xl: 18px;
+  --text-3xl: 24px;
+  
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* ===========================================================================
+     TRANSITIONS
+     @deprecated — Use --cortex-transition-*
+     =========================================================================== */
+  --transition-fast: 100ms ease;
+  --transition-normal: 150ms ease;
+  --transition-slow: 300ms ease;
+
+  /* ===========================================================================
+     Z-INDEX
+     @deprecated — Use --cortex-z-*
+     =========================================================================== */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 500;
+  --z-modal: 1000;
+  --z-popover: 1500;
+  --z-tooltip: 2000;
+  --z-notification: 2500;
+  --z-max: 9999;
+
+  /* ===========================================================================
+     DIMENSIONS
+     @deprecated — Use --cortex-height-*, --cortex-width-*
+     =========================================================================== */
+  --height-input: 32px;
+  --height-button-sm: 28px;
+  --height-button-md: 32px;
+  --height-button-lg: 36px;
+  --height-tab: 35px;
+  --height-titlebar: 40px;
+  --height-statusbar: 22px;
+  
+  --width-sidebar: 260px;
+  --width-sidebar-min: 160px;
+  --width-activitybar: 48px;
+
+  /* ===========================================================================
+     COMPOSANT: INPUT
+     @deprecated — Use --cortex-input-*
+     =========================================================================== */
+  --input-bg: var(--surface-input);
+  --input-border: var(--border-default);
+  --input-border-hover: var(--border-hover);
+  --input-border-focus: var(--border-focus);
+  --input-text: var(--text-primary);
+  --input-placeholder: var(--text-placeholder);
+  --input-radius: var(--radius-sm);
+  --input-height: var(--height-input);
+
+  /* ===========================================================================
+     COMPOSANT: BUTTON
+     @deprecated — Use --cortex-btn-primary-*, --cortex-btn-secondary-*, etc.
+     =========================================================================== */
+  --button-primary-bg: var(--accent-primary);
+  --button-primary-bg-hover: var(--accent-hover);
+  --button-primary-bg-active: var(--accent-active);
+  --button-primary-text: var(--palette-white);
+  
+  --button-secondary-bg: transparent;
+  --button-secondary-bg-hover: var(--surface-hover);
+  --button-secondary-bg-active: var(--surface-active);
+  --button-secondary-text: var(--text-primary);
+  --button-secondary-border: var(--border-default);
+  
+  --button-ghost-bg: transparent;
+  --button-ghost-bg-hover: var(--surface-hover);
+  --button-ghost-bg-active: var(--surface-active);
+  --button-ghost-text: var(--text-primary);
+  
+  --button-danger-bg: var(--state-error);
+  --button-danger-bg-hover: #dc2626;
+  --button-danger-bg-active: #b91c1c;
+  --button-danger-text: var(--palette-white);
+
+  /* ===========================================================================
+     COMPOSANT: CARD
+     @deprecated — Use --cortex-card-*
+     =========================================================================== */
+  --card-bg: var(--surface-card);
+  --card-bg-hover: var(--surface-hover);
+  --card-border: var(--border-default);
+  --card-border-hover: var(--border-hover);
+  --card-radius: var(--radius-lg);
+  --card-shadow: var(--shadow-sm);
+
+  /* ===========================================================================
+     COMPOSANT: MODAL
+     @deprecated — Use --cortex-modal-*
+     =========================================================================== */
+  --modal-bg: var(--surface-card);
+  --modal-border: var(--border-default);
+  --modal-radius: var(--radius-lg);
+  --modal-shadow: var(--shadow-modal);
+  --modal-overlay: var(--surface-overlay);
+
+  /* ===========================================================================
+     COMPOSANT: TOAST
+     @deprecated — Use --cortex-toast-*
+     =========================================================================== */
+  --toast-bg: var(--surface-elevated);
+  --toast-border: var(--border-default);
+  --toast-radius: var(--radius-md);
+  --toast-shadow: var(--shadow-popup);
+
+  /* ===========================================================================
+     COMPOSANT: TOOLTIP
+     @deprecated — Use --cortex-tooltip-*
+     =========================================================================== */
+  --tooltip-bg: var(--surface-elevated);
+  --tooltip-border: var(--border-default);
+  --tooltip-text: var(--text-primary);
+  --tooltip-radius: var(--radius-sm);
+  --tooltip-shadow: var(--shadow-sm);
+
+  /* ===========================================================================
+     COMPOSANT: TABS
+     @deprecated — Use --cortex-tab-*
+     =========================================================================== */
+  --tab-bg: transparent;
+  --tab-bg-hover: var(--surface-hover);
+  --tab-bg-active: var(--surface-active);
+  --tab-text: var(--text-muted);
+  --tab-text-active: var(--text-title);
+  --tab-border: var(--border-default);
+
+  /* ===========================================================================
+     COMPOSANT: SCROLLBAR
+     @deprecated — Use --cortex-scrollbar-*
+     =========================================================================== */
+  --scrollbar-thumb: var(--palette-gray-600);
+  --scrollbar-thumb-hover: var(--palette-gray-500);
+  --scrollbar-track: transparent;
+  --scrollbar-width: 8px;
+
+  /* ===========================================================================
+     COMPOSANT: SKELETON
+     @deprecated — Use --cortex-skeleton-*
+     =========================================================================== */
+  --skeleton-base: var(--surface-card);
+  --skeleton-highlight: var(--surface-hover);
+
+  /* ===========================================================================
+     VIBE MODE
+     @deprecated — Vibe mode now uses cortex-tokens.css accent colors
+     =========================================================================== */
+  --vibe-accent: var(--accent-primary);
+  --vibe-accent-hover: var(--accent-hover);
+  --vibe-accent-muted: var(--accent-muted);
+  --vibe-bg: var(--surface-base);
+  --vibe-surface: var(--surface-card);
+  --vibe-surface-elevated: var(--surface-elevated);
+  --vibe-border: var(--border-default);
+  --vibe-text-primary: var(--text-title);
+  --vibe-text-secondary: var(--text-primary);
+  --vibe-text-muted: var(--text-muted);
+
+  /* ===========================================================================
+     BACKWARD COMPATIBILITY ALIASES
+     @deprecated — These map old Orion variables to cortex-tokens.css equivalents.
+     All these aliases should be migrated to use --cortex-* directly.
+     =========================================================================== */
+  
+  /* JetBrains aliases */
+  --jb-canvas: var(--surface-base);
+  --jb-panel: var(--surface-panel);
+  --jb-popup: var(--surface-elevated);
+  --jb-modal: var(--surface-elevated);
+  --jb-surface-hover: var(--surface-hover);
+  --jb-surface-active: var(--surface-active);
+  --jb-surface-selected: var(--surface-active);
+  
+  --jb-border-default: var(--border-default);
+  --jb-border-focus: var(--border-focus);
+  --jb-border-error: var(--border-error);
+  
+  --jb-text-body-color: var(--text-primary);
+  --jb-text-secondary-color: var(--text-secondary);
+  --jb-text-muted-color: var(--text-muted);
+  --jb-text-placeholder: var(--text-placeholder);
+  --jb-text-disabled: var(--text-disabled);
+  --jb-text-title: var(--text-title);
+  
+  --jb-font-ui: var(--font-ui);
+  --jb-font-code: var(--font-mono);
+  --jb-radius-sm: var(--radius-sm);
+  --jb-radius-md: var(--radius-md);
+  --jb-radius-lg: var(--radius-lg);
+  --jb-text-body-size: var(--text-base);
+  --jb-icon-color-default: var(--text-muted);
+  --jb-icon-color-inactive: var(--text-disabled);
+  --jb-icon-color-active: var(--text-title);
+  
+  --jb-btn-primary-bg: var(--button-primary-bg);
+  --jb-btn-primary-color: var(--button-primary-text);
+  --jb-input-bg: var(--input-bg);
+  --jb-input-border: 1px solid var(--input-border);
+  --jb-input-color: var(--input-text);
+  --jb-input-height: var(--input-height);
+  --jb-input-radius: var(--input-radius);
+  
+  --jb-shadow-popup: var(--shadow-popup);
+  --jb-shadow-modal: var(--shadow-modal);
+  --jb-scrollbar-thumb: var(--scrollbar-thumb);
+  --jb-scrollbar-thumb-hover: var(--scrollbar-thumb-hover);
+  
+  /* Cortex aliases */
+  --cortex-transition-fast: var(--transition-fast);
+  --cortex-transition-normal: var(--transition-normal);
+  --cortex-transition-slow: var(--transition-slow);
+  --cortex-accent: var(--accent-primary);
+  --cortex-accent-hover: var(--accent-hover);
+  --cortex-accent-muted: var(--accent-muted);
+  --cortex-success: var(--state-success);
+  --cortex-warning: var(--state-warning);
+  --cortex-error: var(--state-error);
+  --cortex-info: var(--state-info);
+  
+  /* Cortex text aliases - CRITICAL for text colors */
+  --cortex-text-primary: var(--text-primary);
+  --cortex-text-secondary: var(--text-secondary);
+  --cortex-text-muted: var(--text-muted);
+  --cortex-text-disabled: var(--text-disabled);
+  --cortex-text-placeholder: var(--text-placeholder);
+  --cortex-text-link: var(--accent-primary);
+  
+  /* Cortex surface aliases */
+  --cortex-bg-base: var(--surface-base);
+  --cortex-bg-elevated: var(--surface-elevated);
+  --cortex-surface-base: var(--surface-base);
+  --cortex-surface-raised: var(--surface-card);
+  --cortex-surface-hover: var(--surface-hover);
+  --cortex-active-selection: var(--surface-active);
+  
+  /* Cortex border aliases */
+  --cortex-border-base: var(--border-default);
+  --cortex-border-subtle: var(--border-default);
+  --cortex-border-focus: var(--border-focus);
+  --cortex-focus-color: var(--border-focus);
+  
+  /* Cortex spacing aliases */
+  --cortex-space-2: 2px;
+  --cortex-space-4: 4px;
+  --cortex-space-6: 6px;
+  --cortex-space-8: 8px;
+  --cortex-space-10: 10px;
+  --cortex-space-12: 12px;
+  --cortex-space-16: 16px;
+  --cortex-space-20: 20px;
+  --cortex-space-24: 24px;
+  --cortex-space-32: 32px;
+  --cortex-space-48: 48px;
+  --cortex-space-xs: 4px;
+  --cortex-space-sm: 8px;
+  --cortex-space-md: 12px;
+  --cortex-space-lg: 16px;
+  --cortex-space-xl: 20px;
+  --cortex-space-panel-header-x: 12px;
+  
+  /* Cortex radius aliases */
+  --cortex-radius-sm: var(--radius-sm);
+  --cortex-radius-md: var(--radius-md);
+  --cortex-radius-lg: var(--radius-lg);
+  
+  /* Cortex height aliases */
+  --cortex-height-button-sm: var(--height-button-sm);
+  --cortex-height-button-md: var(--height-button-md);
+  --cortex-height-button-lg: var(--height-button-lg);
+  --cortex-height-tab: var(--height-tab);
+  --cortex-height-titlebar: var(--height-titlebar);
+  --cortex-height-statusbar: var(--height-statusbar);
+  --cortex-height-command-center: 32px;
+  
+  /* Cortex width aliases */
+  --cortex-width-activitybar: var(--width-activitybar);
+  --cortex-width-command-center: 500px;
+  --cortex-width-command-center-max: 600px;
+  
+  /* Cortex z-index aliases */
+  --cortex-z-menubar: 2500;
+  --cortex-z-titlebar: 2500;
+  --cortex-z-command-center: 2000;
+  --cortex-z-window-controls: 3000;
+  --cortex-z-notifications: 1000;
+  --cortex-z-drop-target: 10000;
+  
+  /* Cortex font aliases */
+  --cortex-font-code: var(--font-mono);
+  --cortex-font-ui: var(--font-ui);
+  
+  /* Cortex syntax colors */
+  --cortex-syntax-red: var(--state-error);
+  --cortex-syntax-green: var(--state-success);
+  --cortex-syntax-yellow: var(--state-warning);
+  --cortex-syntax-blue: var(--accent-primary);
+  
+  /* UI Panel */
+  --ui-panel-bg: var(--surface-panel);
+  --ui-panel-bg-lighter: var(--surface-hover);
+  --ui-card-bg: var(--surface-card);
+  --body-bg: var(--surface-base);
+  
+  /* Tailwind compatibility - CRITICAL for body classes */
+  --background: var(--surface-base);
+  --foreground: var(--text-primary);
+  
+  /* Additional background aliases used in editor-features.css */
+  --background-base: var(--surface-base);
+  --background-stronger: var(--surface-card);
+  --background-elevated: var(--surface-elevated);
+  --background-tertiary: var(--surface-input);
+  
+  /* Foreground aliases */
+  --foreground-base: var(--text-primary);
+  --foreground-muted: var(--text-muted);
+
+  /* ===========================================================================
+     CORTEX TOKEN ALIASES
+     @deprecated — Maps legacy --surface-*, --text-*, --accent-*, --border-*,
+     --button-*, --card-*, --modal-*, --toast-*, --tooltip-*, --tab-*,
+     --scrollbar-*, --skeleton-* variables to their --cortex-* equivalents.
+     This ensures existing components continue to work during migration.
+     =========================================================================== */
+
+  /* @deprecated Surface → Cortex BG aliases */
+  --surface-base: var(--cortex-bg-primary);
+  --surface-card: var(--cortex-bg-secondary);
+  --surface-panel: var(--cortex-bg-secondary);
+  --surface-input: var(--cortex-bg-tertiary);
+  --surface-hover: var(--cortex-bg-hover);
+  --surface-active: var(--cortex-bg-active);
+  --surface-elevated: var(--cortex-bg-elevated);
+  --surface-overlay: var(--cortex-bg-overlay);
+
+  /* @deprecated Text → Cortex text aliases */
+  --text-title: var(--cortex-text-primary);
+  --text-primary: var(--cortex-text-primary);
+  --text-secondary: var(--cortex-text-secondary);
+  --text-muted: var(--cortex-text-muted);
+  --text-placeholder: var(--cortex-text-placeholder);
+  --text-disabled: var(--cortex-text-disabled);
+  --text-inverse: var(--cortex-text-inverse);
+
+  /* @deprecated Accent → Cortex accent aliases */
+  --accent-primary: var(--cortex-accent-primary);
+  --accent-hover: var(--cortex-accent-hover);
+  --accent-active: var(--cortex-accent-pressed);
+  --accent-muted: var(--cortex-accent-muted);
+  --accent-glow: var(--cortex-accent-glow);
+  --accent-light: var(--cortex-accent-primary);
+
+  /* @deprecated Border → Cortex border aliases */
+  --border-default: var(--cortex-border-default);
+  --border-hover: var(--cortex-border-hover);
+  --border-focus: var(--cortex-border-focus);
+  --border-error: var(--cortex-border-error);
+  --border-success: var(--cortex-border-success);
+
+  /* @deprecated State → Cortex state aliases */
+  --state-success: var(--cortex-success);
+  --state-success-bg: var(--cortex-success-bg);
+  --state-warning: var(--cortex-warning);
+  --state-warning-bg: var(--cortex-warning-bg);
+  --state-error: var(--cortex-error);
+  --state-error-bg: var(--cortex-error-bg);
+  --state-info: var(--cortex-info);
+  --state-info-bg: var(--cortex-info-bg);
+
+  /* @deprecated Shadow → Cortex shadow aliases */
+  --shadow-sm: var(--cortex-shadow-sm);
+  --shadow-md: var(--cortex-shadow-md);
+  --shadow-lg: var(--cortex-shadow-lg);
+  --shadow-popup: var(--cortex-elevation-3);
+  --shadow-modal: var(--cortex-elevation-4);
+
+  /* @deprecated Radius → Cortex radius aliases */
+  --radius-sm: var(--cortex-radius-sm);
+  --radius-md: var(--cortex-radius-md);
+  --radius-lg: var(--cortex-radius-lg);
+  --radius-full: var(--cortex-radius-full);
+
+  /* @deprecated Spacing → Cortex spacing aliases */
+  --space-0: var(--cortex-space-0);
+  --space-1: var(--cortex-space-1);
+  --space-2: var(--cortex-space-2);
+  --space-3: var(--cortex-space-3);
+  --space-4: var(--cortex-space-4);
+  --space-5: var(--cortex-space-5);
+  --space-6: var(--cortex-space-6);
+  --space-8: var(--cortex-space-8);
+  --space-10: var(--cortex-space-10);
+  --space-12: var(--cortex-space-12);
+
+  /* @deprecated Typography → Cortex font aliases */
+  --font-ui: var(--cortex-font-sans);
+  --font-mono: var(--cortex-font-mono);
+
+  /* @deprecated Transition → Cortex transition aliases */
+  --transition-fast: var(--cortex-transition-fast);
+  --transition-normal: var(--cortex-transition-normal);
+  --transition-slow: var(--cortex-transition-slow);
+
+  /* @deprecated Component: Input → Cortex aliases */
+  --input-bg: var(--cortex-input-bg);
+  --input-border: var(--cortex-input-border);
+  --input-border-hover: var(--cortex-input-border-hover);
+  --input-border-focus: var(--cortex-input-border-focus);
+  --input-text: var(--cortex-input-text);
+  --input-placeholder: var(--cortex-input-placeholder);
+  --input-radius: var(--cortex-input-radius);
+
+  /* @deprecated Component: Button → Cortex aliases */
+  --button-primary-bg: var(--cortex-btn-primary-bg);
+  --button-primary-bg-hover: var(--cortex-btn-primary-bg-hover);
+  --button-primary-bg-active: var(--cortex-btn-primary-bg-active);
+  --button-primary-text: var(--cortex-btn-primary-text);
+  --button-secondary-bg: var(--cortex-btn-secondary-bg);
+  --button-secondary-bg-hover: var(--cortex-btn-secondary-bg-hover);
+  --button-secondary-bg-active: var(--cortex-btn-secondary-bg-active);
+  --button-secondary-text: var(--cortex-btn-secondary-text);
+  --button-secondary-border: var(--cortex-btn-secondary-border);
+  --button-ghost-bg: var(--cortex-btn-ghost-bg);
+  --button-ghost-bg-hover: var(--cortex-btn-ghost-bg-hover);
+  --button-ghost-bg-active: var(--cortex-btn-ghost-bg-active);
+  --button-ghost-text: var(--cortex-btn-ghost-text);
+  --button-danger-bg: var(--cortex-btn-danger-bg);
+  --button-danger-bg-hover: var(--cortex-btn-danger-bg-hover);
+  --button-danger-bg-active: var(--cortex-btn-danger-bg-active);
+  --button-danger-text: var(--cortex-btn-danger-text);
+
+  /* @deprecated Component: Card → Cortex aliases */
+  --card-bg: var(--cortex-card-bg);
+  --card-bg-hover: var(--cortex-card-bg-hover);
+  --card-border: var(--cortex-card-border);
+  --card-border-hover: var(--cortex-card-border-hover);
+  --card-radius: var(--cortex-card-radius);
+  --card-shadow: var(--cortex-card-shadow);
+
+  /* @deprecated Component: Modal → Cortex aliases */
+  --modal-bg: var(--cortex-modal-bg);
+  --modal-border: var(--cortex-modal-border);
+  --modal-radius: var(--cortex-modal-radius);
+  --modal-shadow: var(--cortex-modal-shadow);
+  --modal-overlay: var(--cortex-modal-overlay);
+
+  /* @deprecated Component: Toast → Cortex aliases */
+  --toast-bg: var(--cortex-toast-bg);
+  --toast-border: var(--cortex-toast-border);
+  --toast-radius: var(--cortex-toast-radius);
+  --toast-shadow: var(--cortex-toast-shadow);
+
+  /* @deprecated Component: Tooltip → Cortex aliases */
+  --tooltip-bg: var(--cortex-tooltip-bg);
+  --tooltip-border: var(--cortex-tooltip-border);
+  --tooltip-text: var(--cortex-tooltip-text);
+  --tooltip-radius: var(--cortex-tooltip-radius);
+  --tooltip-shadow: var(--cortex-tooltip-shadow);
+
+  /* @deprecated Component: Tab → Cortex aliases */
+  --tab-bg: var(--cortex-tab-bg);
+  --tab-bg-hover: var(--cortex-tab-bg-hover);
+  --tab-bg-active: var(--cortex-tab-bg-active);
+  --tab-text: var(--cortex-tab-text);
+  --tab-text-active: var(--cortex-tab-text-active);
+
+  /* @deprecated Component: Scrollbar → Cortex aliases */
+  --scrollbar-thumb: var(--cortex-scrollbar-thumb);
+  --scrollbar-thumb-hover: var(--cortex-scrollbar-thumb-hover);
+  --scrollbar-track: var(--cortex-scrollbar-track);
+  --scrollbar-width: var(--cortex-scrollbar-width);
+
+  /* @deprecated Component: Skeleton → Cortex aliases */
+  --skeleton-base: var(--cortex-skeleton-base);
+  --skeleton-highlight: var(--cortex-skeleton-highlight);
+
+  /* @deprecated Vibe → Cortex aliases */
+  --vibe-accent: var(--cortex-accent-primary);
+  --vibe-accent-hover: var(--cortex-accent-hover);
+  --vibe-accent-muted: var(--cortex-accent-muted);
+  --vibe-bg: var(--cortex-bg-primary);
+  --vibe-surface: var(--cortex-bg-secondary);
+  --vibe-surface-elevated: var(--cortex-bg-elevated);
+  --vibe-border: var(--cortex-border-default);
+  --vibe-text-primary: var(--cortex-text-primary);
+  --vibe-text-secondary: var(--cortex-text-secondary);
+  --vibe-text-muted: var(--cortex-text-muted);
+
+  /* @deprecated Tailwind compat → Cortex aliases */
+  --background: var(--cortex-bg-primary);
+  --foreground: var(--cortex-text-primary);
+  --background-base: var(--cortex-bg-primary);
+  --background-stronger: var(--cortex-bg-secondary);
+  --background-elevated: var(--cortex-bg-elevated);
+  --background-tertiary: var(--cortex-bg-tertiary);
+  --foreground-base: var(--cortex-text-primary);
+  --foreground-muted: var(--cortex-text-muted);
+
+  /* @deprecated UI Panel → Cortex aliases */
+  --ui-panel-bg: var(--cortex-bg-secondary);
+  --ui-panel-bg-lighter: var(--cortex-bg-hover);
+  --ui-card-bg: var(--cortex-bg-secondary);
+  --body-bg: var(--cortex-bg-primary);
+}

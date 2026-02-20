@@ -1,0 +1,1001 @@
+/* =============================================================================
+   HIGH CONTRAST ACCESSIBILITY THEME - Orion IDE
+   =============================================================================
+   WCAG AAA Compliant High Contrast Theme
+   
+   This theme is designed for users with visual impairments who require
+   maximum contrast between foreground and background elements.
+   
+   Compliance:
+   - WCAG 2.1 Level AAA (7:1 minimum contrast ratio for normal text)
+   - WCAG 2.1 Level AA (4.5:1 minimum contrast ratio for large text)
+   - Enhanced focus indicators (3px solid outlines)
+   - No reliance on color alone to convey information
+   - Clear, distinct borders on all interactive elements
+   
+   Color Palette:
+   - Background:      #000000 (Pure Black) / #0a0a0a (Near Black)
+   - Foreground:      #ffffff (Pure White) / #f0f0f0 (Bright White)
+   - Primary Accent:  #00ffff (Bright Cyan) - Links, Focus
+   - Secondary:       #ffff00 (Bright Yellow) - Warnings, Highlights
+   - Error:           #ff0000 (Bright Red)
+   - Success:         #00ff00 (Bright Green)
+   - Borders:         #ffffff / #00ffff
+   
+   Usage:
+   Apply the .theme-high-contrast class to the root element or body.
+   
+   Dependencies: design-tokens.css (base theme variables)
+   ============================================================================= */
+
+/* =============================================================================
+   1. HIGH CONTRAST THEME ROOT SELECTOR
+   ============================================================================= */
+
+.theme-high-contrast {
+
+  /* ===========================================================================
+     2. SURFACE & ELEVATION COLORS
+     ===========================================================================
+     All surfaces use pure black or near-black for maximum contrast.
+     No gradients, glassmorphism, or transparency effects.
+     =========================================================================== */
+  
+  /* Core background - Pure black for maximum contrast */
+  --ui-panel-bg: #000000;
+  --ui-panel-bg-lighter: #0a0a0a;
+  --ui-card-bg: #000000;
+  
+  /* Disable gradient backgrounds - use solid colors instead */
+  --gradient-bg-primary: #000000;
+  --gradient-bg-secondary: #000000;
+  --gradient-bg-accent: #0a0a0a;
+  --body-bg: #000000;
+  
+  /* Remove vibrancy/glass effects - solid backgrounds only */
+  --vibrancy-overlay: #000000;
+  --vibrancy-overlay-light: #0a0a0a;
+  --glass-blur: 0;
+  --glass-blur-heavy: 0;
+  --glass-blur-light: 0;
+  
+  /* JetBrains elevation system - High Contrast */
+  --jb-canvas: #000000;
+  --jb-app-root: #000000;
+  --jb-panel: #000000;
+  --jb-popup: #0a0a0a;
+  --jb-modal: #0a0a0a;
+  --jb-overlay-backdrop: rgba(0, 0, 0, 0.9);
+  
+  /* Interactive surfaces - Distinct from background */
+  --jb-surface-hover: #1a1a1a;
+  --jb-surface-active: #2a2a2a;
+  --jb-surface-selected: #1a1a1a;
+  
+  /* Cortex backward compatibility aliases */
+  --cortex-bg-base: #000000;
+  --cortex-bg-elevated: #0a0a0a;
+  --cortex-bg-overlay: #0a0a0a;
+  --cortex-bg-titlebar: #000000;
+  --cortex-bg-input: #000000;
+  --cortex-bg-editor: #000000;
+  --cortex-activity-bar-bg: #000000;
+  --cortex-bg-selection: #1a1a1a;
+  --cortex-statusbar-bg: #000000;
+  --cortex-surface-base: #000000;
+  --cortex-surface-raised: #0a0a0a;
+  --cortex-surface-hover: #1a1a1a;
+  --cortex-surface-active: #2a2a2a;
+  --cortex-active-selection: #1a1a1a;
+  
+  /* Legacy surface/background aliases */
+  --app-bg: #000000;
+  --sidebar-bg: #000000;
+  --editor-bg: #000000;
+  --panel-header: #000000;
+  --input-bg: #000000;
+  --background-base: #000000;
+  --background-stronger: #0a0a0a;
+  --background-elevated: #0a0a0a;
+  --surface-base: #000000;
+  --surface-raised: #0a0a0a;
+  --surface-raised-hover: #1a1a1a;
+  --surface-active: #2a2a2a;
+  --surface-hover: #1a1a1a;
+  --surface-sunken: #000000;
+  --surface-overlay: #0a0a0a;
+  --active-selection: #1a1a1a;
+
+  /* ===========================================================================
+     3. BORDER SYSTEM - High Visibility
+     ===========================================================================
+     All borders are clearly visible with bright colors.
+     Focus borders are extra thick (3px) for maximum visibility.
+     =========================================================================== */
+  
+  /* Borders - Highly visible white/cyan */
+  --jb-border-divider: #ffffff;
+  --jb-border-default: #ffffff;
+  --jb-border-focus: #00ffff;
+  --jb-border-focus-width: 3px;
+  --jb-border-error: #ff0000;
+  
+  /* Border radius - Slightly reduced for cleaner edges */
+  --jb-radius-sm: 4px;
+  --jb-radius-md: 6px;
+  --jb-radius-lg: 8px;
+  
+  /* Cortex backward compatibility */
+  --cortex-border-base: #ffffff;
+  --cortex-border-subtle: #ffffff;
+  --cortex-border-focus: #00ffff;
+  --cortex-border-selected: #00ffff;
+  --cortex-radius-sm: 4px;
+  --cortex-radius-md: 6px;
+  --cortex-radius-lg: 8px;
+  --cortex-radius-full: 9999px;
+  
+  /* Legacy border aliases */
+  --border-default: #ffffff;
+  --border-base: #ffffff;
+  --border-weak: #888888;
+  --border-subtle: #888888;
+  --border-focused: #00ffff;
+  --border-selected: #00ffff;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-menu: 6px;
+
+  /* ===========================================================================
+     4. TYPOGRAPHY - Maximum Readability
+     ===========================================================================
+     All text uses pure white or very bright colors.
+     No muted or low-contrast text colors.
+     =========================================================================== */
+  
+  /* Text colors - All high contrast (7:1+ ratio against black) */
+  --jb-text-body-color: #ffffff;
+  --jb-text-secondary-color: #f0f0f0;
+  --jb-text-muted-color: #e0e0e0;
+  --jb-text-header-color: #ffffff;
+  --jb-text-placeholder: #b0b0b0;
+  --jb-text-disabled: #808080;
+  --jb-text-navbar-color: #ffffff;
+  
+  /* Cortex backward compatibility */
+  --cortex-text-primary: #ffffff;
+  --cortex-text-secondary: #f0f0f0;
+  --cortex-text-muted: #e0e0e0;
+  --cortex-text-disabled: #808080;
+  --cortex-text-link: #00ffff;
+  
+  /* Legacy text aliases */
+  --text-primary: #ffffff;
+  --text-secondary: #f0f0f0;
+  --text-base: #ffffff;
+  --text-strong: #ffffff;
+  --text-weak: #e0e0e0;
+  --text-weaker: #b0b0b0;
+  --text-tertiary: #e0e0e0;
+
+  /* ===========================================================================
+     5. COMPONENT TOKENS - High Contrast Variants
+     =========================================================================== */
+  
+  /* Button - High contrast with visible borders */
+  --jb-btn-primary-bg: #00ffff;
+  --jb-btn-primary-color: #000000;
+  --jb-btn-primary-height: 32px;
+  --jb-btn-primary-padding: 0 16px;
+  --jb-btn-secondary-bg: transparent;
+  --jb-btn-secondary-color: #ffffff;
+  --jb-btn-secondary-border: 2px solid #ffffff;
+  
+  /* Input - Clear borders and high contrast text */
+  --jb-input-bg: #000000;
+  --jb-input-border: 2px solid #ffffff;
+  --jb-input-color: #ffffff;
+  --jb-input-height: 32px;
+  --jb-input-padding: 0 10px;
+  --jb-input-radius: 4px;
+  --jb-input-placeholder: #b0b0b0;
+  
+  /* Tab - Clear distinction between active and inactive */
+  --jb-tab-container-bg: #000000;
+  --jb-tab-inactive-bg: transparent;
+  --jb-tab-inactive-color: #e0e0e0;
+  --jb-tab-active-bg: #0a0a0a;
+  --jb-tab-active-color: #ffffff;
+  --jb-tab-active-radius-top: 4px;
+  
+  /* Tree - High contrast selection */
+  --jb-tree-row-height: 28px;
+  --jb-tree-icon-gap: 8px;
+  --jb-tree-selection-bg: #1a1a1a;
+  --jb-tree-selection-color: #ffffff;
+  --jb-tree-selection-radius: 4px;
+  
+  /* Floating panels - Visible borders */
+  --jb-floating-panel-radius: 8px;
+  --jb-floating-panel-gap: 4px;
+  --jb-floating-editor-bg: #000000;
+  --jb-floating-sidebar-bg: #000000;
+  --jb-floating-panel-bg: #000000;
+  
+  /* Accent colors - Bright cyan for primary accent */
+  --cortex-accent: #00ffff;
+  --cortex-accent-hover: #80ffff;
+  --cortex-accent-muted: #00cccc;
+  --cortex-accent-glow: none;
+  --cortex-focus-color: #00ffff;
+  --cortex-focus-color-alt: #80ffff;
+  
+  /* Legacy accent aliases */
+  --accent: #00ffff;
+  --accent-hover: #80ffff;
+  --accent-muted: #00cccc;
+  --accent-primary: #00ffff;
+  --accent-glow: none;
+
+  /* ===========================================================================
+     6. SEMANTIC COLORS - Bright & Distinct
+     ===========================================================================
+     Using pure, saturated colors for maximum visibility.
+     Each semantic color is clearly distinguishable.
+     =========================================================================== */
+  
+  --primary: #00ffff;
+  --success: #00ff00;
+  --warning: #ffff00;
+  --error: #ff0000;
+  --error-red: #ff0000;
+  --error-bg: #330000;
+  --info: #00ffff;
+  
+  --cortex-primary: #00ffff;
+  --cortex-success: #00ff00;
+  --cortex-warning: #ffff00;
+  --cortex-error: #ff0000;
+  --cortex-info: #00ffff;
+  --cortex-error-bg: #330000;
+
+  /* ===========================================================================
+     7. ICONOGRAPHY - High Visibility
+     =========================================================================== */
+  
+  --jb-icon-size: 18px;
+  --jb-icon-stroke: 2px;
+  --jb-icon-color-default: #ffffff;
+  --jb-icon-color-inactive: #b0b0b0;
+  --jb-icon-color-active: #ffffff;
+  --jb-icon-indicator: #00ffff;
+  --jb-icon-folder: #ffff00;
+  --jb-icon-file-default: #ffffff;
+  --jb-icon-file-js: #ffff00;
+  --jb-icon-file-ts: #00ffff;
+
+  /* ===========================================================================
+     8. SHADOWS - Replaced with Borders
+     ===========================================================================
+     Shadows are not effective for high contrast users.
+     Using solid borders instead for depth indication.
+     =========================================================================== */
+  
+  --jb-shadow-popup: none;
+  --jb-shadow-modal: none;
+  --jb-shadow-tab-active: none;
+  --cortex-shadow-widget: none;
+  --cortex-shadow-menu: none;
+
+  /* ===========================================================================
+     9. SCROLLBAR - High Visibility
+     =========================================================================== */
+  
+  --jb-scrollbar-thumb: #ffffff;
+  --jb-scrollbar-thumb-hover: #00ffff;
+  --jb-scrollbar-track: #1a1a1a;
+  --jb-scrollbar-width: 12px;
+  --cortex-scrollbar-thumb: #ffffff;
+  --cortex-scrollbar-thumb-hover: #00ffff;
+  --cortex-scrollbar-track-bg: #1a1a1a;
+  --cortex-scrollbar-thumb-bg: #ffffff;
+  --cortex-scrollbar-thumb-hover-bg: #00ffff;
+  --cortex-scrollbar-thumb-active-bg: #00ffff;
+  --cortex-scrollbar-width: 12px;
+  --cortex-scrollbar-height: 12px;
+  --cortex-scrollbar-width-thin: 10px;
+
+  /* ===========================================================================
+     10. SEARCH HIGHLIGHTING
+     =========================================================================== */
+  
+  --cortex-search-match: #ffff00;
+  --cortex-search-match-active: #ff0000;
+
+  /* ===========================================================================
+     11. SYNTAX HIGHLIGHTING - High Contrast
+     ===========================================================================
+     Colors chosen for maximum distinction and readability.
+     All colors meet 7:1 contrast ratio against black.
+     =========================================================================== */
+  
+  --cortex-syntax-keyword: #ff80ff;
+  --cortex-syntax-type: #00ffff;
+  --cortex-syntax-variable: #ffffff;
+  --cortex-syntax-function: #ffff00;
+  --cortex-syntax-number: #00ff00;
+  --cortex-syntax-string: #ff8080;
+  --cortex-syntax-comment: #80ff80;
+  --cortex-syntax-operator: #ffffff;
+  --cortex-syntax-red: #ff0000;
+  --cortex-syntax-green: #00ff00;
+  --cortex-syntax-yellow: #ffff00;
+  --cortex-syntax-blue: #00ffff;
+  --cortex-syntax-purple: #ff80ff;
+  --cortex-syntax-cyan: #00ffff;
+  --cortex-syntax-orange: #ffaa00;
+
+  /* ===========================================================================
+     12. CURSOR & ANIMATION TOKENS
+     =========================================================================== */
+  
+  --cursor-color: #00ffff;
+  --cursor-width: 3px;
+  --stream-highlight-color: #333300;
+  
+  /* Activity indicator */
+  --activity-indicator-color: #00ffff;
+
+  /* ===========================================================================
+     13. SASH (RESIZE HANDLE) - High Visibility
+     =========================================================================== */
+  
+  --cortex-sash-size: 4px;
+  --cortex-sash-hover-size: 6px;
+  --cortex-sash-hover-border: #00ffff;
+}
+
+/* =============================================================================
+   14. FOCUS STYLES - Enhanced Visibility
+   =============================================================================
+   3px solid outlines on all focusable elements.
+   High contrast focus ring with offset for clarity.
+   ============================================================================= */
+
+.theme-high-contrast :focus-visible {
+  outline: 3px solid #00ffff !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+.theme-high-contrast :focus {
+  outline: 3px solid #00ffff !important;
+  outline-offset: 2px !important;
+}
+
+/* Remove default focus styles that might interfere */
+.theme-high-contrast *:focus:not(:focus-visible) {
+  outline: 3px solid #00ffff !important;
+  outline-offset: 2px !important;
+}
+
+/* =============================================================================
+   15. LINK STYLES - Underlined & Distinct
+   =============================================================================
+   All links must be underlined (not just color) per WCAG.
+   ============================================================================= */
+
+.theme-high-contrast a,
+.theme-high-contrast [role="link"],
+.theme-high-contrast .link {
+  color: #00ffff !important;
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 2px !important;
+}
+
+.theme-high-contrast a:hover,
+.theme-high-contrast [role="link"]:hover,
+.theme-high-contrast .link:hover {
+  color: #80ffff !important;
+  text-decoration-thickness: 3px !important;
+}
+
+.theme-high-contrast a:visited {
+  color: #ff80ff !important;
+}
+
+/* =============================================================================
+   16. BUTTON STYLES - High Contrast
+   ============================================================================= */
+
+.theme-high-contrast button,
+.theme-high-contrast [role="button"],
+.theme-high-contrast .btn {
+  border: 2px solid #ffffff !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.theme-high-contrast button:hover,
+.theme-high-contrast [role="button"]:hover,
+.theme-high-contrast .btn:hover {
+  background: #1a1a1a !important;
+  border-color: #00ffff !important;
+  color: #ffffff !important;
+}
+
+.theme-high-contrast button:active,
+.theme-high-contrast [role="button"]:active,
+.theme-high-contrast .btn:active {
+  background: #2a2a2a !important;
+}
+
+/* Primary button variant */
+.theme-high-contrast .btn-primary,
+.theme-high-contrast button[data-variant="primary"] {
+  background: #00ffff !important;
+  color: #000000 !important;
+  border-color: #00ffff !important;
+}
+
+.theme-high-contrast .btn-primary:hover,
+.theme-high-contrast button[data-variant="primary"]:hover {
+  background: #80ffff !important;
+  border-color: #80ffff !important;
+}
+
+/* Danger/destructive button */
+.theme-high-contrast .btn-danger,
+.theme-high-contrast button[data-variant="danger"] {
+  background: #ff0000 !important;
+  color: #ffffff !important;
+  border-color: #ff0000 !important;
+}
+
+/* =============================================================================
+   17. INPUT & FORM STYLES
+   ============================================================================= */
+
+.theme-high-contrast input,
+.theme-high-contrast textarea,
+.theme-high-contrast select,
+.theme-high-contrast [role="textbox"],
+.theme-high-contrast [role="combobox"] {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  caret-color: #00ffff !important;
+}
+
+.theme-high-contrast input:focus,
+.theme-high-contrast textarea:focus,
+.theme-high-contrast select:focus {
+  border-color: #00ffff !important;
+}
+
+.theme-high-contrast input::placeholder,
+.theme-high-contrast textarea::placeholder {
+  color: #b0b0b0 !important;
+  opacity: 1 !important;
+}
+
+/* Checkbox & Radio - High contrast indicators */
+.theme-high-contrast input[type="checkbox"],
+.theme-high-contrast input[type="radio"] {
+  accent-color: #00ffff !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* Disabled state - still visible but clearly disabled */
+.theme-high-contrast input:disabled,
+.theme-high-contrast textarea:disabled,
+.theme-high-contrast select:disabled,
+.theme-high-contrast button:disabled {
+  background: #1a1a1a !important;
+  color: #808080 !important;
+  border-color: #808080 !important;
+  cursor: not-allowed !important;
+}
+
+/* =============================================================================
+   18. SELECTION STYLES
+   ============================================================================= */
+
+.theme-high-contrast ::selection {
+  background: #ffff00 !important;
+  color: #000000 !important;
+}
+
+.theme-high-contrast ::placeholder {
+  color: #b0b0b0 !important;
+}
+
+/* =============================================================================
+   19. PANEL & CONTAINER BORDERS
+   =============================================================================
+   All panels and containers have visible borders.
+   ============================================================================= */
+
+.theme-high-contrast .panel,
+.theme-high-contrast .sidebar,
+.theme-high-contrast .editor,
+.theme-high-contrast .terminal,
+.theme-high-contrast [role="region"],
+.theme-high-contrast [role="complementary"],
+.theme-high-contrast [role="navigation"] {
+  border: 1px solid #ffffff !important;
+}
+
+/* Modal and popup borders */
+.theme-high-contrast .modal,
+.theme-high-contrast [role="dialog"],
+.theme-high-contrast [role="alertdialog"],
+.theme-high-contrast .popup,
+.theme-high-contrast .dropdown,
+.theme-high-contrast [role="menu"],
+.theme-high-contrast [role="listbox"] {
+  border: 2px solid #ffffff !important;
+  background: #000000 !important;
+}
+
+/* =============================================================================
+   20. TAB STYLES - Clear Active State
+   ============================================================================= */
+
+.theme-high-contrast [role="tab"] {
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  color: #e0e0e0 !important;
+}
+
+.theme-high-contrast [role="tab"][aria-selected="true"],
+.theme-high-contrast [role="tab"].active,
+.theme-high-contrast .tab-active {
+  border: 2px solid #00ffff !important;
+  background: #0a0a0a !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.theme-high-contrast [role="tab"]:hover {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+}
+
+/* =============================================================================
+   21. LIST & TREE STYLES
+   ============================================================================= */
+
+.theme-high-contrast [role="listitem"],
+.theme-high-contrast [role="option"],
+.theme-high-contrast [role="treeitem"],
+.theme-high-contrast .list-item,
+.theme-high-contrast .tree-item {
+  border: 1px solid transparent !important;
+}
+
+.theme-high-contrast [role="listitem"]:hover,
+.theme-high-contrast [role="option"]:hover,
+.theme-high-contrast [role="treeitem"]:hover,
+.theme-high-contrast .list-item:hover,
+.theme-high-contrast .tree-item:hover {
+  background: #1a1a1a !important;
+  border-color: #ffffff !important;
+}
+
+.theme-high-contrast [role="listitem"][aria-selected="true"],
+.theme-high-contrast [role="option"][aria-selected="true"],
+.theme-high-contrast [role="treeitem"][aria-selected="true"],
+.theme-high-contrast .list-item.selected,
+.theme-high-contrast .tree-item.selected {
+  background: #1a1a1a !important;
+  border: 2px solid #00ffff !important;
+  color: #ffffff !important;
+}
+
+/* =============================================================================
+   22. SCROLLBAR STYLES - High Visibility
+   ============================================================================= */
+
+.theme-high-contrast ::-webkit-scrollbar {
+  width: 12px !important;
+  height: 12px !important;
+  background: #1a1a1a !important;
+}
+
+.theme-high-contrast ::-webkit-scrollbar-track {
+  background: #1a1a1a !important;
+  border: 1px solid #ffffff !important;
+}
+
+.theme-high-contrast ::-webkit-scrollbar-thumb {
+  background: #ffffff !important;
+  border-radius: 2px !important;
+  border: 1px solid #000000 !important;
+}
+
+.theme-high-contrast ::-webkit-scrollbar-thumb:hover {
+  background: #00ffff !important;
+}
+
+.theme-high-contrast ::-webkit-scrollbar-corner {
+  background: #000000 !important;
+}
+
+/* =============================================================================
+   23. TABLE STYLES
+   ============================================================================= */
+
+.theme-high-contrast table {
+  border-collapse: collapse !important;
+  border: 2px solid #ffffff !important;
+}
+
+.theme-high-contrast th,
+.theme-high-contrast td {
+  border: 1px solid #ffffff !important;
+  padding: 8px !important;
+}
+
+.theme-high-contrast th {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.theme-high-contrast tr:hover td {
+  background: #1a1a1a !important;
+}
+
+/* =============================================================================
+   24. NOTIFICATION & ALERT STYLES
+   ============================================================================= */
+
+.theme-high-contrast .notification,
+.theme-high-contrast [role="alert"],
+.theme-high-contrast [role="status"] {
+  border: 2px solid #ffffff !important;
+  background: #000000 !important;
+}
+
+/* Error notifications */
+.theme-high-contrast .notification-error,
+.theme-high-contrast [role="alert"][data-type="error"] {
+  border-color: #ff0000 !important;
+  background: #330000 !important;
+}
+
+/* Warning notifications */
+.theme-high-contrast .notification-warning,
+.theme-high-contrast [role="alert"][data-type="warning"] {
+  border-color: #ffff00 !important;
+  background: #333300 !important;
+}
+
+/* Success notifications */
+.theme-high-contrast .notification-success,
+.theme-high-contrast [role="alert"][data-type="success"] {
+  border-color: #00ff00 !important;
+  background: #003300 !important;
+}
+
+/* Info notifications */
+.theme-high-contrast .notification-info,
+.theme-high-contrast [role="alert"][data-type="info"] {
+  border-color: #00ffff !important;
+  background: #003333 !important;
+}
+
+/* =============================================================================
+   25. BADGE STYLES
+   ============================================================================= */
+
+.theme-high-contrast .badge {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+  font-weight: 700 !important;
+}
+
+.theme-high-contrast .badge-error {
+  background: #ff0000 !important;
+  color: #ffffff !important;
+}
+
+.theme-high-contrast .badge-warning {
+  background: #ffff00 !important;
+  color: #000000 !important;
+}
+
+.theme-high-contrast .badge-success {
+  background: #00ff00 !important;
+  color: #000000 !important;
+}
+
+/* =============================================================================
+   26. TOOLTIP STYLES
+   ============================================================================= */
+
+.theme-high-contrast .tooltip,
+.theme-high-contrast [role="tooltip"] {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  font-weight: 500 !important;
+}
+
+/* =============================================================================
+   27. PROGRESS BAR STYLES
+   ============================================================================= */
+
+.theme-high-contrast progress,
+.theme-high-contrast [role="progressbar"] {
+  background: #1a1a1a !important;
+  border: 2px solid #ffffff !important;
+}
+
+.theme-high-contrast progress::-webkit-progress-bar {
+  background: #1a1a1a !important;
+}
+
+.theme-high-contrast progress::-webkit-progress-value {
+  background: #00ffff !important;
+}
+
+.theme-high-contrast progress::-moz-progress-bar {
+  background: #00ffff !important;
+}
+
+/* =============================================================================
+   28. DIVIDER & SEPARATOR STYLES
+   ============================================================================= */
+
+.theme-high-contrast hr,
+.theme-high-contrast [role="separator"] {
+  border: none !important;
+  border-top: 2px solid #ffffff !important;
+  background: none !important;
+}
+
+/* =============================================================================
+   29. IMPORTANT TEXT EMPHASIS
+   =============================================================================
+   Bold text for headings and important elements.
+   ============================================================================= */
+
+.theme-high-contrast h1,
+.theme-high-contrast h2,
+.theme-high-contrast h3,
+.theme-high-contrast h4,
+.theme-high-contrast h5,
+.theme-high-contrast h6 {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.theme-high-contrast strong,
+.theme-high-contrast b {
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+.theme-high-contrast em,
+.theme-high-contrast i {
+  font-style: italic !important;
+  color: #ffff00 !important;
+}
+
+.theme-high-contrast mark {
+  background: #ffff00 !important;
+  color: #000000 !important;
+}
+
+.theme-high-contrast code {
+  background: #1a1a1a !important;
+  color: #00ffff !important;
+  border: 1px solid #ffffff !important;
+  padding: 2px 4px !important;
+}
+
+.theme-high-contrast pre {
+  background: #0a0a0a !important;
+  border: 2px solid #ffffff !important;
+  padding: 12px !important;
+}
+
+/* =============================================================================
+   30. DISABLED TRANSPARENCY - Remove All Opacity Effects
+   =============================================================================
+   High contrast mode requires solid colors, no transparency.
+   ============================================================================= */
+
+.theme-high-contrast [disabled],
+.theme-high-contrast [aria-disabled="true"],
+.theme-high-contrast .disabled {
+  opacity: 1 !important;
+  color: #808080 !important;
+  border-color: #808080 !important;
+}
+
+/* Remove all opacity-based effects */
+.theme-high-contrast * {
+  --tw-ring-opacity: 1 !important;
+  --tw-bg-opacity: 1 !important;
+  --tw-text-opacity: 1 !important;
+  --tw-border-opacity: 1 !important;
+}
+
+/* =============================================================================
+   31. ACTIVITY BAR & STATUS BAR
+   ============================================================================= */
+
+.theme-high-contrast .activity-bar,
+.theme-high-contrast [role="toolbar"] {
+  background: #000000 !important;
+  border-right: 2px solid #ffffff !important;
+}
+
+.theme-high-contrast .status-bar {
+  background: #000000 !important;
+  border-top: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Activity bar icons */
+.theme-high-contrast .activity-bar-item,
+.theme-high-contrast .activity-bar [role="button"] {
+  color: #ffffff !important;
+  border: 2px solid transparent !important;
+}
+
+.theme-high-contrast .activity-bar-item:hover,
+.theme-high-contrast .activity-bar [role="button"]:hover {
+  background: #1a1a1a !important;
+  border-color: #ffffff !important;
+}
+
+.theme-high-contrast .activity-bar-item.active,
+.theme-high-contrast .activity-bar [role="button"][aria-pressed="true"] {
+  background: #1a1a1a !important;
+  border-color: #00ffff !important;
+}
+
+/* =============================================================================
+   32. EDITOR SPECIFIC STYLES
+   ============================================================================= */
+
+/* Line numbers */
+.theme-high-contrast .line-numbers,
+.theme-high-contrast .monaco-editor .line-numbers {
+  color: #b0b0b0 !important;
+}
+
+/* Current line highlight */
+.theme-high-contrast .current-line,
+.theme-high-contrast .monaco-editor .current-line {
+  background: #1a1a1a !important;
+  border-left: 3px solid #00ffff !important;
+}
+
+/* Matching brackets */
+.theme-high-contrast .bracket-match,
+.theme-high-contrast .monaco-editor .bracket-match {
+  background: #333300 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+/* Error/warning squiggles - use solid underlines */
+.theme-high-contrast .squiggly-error {
+  border-bottom: 3px solid #ff0000 !important;
+  background: none !important;
+}
+
+.theme-high-contrast .squiggly-warning {
+  border-bottom: 3px solid #ffff00 !important;
+  background: none !important;
+}
+
+/* =============================================================================
+   33. CURSOR STYLES - Enhanced Visibility
+   ============================================================================= */
+
+.theme-high-contrast .cursor,
+.theme-high-contrast .monaco-editor .cursor {
+  background: #00ffff !important;
+  width: 3px !important;
+}
+
+.theme-high-contrast .streaming-cursor {
+  background-color: #00ffff !important;
+  width: 3px !important;
+}
+
+/* =============================================================================
+   34. REMOVE ANIMATIONS FOR ACCESSIBILITY (Optional)
+   =============================================================================
+   Users may enable reduced motion at OS level.
+   This ensures animations are still reduced in high contrast mode.
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-high-contrast *,
+  .theme-high-contrast *::before,
+  .theme-high-contrast *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =============================================================================
+   35. RESIZE HANDLES / SASH - High Visibility
+   ============================================================================= */
+
+.theme-high-contrast .monaco-sash,
+.theme-high-contrast .resize-handle {
+  background: transparent !important;
+}
+
+.theme-high-contrast .monaco-sash::before,
+.theme-high-contrast .resize-handle::before {
+  background: #ffffff !important;
+}
+
+.theme-high-contrast .monaco-sash:hover::before,
+.theme-high-contrast .monaco-sash.hover::before,
+.theme-high-contrast .resize-handle:hover::before {
+  background: #00ffff !important;
+}
+
+/* =============================================================================
+   36. AGENT MODE - High Contrast Orange Indicators
+   ============================================================================= */
+
+.theme-high-contrast .agent-mode-active {
+  border: 3px solid #ff8000 !important;
+  box-shadow: none !important;
+}
+
+.theme-high-contrast .agent-mode-indicator {
+  background-color: #ff8000 !important;
+  box-shadow: none !important;
+}
+
+.theme-high-contrast .agent-mode-overlay {
+  border: 3px solid #ff8000 !important;
+  background: transparent !important;
+}
+
+/* =============================================================================
+   37. SKELETON LOADING - High Contrast
+   ============================================================================= */
+
+.theme-high-contrast .skeleton {
+  background: #1a1a1a !important;
+  border: 1px solid #ffffff !important;
+}
+
+.theme-high-contrast .skeleton--shimmer::after {
+  display: none !important;
+}
+
+/* =============================================================================
+   38. PRINT STYLES - Maintain Contrast
+   ============================================================================= */
+
+@media print {
+  .theme-high-contrast * {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+  }
+  
+  .theme-high-contrast a {
+    color: #000000 !important;
+    text-decoration: underline !important;
+  }
+}

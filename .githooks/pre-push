@@ -1,0 +1,55 @@
+#!/bin/bash
+set -e
+
+if [ "${SKIP_GIT_HOOKS:-0}" = "1" ]; then
+  echo "[githook:pre-push] Skipping (SKIP_GIT_HOOKS=1)"
+  exit 0
+fi
+
+echo "[githook:pre-push] Running pre-push quality gate..."
+
+# ── 1. Frontend build (must run before Rust checks: tauri needs dist/) ──
+if command -v npx >/dev/null 2>&1 && [ -f "package.json" ]; then
+  echo "[githook:pre-push] Building frontend (required by tauri)..."
+  npm run build || {
+    echo "[githook:pre-push] Frontend build failed."
+    exit 1
+  }
+fi
+
+# ── 2. Rust formatting ──
+if command -v cargo >/dev/null 2>&1; then
+  echo "[githook:pre-push] Checking Rust formatting..."
+  (cd src-tauri && cargo fmt --all -- --check) || {
+    echo "[githook:pre-push] Rust formatting failed. Run: cd src-tauri && cargo fmt --all"
+    exit 1
+  }
+
+  # ── 3. Clippy ──
+  echo "[githook:pre-push] Running Clippy..."
+  (cd src-tauri && cargo clippy --all-targets -- -D warnings) || {
+    echo "[githook:pre-push] Clippy found errors."
+    exit 1
+  }
+
+  # ── 4. Cargo test ──
+  # (cargo test includes compilation, so running cargo check separately is redundant here)
+  echo "[githook:pre-push] Running cargo test..."
+  (cd src-tauri && cargo test) || {
+    echo "[githook:pre-push] cargo test failed."
+    exit 1
+  }
+else
+  echo "[githook:pre-push] cargo not found, skipping Rust checks"
+fi
+
+# ── 6. Frontend tests ──
+if command -v npx >/dev/null 2>&1 && [ -f "package.json" ]; then
+  echo "[githook:pre-push] Running frontend tests..."
+  npm run test || {
+    echo "[githook:pre-push] Frontend tests failed."
+    exit 1
+  }
+fi
+
+echo "[githook:pre-push] pre-push quality gate passed."

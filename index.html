@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cortex Desktop</title>
+    
+    <!-- Google Fonts - DM Sans, Figtree & Source Code Pro -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Inter Font - Local (No external requests for faster startup) -->
+    <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/Inter-Medium.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/Inter-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/fonts/inter.css">
+    
+    <!-- Critical CSS - Inline for instant first paint -->
+    <style>
+      :root {
+        --background: #1e1e1e;
+        --foreground: #cccccc;
+        --text-primary: #cccccc;
+        --text-secondary: #9d9d9d;
+        --text-muted: #6d6d6d;
+        --surface-base: #1e1e1e;
+        --surface-card: #191a1c;
+        --surface-panel: #252526;
+        --surface-hover: #2a2d2e;
+        --surface-active: #37373d;
+        --accent: #007acc;
+        --accent-hover: #1c8cd9;
+        --border: #3c3c3c;
+        --border-subtle: #2d2d2d;
+      }
+      
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      html, body { 
+        margin: 0;
+        padding: 0;
+        background: var(--background) !important;
+        color: var(--foreground) !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 13px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow: hidden;
+      }
+      
+      #root {
+        min-height: 100vh;
+        background: var(--background);
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Skeleton loader styles */
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      
+      .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      
+      .animate-spin {
+        animation: spin 0.8s linear infinite;
+      }
+      
+      /* Initial loader - shown immediately before JS loads */
+      .initial-loader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--background);
+        z-index: 9999;
+      }
+      
+      .initial-loader .spinner {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      
+      /* Prevent FOUC */
+      html {
+        background-color: #1e1e1e;
+      }
+      
+      /* Scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 5px;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Initial loader - removed by JS when app loads -->
+      <div class="initial-loader" id="initial-loader">
+        <div class="spinner"></div>
+      </div>
+    </div>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>

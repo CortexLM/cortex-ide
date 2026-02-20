@@ -1,0 +1,1006 @@
+/**
+ * DefineKeybindingWidget - Modal widget for capturing keyboard shortcuts
+ * 
+ * Features:
+ * - "Press desired key combination" mode
+ * - Real-time display of pressed keys
+ * - Chord support (e.g., Ctrl+K Ctrl+C)
+ * - Clear, Accept, Cancel buttons
+ * - Conflict detection
+ * - 5-second inactivity timeout
+ */
+
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  RecordedKey,
+  KeybindingItem,
+  KeybindingConflict,
+} from '../../types/keybindings';
+import {
+  parseKeybinding,
+  keybindingToString,
+  normalizeKeybinding,
+  detectConflicts,
+  KeybindingPart,
+  ParsedKeybinding,
+} from '../../utils/keybindingResolver';
+
+// ============================================================================
+// Types
+// ============================================================================
+
+interface DefineKeybindingWidgetProps {
+  /** Whether the widget is visible */
+  isOpen: boolean;
+  /** Callback when widget is closed */
+  onClose: () => void;
+  /** Callback when keybinding is accepted */
+  onAccept: (keybinding: string) => void;
+  /** Target command for the new keybinding (for display purposes) */
+  targetCommand?: string;
+  /** Human-readable command title */
+  commandTitle?: string;
+  /** Existing keybindings for conflict detection */
+  existingKeybindings?: KeybindingItem[];
+  /** Initial keybinding value (for editing) */
+  initialValue?: string;
+  /** Platform for display formatting */
+  platform?: 'windows' | 'mac' | 'linux';
+}
+
+interface ChordPart {
+  keys: RecordedKey[];
+  displayString: string;
+}
+
+interface WidgetState {
+  /** Current chord parts being recorded */
+  chordParts: ChordPart[];
+  /** Whether currently waiting for next chord part */
+  awaitingChord: boolean;
+  /** Keys currently held down */
+  currentKeys: RecordedKey[];
+  /** Detected conflicts */
+  conflicts: KeybindingConflict[];
+  /** Last activity timestamp */
+  lastActivity: number;
+  /** Whether the input is focused */
+  isFocused: boolean;
+}
+
+// ============================================================================
+// Constants
+// ============================================================================
+
+const INACTIVITY_TIMEOUT = 5000; // 5 seconds
+const CHORD_TIMEOUT = 1000; // 1 second between chord parts
+
+// Keys that should not be recorded as main keys (modifiers only)
+const MODIFIER_CODES = new Set([
+  'ControlLeft', 'ControlRight',
+  'ShiftLeft', 'ShiftRight',
+  'AltLeft', 'AltRight',
+  'MetaLeft', 'MetaRight',
+  'Control', 'Shift', 'Alt', 'Meta',
+]);
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
+
+/**
+ * Convert a recorded key to a keybinding part
+ */
+function recordedKeyToKeybindingPart(key: RecordedKey): KeybindingPart {
+  return {
+    ctrlKey: key.ctrlKey,
+    shiftKey: key.shiftKey,
+    altKey: key.altKey,
+    metaKey: key.metaKey,
+    keyCode: key.code,
+  };
+}
+
+/**
+ * Convert recorded keys to a display string
+ */
+function keysToDisplayString(
+  keys: RecordedKey[],
+  platform: 'windows' | 'mac' | 'linux'
+): string {
+  if (keys.length === 0) return '';
+
+  // Get the main key (last non-modifier key pressed)
+  const mainKey = keys.find(k => !MODIFIER_CODES.has(k.code));
+  if (!mainKey) return '';
+
+  const part: KeybindingPart = {
+    ctrlKey: mainKey.ctrlKey,
+    shiftKey: mainKey.shiftKey,
+    altKey: mainKey.altKey,
+    metaKey: mainKey.metaKey,
+    keyCode: mainKey.code,
+  };
+
+  const parsed: ParsedKeybinding = {
+    parts: [part],
+    isChord: false,
+  };
+
+  return keybindingToString(parsed, platform);
+}
+
+/**
+ * Convert chord parts to a keybinding string
+ */
+function chordPartsToKeybindingString(
+  chordParts: ChordPart[],
+  platform: 'windows' | 'mac' | 'linux'
+): string {
+  return chordParts
+    .map(part => keysToDisplayString(part.keys, platform))
+    .filter(Boolean)
+    .join(' ');
+}
+
+/**
+ * Convert chord parts to normalized keybinding string
+ */
+function chordPartsToNormalizedString(chordParts: ChordPart[]): string {
+  const parts: KeybindingPart[] = [];
+
+  for (const chordPart of chordParts) {
+    const mainKey = chordPart.keys.find(k => !MODIFIER_CODES.has(k.code));
+    if (mainKey) {
+      parts.push(recordedKeyToKeybindingPart(mainKey));
+    }
+  }
+
+  if (parts.length === 0) return '';
+
+  return parts.map(part => {
+    const modifiers: string[] = [];
+    if (part.ctrlKey) modifiers.push('ctrl');
+    if (part.shiftKey) modifiers.push('shift');
+    if (part.altKey) modifiers.push('alt');
+    if (part.metaKey) modifiers.push('meta');
+    modifiers.push(part.keyCode.toLowerCase());
+    return modifiers.join('+');
+  }).join(' ');
+}
+
+/**
+ * Get key display name
+ */
+function getKeyDisplayName(code: string): string {
+  const keyMap: Record<string, string> = {
+    'Space': 'Space',
+    'Enter': 'Enter',
+    'Escape': 'Esc',
+    'Backspace': 'Backspace',
+    'Tab': 'Tab',
+    'Delete': 'Delete',
+    'Insert': 'Insert',
+    'Home': 'Home',
+    'End': 'End',
+    'PageUp': 'Page Up',
+    'PageDown': 'Page Down',
+    'ArrowUp': 'Up',
+    'ArrowDown': 'Down',
+    'ArrowLeft': 'Left',
+    'ArrowRight': 'Right',
+  };
+
+  if (keyMap[code]) return keyMap[code];
+
+  // Handle Key* codes (letters)
+  if (code.startsWith('Key')) {
+    return code.slice(3);
+  }
+
+  // Handle Digit* codes (numbers)
+  if (code.startsWith('Digit')) {
+    return code.slice(5);
+  }
+
+  // Handle Numpad* codes
+  if (code.startsWith('Numpad')) {
+    return `Numpad ${code.slice(6)}`;
+  }
+
+  // Handle function keys
+  if (/^F\d+$/.test(code)) {
+    return code;
+  }
+
+  return code;
+}
+
+// ============================================================================
+// Custom Hooks
+// ============================================================================
+
+/**
+ * Hook for managing inactivity timeout
+ */
+function useInactivityTimeout(
+  isActive: boolean,
+  lastActivity: number,
+  onTimeout: () => void,
+  timeoutMs: number = INACTIVITY_TIMEOUT
+): void {
+  useEffect(() => {
+    if (!isActive) return;
+
+    const checkTimeout = () => {
+      const elapsed = Date.now() - lastActivity;
+      if (elapsed >= timeoutMs) {
+        onTimeout();
+      }
+    };
+
+    const interval = setInterval(checkTimeout, 500);
+    return () => clearInterval(interval);
+  }, [isActive, lastActivity, onTimeout, timeoutMs]);
+}
+
+// ============================================================================
+// Main Component
+// ============================================================================
+
+export const DefineKeybindingWidget: React.FC<DefineKeybindingWidgetProps> = ({
+  isOpen,
+  onClose,
+  onAccept,
+  targetCommand,
+  commandTitle,
+  existingKeybindings = [],
+  initialValue,
+  platform = 'windows',
+}) => {
+  // -------------------------------------------------------------------------
+  // State
+  // -------------------------------------------------------------------------
+  
+  const [state, setState] = useState<WidgetState>({
+    chordParts: [],
+    awaitingChord: false,
+    currentKeys: [],
+    conflicts: [],
+    lastActivity: Date.now(),
+    isFocused: false,
+  });
+
+  const inputRef = useRef<HTMLDivElement>(null);
+  const chordTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // -------------------------------------------------------------------------
+  // Computed Values
+  // -------------------------------------------------------------------------
+
+  const currentKeybinding = chordPartsToKeybindingString(state.chordParts, platform);
+  const normalizedKeybinding = chordPartsToNormalizedString(state.chordParts);
+  const hasKeybinding = state.chordParts.length > 0;
+  const isRecording = state.isFocused;
+
+  // -------------------------------------------------------------------------
+  // Conflict Detection
+  // -------------------------------------------------------------------------
+
+  const checkConflicts = useCallback((keybinding: string) => {
+    if (!keybinding || existingKeybindings.length === 0) {
+      setState(prev => ({ ...prev, conflicts: [] }));
+      return;
+    }
+
+    const allBindings = existingKeybindings.map(b => ({
+      key: b.key,
+      command: b.command,
+      when: b.when,
+      source: b.source,
+    }));
+
+    // Add the current keybinding being defined
+    allBindings.push({
+      key: keybinding,
+      command: targetCommand || '__new__',
+      when: undefined,
+      source: 'user' as const,
+    });
+
+    const detectedConflicts = detectConflicts(allBindings);
+    
+    // Filter to only show conflicts involving the new keybinding
+    const relevantConflicts = detectedConflicts.filter(conflict => {
+      const normalizedConflictKey = normalizeKeybinding(conflict.keybinding);
+      const normalizedNewKey = normalizeKeybinding(keybinding);
+      return normalizedConflictKey === normalizedNewKey;
+    });
+
+    setState(prev => ({ ...prev, conflicts: relevantConflicts }));
+  }, [existingKeybindings, targetCommand]);
+
+  useEffect(() => {
+    if (normalizedKeybinding) {
+      checkConflicts(normalizedKeybinding);
+    }
+  }, [normalizedKeybinding, checkConflicts]);
+
+  // -------------------------------------------------------------------------
+  // Handlers
+  // -------------------------------------------------------------------------
+
+  const handleClear = useCallback(() => {
+    if (chordTimeoutRef.current) {
+      clearTimeout(chordTimeoutRef.current);
+      chordTimeoutRef.current = null;
+    }
+
+    setState(prev => ({
+      ...prev,
+      chordParts: [],
+      awaitingChord: false,
+      currentKeys: [],
+      conflicts: [],
+      lastActivity: Date.now(),
+    }));
+  }, []);
+
+  const handleAccept = useCallback(() => {
+    if (hasKeybinding) {
+      onAccept(normalizedKeybinding);
+    }
+  }, [hasKeybinding, normalizedKeybinding, onAccept]);
+
+  const handleCancel = useCallback(() => {
+    handleClear();
+    onClose();
+  }, [handleClear, onClose]);
+
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Ignore pure modifier key presses
+    if (MODIFIER_CODES.has(event.code)) {
+      return;
+    }
+
+    // Handle Escape to cancel
+    if (event.code === 'Escape' && !event.ctrlKey && !event.altKey && !event.metaKey && !event.shiftKey) {
+      handleCancel();
+      return;
+    }
+
+    // Handle Enter to accept
+    if (event.code === 'Enter' && !event.ctrlKey && !event.altKey && !event.metaKey && !event.shiftKey) {
+      if (hasKeybinding) {
+        handleAccept();
+      }
+      return;
+    }
+
+    const recordedKey: RecordedKey = {
+      code: event.code,
+      key: event.key,
+      ctrlKey: event.ctrlKey,
+      shiftKey: event.shiftKey,
+      altKey: event.altKey,
+      metaKey: event.metaKey,
+      timestamp: Date.now(),
+    };
+
+    // Clear chord timeout
+    if (chordTimeoutRef.current) {
+      clearTimeout(chordTimeoutRef.current);
+      chordTimeoutRef.current = null;
+    }
+
+    setState(prev => {
+      const newKeys = [...prev.currentKeys, recordedKey];
+      const displayString = keysToDisplayString(newKeys, platform);
+
+      // Create new chord part
+      const newChordPart: ChordPart = {
+        keys: newKeys,
+        displayString,
+      };
+
+      // If we're continuing a chord, add to existing parts
+      // Otherwise, start fresh or replace single key
+      let newChordParts: ChordPart[];
+
+      if (prev.awaitingChord && prev.chordParts.length > 0) {
+        // Adding second part of chord
+        newChordParts = [...prev.chordParts, newChordPart];
+      } else if (prev.chordParts.length > 0 && !prev.awaitingChord) {
+        // Replace existing single key with new key
+        newChordParts = [newChordPart];
+      } else {
+        // First key press
+        newChordParts = [newChordPart];
+      }
+
+      return {
+        ...prev,
+        chordParts: newChordParts,
+        currentKeys: newKeys,
+        awaitingChord: false,
+        lastActivity: Date.now(),
+      };
+    });
+
+    // Set chord timeout - if user presses a key with modifier within timeout,
+    // it will be considered a chord
+    chordTimeoutRef.current = setTimeout(() => {
+      setState(prev => {
+        // If the last chord part has modifiers, wait for potential chord
+        const lastPart = prev.chordParts[prev.chordParts.length - 1];
+        if (lastPart) {
+          const mainKey = lastPart.keys.find(k => !MODIFIER_CODES.has(k.code));
+          if (mainKey && (mainKey.ctrlKey || mainKey.altKey || mainKey.metaKey)) {
+            // Potential chord starter - wait for next key
+            return {
+              ...prev,
+              awaitingChord: true,
+              currentKeys: [],
+            };
+          }
+        }
+        return {
+          ...prev,
+          awaitingChord: false,
+          currentKeys: [],
+        };
+      });
+    }, CHORD_TIMEOUT);
+  }, [handleCancel, handleAccept, hasKeybinding, platform]);
+
+  const handleKeyUp = useCallback((event: React.KeyboardEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Update current keys on key release
+    setState(prev => ({
+      ...prev,
+      currentKeys: prev.currentKeys.filter(k => k.code !== event.code),
+      lastActivity: Date.now(),
+    }));
+  }, []);
+
+  const handleFocus = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      isFocused: true,
+      lastActivity: Date.now(),
+    }));
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      isFocused: false,
+    }));
+  }, []);
+
+  // -------------------------------------------------------------------------
+  // Inactivity Timeout
+  // -------------------------------------------------------------------------
+
+  useInactivityTimeout(
+    isRecording && hasKeybinding,
+    state.lastActivity,
+    useCallback(() => {
+      // Auto-accept on timeout if we have a keybinding
+      if (hasKeybinding) {
+        handleAccept();
+      }
+    }, [hasKeybinding, handleAccept])
+  );
+
+  // -------------------------------------------------------------------------
+  // Effects
+  // -------------------------------------------------------------------------
+
+  // Focus input when opened
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  // Initialize with initial value
+  useEffect(() => {
+    if (isOpen && initialValue) {
+      try {
+        const parsed = parseKeybinding(initialValue);
+        const chordParts: ChordPart[] = parsed.parts.map(part => {
+          const mockKey: RecordedKey = {
+            code: part.keyCode,
+            key: getKeyDisplayName(part.keyCode),
+            ctrlKey: part.ctrlKey,
+            shiftKey: part.shiftKey,
+            altKey: part.altKey,
+            metaKey: part.metaKey,
+            timestamp: Date.now(),
+          };
+          return {
+            keys: [mockKey],
+            displayString: keysToDisplayString([mockKey], platform),
+          };
+        });
+
+        setState(prev => ({
+          ...prev,
+          chordParts,
+          lastActivity: Date.now(),
+        }));
+      } catch {
+        // Invalid initial value, ignore
+      }
+    }
+  }, [isOpen, initialValue, platform]);
+
+  // Cleanup on close
+  useEffect(() => {
+    if (!isOpen) {
+      handleClear();
+    }
+  }, [isOpen, handleClear]);
+
+  // Cleanup chord timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (chordTimeoutRef.current) {
+        clearTimeout(chordTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // -------------------------------------------------------------------------
+  // Render
+  // -------------------------------------------------------------------------
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div className="define-keybinding-widget-overlay" onClick={handleCancel}>
+      <div 
+        className="define-keybinding-widget"
+        onClick={e => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="define-keybinding-title"
+      >
+        {/* Header */}
+        <div className="define-keybinding-header">
+          <h2 id="define-keybinding-title" className="define-keybinding-title">
+            Define Keybinding
+          </h2>
+          {targetCommand && (
+            <p className="define-keybinding-command">
+              for <strong>{commandTitle || targetCommand}</strong>
+            </p>
+          )}
+        </div>
+
+        {/* Input Area */}
+        <div className="define-keybinding-content">
+          <p className="define-keybinding-instruction">
+            {isRecording 
+              ? 'Press desired key combination'
+              : 'Click below to start recording'
+            }
+          </p>
+
+          <div
+            ref={inputRef}
+            className={`define-keybinding-input ${isRecording ? 'recording' : ''} ${hasKeybinding ? 'has-value' : ''}`}
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
+            onKeyUp={handleKeyUp}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            role="textbox"
+            aria-label="Keybinding input"
+            aria-describedby="keybinding-hint"
+          >
+            {hasKeybinding ? (
+              <span className="define-keybinding-value">
+                {currentKeybinding}
+                {state.awaitingChord && (
+                  <span className="define-keybinding-chord-separator"> + ...</span>
+                )}
+              </span>
+            ) : (
+              <span className="define-keybinding-placeholder">
+                {isRecording ? 'Waiting for keys...' : 'Click to record'}
+              </span>
+            )}
+
+            {isRecording && (
+              <span className="define-keybinding-recording-indicator" aria-hidden="true">
+                <span className="recording-dot"></span>
+                Recording
+              </span>
+            )}
+          </div>
+
+          <p id="keybinding-hint" className="define-keybinding-hint">
+            Press <kbd>Escape</kbd> to cancel, <kbd>Enter</kbd> to accept.
+            {hasKeybinding && ' Will auto-accept after 5 seconds of inactivity.'}
+          </p>
+
+          {/* Chord Support Info */}
+          {state.awaitingChord && (
+            <p className="define-keybinding-chord-hint">
+              Press another key combination to create a chord (e.g., Ctrl+K Ctrl+C)
+            </p>
+          )}
+        </div>
+
+        {/* Conflicts Section */}
+        {state.conflicts.length > 0 && (
+          <div className="define-keybinding-conflicts" role="alert">
+            <h3 className="conflicts-title">
+              <span className="conflicts-icon" aria-hidden="true">!</span>
+              Keybinding Conflicts Detected
+            </h3>
+            <ul className="conflicts-list">
+              {state.conflicts.map((conflict, index) => (
+                <li key={index} className="conflict-item">
+                  <span className="conflict-key">{conflict.keybinding}</span>
+                  <span className="conflict-type">
+                    ({conflict.conflictType === 'exact' ? 'duplicate' : 'shadows'})
+                  </span>
+                  <ul className="conflict-commands">
+                    {conflict.conflictingCommands
+                      .filter(cmd => cmd.command !== '__new__' && cmd.command !== targetCommand)
+                      .map((cmd, cmdIndex) => (
+                        <li key={cmdIndex} className="conflict-command">
+                          <code>{cmd.command}</code>
+                          {cmd.when && (
+                            <span className="conflict-when"> when: {cmd.when}</span>
+                          )}
+                          <span className="conflict-source"> ({cmd.source})</span>
+                        </li>
+                      ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Footer with Buttons */}
+        <div className="define-keybinding-footer">
+          <button
+            type="button"
+            className="define-keybinding-button button-secondary"
+            onClick={handleClear}
+            disabled={!hasKeybinding}
+          >
+            Clear
+          </button>
+          <div className="define-keybinding-footer-spacer" />
+          <button
+            type="button"
+            className="define-keybinding-button button-secondary"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="define-keybinding-button button-primary"
+            onClick={handleAccept}
+            disabled={!hasKeybinding}
+          >
+            Accept
+          </button>
+        </div>
+      </div>
+
+      {/* Styles */}
+      <style>{`
+        .define-keybinding-widget-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+        }
+
+        .define-keybinding-widget {
+          background-color: var(--vscode-editor-background, #1e1e1e);
+          border: 1px solid var(--vscode-widget-border, #454545);
+          border-radius: 6px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+          min-width: 400px;
+          max-width: 500px;
+          overflow: hidden;
+        }
+
+        .define-keybinding-header {
+          padding: 16px 20px 12px;
+          border-bottom: 1px solid var(--vscode-widget-border, #454545);
+        }
+
+        .define-keybinding-title {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--vscode-foreground, #cccccc);
+        }
+
+        .define-keybinding-command {
+          margin: 4px 0 0;
+          font-size: 12px;
+          color: var(--vscode-descriptionForeground, #9e9e9e);
+        }
+
+        .define-keybinding-content {
+          padding: 16px 20px;
+        }
+
+        .define-keybinding-instruction {
+          margin: 0 0 12px;
+          font-size: 13px;
+          color: var(--vscode-foreground, #cccccc);
+          text-align: center;
+        }
+
+        .define-keybinding-input {
+          position: relative;
+          background-color: var(--vscode-input-background, #3c3c3c);
+          border: 1px solid var(--vscode-input-border, #3c3c3c);
+          border-radius: 4px;
+          padding: 12px 16px;
+          min-height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .define-keybinding-input:focus {
+          outline: none;
+          border-color: var(--vscode-focusBorder, #007acc);
+          box-shadow: 0 0 0 1px var(--vscode-focusBorder, #007acc);
+        }
+
+        .define-keybinding-input.recording {
+          border-color: var(--vscode-inputValidation-infoBorder, #007acc);
+          background-color: var(--vscode-inputValidation-infoBackground, rgba(0, 122, 204, 0.1));
+        }
+
+        .define-keybinding-input.has-value {
+          background-color: var(--vscode-input-background, #3c3c3c);
+        }
+
+        .define-keybinding-value {
+          font-family: var(--vscode-editor-font-family, 'Consolas', monospace);
+          font-size: 16px;
+          font-weight: 500;
+          color: var(--vscode-foreground, #cccccc);
+          letter-spacing: 0.5px;
+        }
+
+        .define-keybinding-chord-separator {
+          color: var(--vscode-descriptionForeground, #9e9e9e);
+          animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+          0%, 50% { opacity: 1; }
+          51%, 100% { opacity: 0.3; }
+        }
+
+        .define-keybinding-placeholder {
+          color: var(--vscode-input-placeholderForeground, #9e9e9e);
+          font-size: 13px;
+        }
+
+        .define-keybinding-recording-indicator {
+          position: absolute;
+          top: 4px;
+          right: 8px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 10px;
+          color: var(--vscode-inputValidation-infoBorder, #007acc);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .recording-dot {
+          width: 6px;
+          height: 6px;
+          background-color: #f44336;
+          border-radius: 50%;
+          animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .define-keybinding-hint {
+          margin: 8px 0 0;
+          font-size: 11px;
+          color: var(--vscode-descriptionForeground, #9e9e9e);
+          text-align: center;
+        }
+
+        .define-keybinding-hint kbd {
+          display: inline-block;
+          padding: 2px 6px;
+          font-family: var(--vscode-editor-font-family, monospace);
+          font-size: 10px;
+          background-color: var(--vscode-keybindingLabel-background, #464646);
+          border: 1px solid var(--vscode-keybindingLabel-border, #5a5a5a);
+          border-radius: 3px;
+          box-shadow: 0 1px 0 var(--vscode-keybindingLabel-bottomBorder, #3a3a3a);
+        }
+
+        .define-keybinding-chord-hint {
+          margin: 8px 0 0;
+          padding: 8px;
+          font-size: 11px;
+          color: var(--vscode-inputValidation-infoForeground, #007acc);
+          background-color: var(--vscode-inputValidation-infoBackground, rgba(0, 122, 204, 0.1));
+          border-radius: 4px;
+          text-align: center;
+        }
+
+        .define-keybinding-conflicts {
+          margin: 0 20px 16px;
+          padding: 12px;
+          background-color: var(--vscode-inputValidation-warningBackground, rgba(255, 193, 7, 0.1));
+          border: 1px solid var(--vscode-inputValidation-warningBorder, #ffca28);
+          border-radius: 4px;
+        }
+
+        .conflicts-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 0 0 8px;
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--vscode-inputValidation-warningForeground, #ffca28);
+        }
+
+        .conflicts-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          height: 16px;
+          background-color: var(--vscode-inputValidation-warningBorder, #ffca28);
+          color: #000;
+          border-radius: 50%;
+          font-size: 11px;
+          font-weight: bold;
+        }
+
+        .conflicts-list {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+
+        .conflict-item {
+          margin-bottom: 8px;
+        }
+
+        .conflict-key {
+          font-family: var(--vscode-editor-font-family, monospace);
+          font-size: 12px;
+          font-weight: 500;
+          color: var(--vscode-foreground, #cccccc);
+        }
+
+        .conflict-type {
+          font-size: 11px;
+          color: var(--vscode-descriptionForeground, #9e9e9e);
+          margin-left: 4px;
+        }
+
+        .conflict-commands {
+          margin: 4px 0 0 16px;
+          padding: 0;
+          list-style: none;
+        }
+
+        .conflict-command {
+          font-size: 11px;
+          color: var(--vscode-descriptionForeground, #9e9e9e);
+          margin-bottom: 2px;
+        }
+
+        .conflict-command code {
+          background-color: var(--vscode-textCodeBlock-background, #2d2d2d);
+          padding: 1px 4px;
+          border-radius: 2px;
+          font-size: 11px;
+        }
+
+        .conflict-when {
+          color: var(--vscode-textPreformat-foreground, #ce9178);
+          font-style: italic;
+        }
+
+        .conflict-source {
+          color: var(--vscode-descriptionForeground, #7a7a7a);
+        }
+
+        .define-keybinding-footer {
+          display: flex;
+          align-items: center;
+          padding: 12px 20px;
+          border-top: 1px solid var(--vscode-widget-border, #454545);
+          background-color: var(--vscode-sideBar-background, #252526);
+        }
+
+        .define-keybinding-footer-spacer {
+          flex: 1;
+        }
+
+        .define-keybinding-button {
+          padding: 6px 14px;
+          font-size: 13px;
+          font-family: inherit;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: background-color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .define-keybinding-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .button-primary {
+          background-color: var(--vscode-button-background, #0e639c);
+          color: var(--vscode-button-foreground, #ffffff);
+          border: none;
+          margin-left: 8px;
+        }
+
+        .button-primary:hover:not(:disabled) {
+          background-color: var(--vscode-button-hoverBackground, #1177bb);
+        }
+
+        .button-secondary {
+          background-color: var(--vscode-button-secondaryBackground, #3a3d41);
+          color: var(--vscode-button-secondaryForeground, #ffffff);
+          border: none;
+          margin-left: 8px;
+        }
+
+        .button-secondary:hover:not(:disabled) {
+          background-color: var(--vscode-button-secondaryHoverBackground, #45494e);
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// ============================================================================
+// Exports
+// ============================================================================
+
+export default DefineKeybindingWidget;
+
+export type { DefineKeybindingWidgetProps, ChordPart, WidgetState };

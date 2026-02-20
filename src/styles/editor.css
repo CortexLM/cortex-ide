@@ -1,0 +1,881 @@
+/* ============================================================================
+   CORTEX DESKTOP - EDITOR CORE STYLING
+   Based on VS Code Monaco Editor specifications
+   
+   Reference: vscode/UI_ANALYSIS/10_editor_core_styling.md
+   ============================================================================ */
+
+/* ============================================================================
+   1. Z-INDEX STACKING CONTEXT
+   ============================================================================ */
+
+/* IME Input - Top layer for text composition */
+.monaco-editor .inputarea.ime-input {
+  z-index: 10;
+  caret-color: var(--vscode-editorCursor-foreground, var(--cortex-accent));
+  color: var(--vscode-editor-foreground, var(--cortex-text-primary));
+}
+
+/* Minimap - Above main content */
+.monaco-editor .minimap {
+  z-index: 5;
+}
+
+/* Hidden text input area - Behind everything */
+.monaco-editor .inputarea {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  outline: none !important;
+  resize: none;
+  border: none;
+  overflow: hidden;
+  color: transparent;
+  background-color: transparent;
+  z-index: -10;
+}
+
+/* Canvas and overlays - Default layer */
+.monaco-editor .view-overlays,
+.monaco-editor .margin-view-overlays,
+.monaco-editor .lines-content {
+  z-index: 0;
+}
+
+/* ============================================================================
+   2. CURSOR STYLES AND ANIMATIONS
+   ============================================================================ */
+
+/* Cursor container */
+.monaco-editor .cursors-layer {
+  position: absolute;
+  top: 0;
+}
+
+/* Individual cursor - base styles */
+.monaco-editor .cursors-layer > .cursor {
+  position: absolute;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Line cursor (default) - solid fill */
+.monaco-editor .cursor-line-style > .cursor {
+  background-color: var(--vscode-editorCursor-foreground, var(--cortex-accent));
+}
+
+/* Block cursor (filled) */
+.monaco-editor .cursor-block-style > .cursor {
+  background-color: var(--vscode-editorCursor-foreground, var(--cortex-accent));
+}
+
+/* Block outline cursor - transparent with 1px border */
+.monaco-editor .cursor-block-outline-style > .cursor {
+  background: transparent;
+  border: 1px solid var(--vscode-editorCursor-foreground, var(--cortex-accent));
+}
+
+/* Underline cursor - 2px solid bottom border */
+.monaco-editor .cursor-underline-style > .cursor {
+  background: transparent;
+  border-bottom: 2px solid var(--vscode-editorCursor-foreground, var(--cortex-accent));
+}
+
+/* Thin underline cursor - 1px solid bottom border */
+.monaco-editor .cursor-underline-thin-style > .cursor {
+  background: transparent;
+  border-bottom: 1px solid var(--vscode-editorCursor-foreground, var(--cortex-accent));
+}
+
+/* Smooth caret animation - 80ms transitions */
+.monaco-editor .cursors-layer.cursor-smooth-caret-animation > .cursor {
+  transition: 
+    left 80ms,
+    top 80ms;
+}
+
+/* Cursor blink animation - Smooth blink (530ms VS Code spec) */
+@keyframes monaco-cursor-smooth {
+  0%, 20% { opacity: 1; }
+  60%, 100% { opacity: 0; }
+}
+
+/* Default cursor blink animation - 530ms matches VS Code exactly */
+.monaco-editor .cursor {
+  animation: monaco-cursor-smooth 530ms ease-in-out infinite alternate;
+  /* GPU acceleration for cursor - promotes to composite layer */
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
+.monaco-editor .cursor-smooth {
+  animation: monaco-cursor-smooth 530ms ease-in-out 0s 20 alternate;
+}
+
+/* Cursor blink animation - Phase blink */
+@keyframes monaco-cursor-phase {
+  0%, 20% { opacity: 1; }
+  90%, 100% { opacity: 0; }
+}
+
+.monaco-editor .cursor-phase {
+  animation: monaco-cursor-phase 0.5s ease-in-out 0s 20 alternate;
+}
+
+/* Cursor blink animation - Expand blink */
+@keyframes monaco-cursor-expand {
+  0%, 20% { transform: scaleY(1); }
+  80%, 100% { transform: scaleY(0); }
+}
+
+.monaco-editor .cursor-expand > .cursor {
+  animation: monaco-cursor-expand 0.5s ease-in-out 0s 20 alternate;
+}
+
+/* ============================================================================
+   3. SELECTION STYLES - 3px Border Radius
+   ============================================================================ */
+
+/* Selection container (abbreviated class for performance) */
+.monaco-editor .lines-content .cslr {
+  position: absolute;
+}
+
+/* Focused selection */
+.monaco-editor .focused .selected-text {
+  background-color: var(--vscode-editor-selectionBackground, rgba(90, 193, 254, 0.25));
+}
+
+/* Unfocused selection */
+.monaco-editor .selected-text {
+  background-color: var(--vscode-editor-inactiveSelectionBackground, rgba(90, 193, 254, 0.15));
+}
+
+/* Selection base styling - 3px border radius for rounded selections */
+.monaco-editor .selection {
+  border-radius: 3px;
+}
+
+/* Selection corner radius classes - 3px standard */
+.monaco-editor .top-left-radius {
+  border-top-left-radius: 3px;
+}
+
+.monaco-editor .bottom-left-radius {
+  border-bottom-left-radius: 3px;
+}
+
+.monaco-editor .top-right-radius {
+  border-top-right-radius: 3px;
+}
+
+.monaco-editor .bottom-right-radius {
+  border-bottom-right-radius: 3px;
+}
+
+/* High contrast themes - disable radius for accessibility */
+.monaco-editor.hc-black .top-left-radius,
+.monaco-editor.hc-light .top-left-radius {
+  border-top-left-radius: 0;
+}
+
+.monaco-editor.hc-black .bottom-left-radius,
+.monaco-editor.hc-light .bottom-left-radius {
+  border-bottom-left-radius: 0;
+}
+
+.monaco-editor.hc-black .top-right-radius,
+.monaco-editor.hc-light .top-right-radius {
+  border-top-right-radius: 0;
+}
+
+.monaco-editor.hc-black .bottom-right-radius,
+.monaco-editor.hc-light .bottom-right-radius {
+  border-bottom-right-radius: 0;
+}
+
+/* ============================================================================
+   3.5 BRACKET MATCH HIGHLIGHTING
+   ============================================================================ */
+
+/* Bracket match - subtle pulse animation */
+.monaco-editor .bracket-match {
+  background-color: rgba(90, 193, 254, 0.15);
+  border: 1px solid rgba(90, 193, 254, 0.4);
+  animation: bracket-pulse 200ms ease-out;
+}
+
+@keyframes bracket-pulse {
+  0% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================================================
+   4. LINE NUMBERS - Tabular Nums Font
+   ============================================================================ */
+
+.monaco-editor .margin-view-overlays .line-numbers {
+  bottom: 0;
+  font-variant-numeric: tabular-nums;
+  position: absolute;
+  text-align: right;
+  display: inline-block;
+  vertical-align: middle;
+  box-sizing: border-box;
+  cursor: default;
+  color: var(--vscode-editorLineNumber-foreground, var(--jb-text-muted-color));
+}
+
+/* Shorthand class for line numbers (VS Code compatible) */
+.monaco-editor .line-numbers {
+  color: var(--jb-text-muted-color);
+}
+
+/* Active line number - brighter for current line */
+.monaco-editor .margin-view-overlays .line-numbers.active-line-number {
+  color: var(--vscode-editorLineNumber-activeForeground, var(--jb-text-body-color));
+}
+
+/* Current line's line number - highlighted */
+.monaco-editor .current-line ~ .line-numbers {
+  color: var(--jb-text-body-color);
+}
+
+/* Relative line numbers - left aligned */
+.monaco-editor .relative-current-line-number {
+  text-align: left;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Line number vertical alignment fix for odd line heights */
+.monaco-editor .margin-view-overlays .line-numbers.lh-odd {
+  margin-top: 1px;
+}
+
+/* ============================================================================
+   5. MINIMAP - Autohide with 500ms Fade
+   ============================================================================ */
+
+/* Minimap shadow effect */
+.monaco-editor .minimap-shadow-visible {
+  box-shadow: var(--vscode-scrollbar-shadow, rgba(0, 0, 0, 0.35)) -6px 0 6px -6px inset;
+  position: absolute;
+  left: -6px;
+  width: 6px;
+  pointer-events: none;
+}
+
+/* No minimap shadow variant */
+.monaco-editor.no-minimap-shadow .minimap-shadow-visible {
+  left: -1px;
+  width: 1px;
+}
+
+/* Minimap slider states */
+.monaco-editor .minimap-slider .minimap-slider-horizontal {
+  background: var(--vscode-minimapSlider-background, rgba(90, 193, 254, 0.1));
+}
+
+.monaco-editor .minimap-slider:hover .minimap-slider-horizontal {
+  background: var(--vscode-minimapSlider-hoverBackground, rgba(90, 193, 254, 0.2));
+}
+
+.monaco-editor .minimap-slider.active .minimap-slider-horizontal {
+  background: var(--vscode-minimapSlider-activeBackground, rgba(90, 193, 254, 0.3));
+}
+
+/* Slider visibility - fade on mouseover */
+.monaco-editor .minimap.slider-mouseover .minimap-slider {
+  opacity: 0;
+  transition: opacity 100ms linear;
+}
+
+.monaco-editor .minimap.slider-mouseover:hover .minimap-slider,
+.monaco-editor .minimap.slider-mouseover .minimap-slider.active {
+  opacity: 1;
+}
+
+/* Autohide minimap - 500ms fade transition */
+.monaco-editor .minimap.minimap-autohide-mouseover,
+.monaco-editor .minimap.minimap-autohide-scroll {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.monaco-editor .minimap.minimap-autohide-mouseover:hover,
+.monaco-editor .minimap.minimap-autohide-scroll.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ============================================================================
+   5.5 SCROLLBAR STYLING
+   ============================================================================ */
+
+/* Scrollbar base styling */
+.monaco-editor .scrollbar {
+  width: 10px;
+}
+
+/* Scrollbar slider/thumb styling */
+.monaco-editor .scrollbar .slider {
+  background: rgba(191, 189, 182, 0.3);
+  border-radius: 2px;
+}
+
+/* Scrollbar slider hover state */
+.monaco-editor .scrollbar .slider:hover {
+  background: rgba(191, 189, 182, 0.5);
+}
+
+/* ============================================================================
+   6. DIAGNOSTICS BORDERS
+   ============================================================================ */
+
+/* Error indicators - 4px double border */
+.monaco-editor .squiggly-error {
+  border-bottom: 4px double var(--vscode-editorError-border, var(--cortex-error));
+}
+
+.monaco-editor .squiggly-error::before {
+  display: block;
+  content: '';
+  width: 100%;
+  height: 100%;
+  background: var(--vscode-editorError-background, rgba(255, 45, 85, 0.1));
+}
+
+/* Warning indicators - 4px double border */
+.monaco-editor .squiggly-warning {
+  border-bottom: 4px double var(--vscode-editorWarning-border, var(--cortex-warning));
+}
+
+.monaco-editor .squiggly-warning::before {
+  display: block;
+  content: '';
+  width: 100%;
+  height: 100%;
+  background: var(--vscode-editorWarning-background, rgba(254, 180, 84, 0.1));
+}
+
+/* Info indicators - 4px double border */
+.monaco-editor .squiggly-info {
+  border-bottom: 4px double var(--vscode-editorInfo-border, var(--cortex-accent));
+}
+
+.monaco-editor .squiggly-info::before {
+  display: block;
+  content: '';
+  width: 100%;
+  height: 100%;
+  background: var(--vscode-editorInfo-background, rgba(90, 193, 254, 0.1));
+}
+
+/* Hint indicators - 2px dotted border */
+.monaco-editor .squiggly-hint {
+  border-bottom: 2px dotted var(--vscode-editorHint-border, var(--cortex-text-muted));
+}
+
+/* Unused code indicators - 2px dashed border */
+.monaco-editor.showUnused .squiggly-unnecessary {
+  border-bottom: 2px dashed var(--vscode-editorUnnecessaryCode-border, var(--cortex-text-disabled));
+}
+
+/* Deprecated code - strikethrough */
+.monaco-editor.showDeprecated .squiggly-inline-deprecated {
+  text-decoration: line-through;
+  text-decoration-color: var(--vscode-editor-foreground, var(--cortex-text-primary));
+}
+
+/* ============================================================================
+   7. CURRENT LINE HIGHLIGHT
+   ============================================================================ */
+
+/* Current line highlight - subtle background, no border (VS Code spec) */
+.monaco-editor .current-line {
+  background: rgba(255, 255, 255, 0.04);
+  border: none;
+}
+
+/* Content area highlight */
+.monaco-editor .view-overlays .current-line {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: none;
+}
+
+/* Margin area highlight */
+.monaco-editor .margin-view-overlays .current-line {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+/* Remove right border when both areas highlighted */
+.monaco-editor .margin-view-overlays .current-line.current-line-margin.current-line-margin-both {
+  border-right: 0;
+}
+
+/* ============================================================================
+   8. GLYPH MARGIN (Breakpoints, Folding)
+   ============================================================================ */
+
+.monaco-editor .glyph-margin {
+  position: absolute;
+  top: 0;
+}
+
+/* Glyph margin widget container */
+.monaco-editor .glyph-margin-widgets .cgmr {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Spinning icon fix - prevents wobble */
+.monaco-editor .glyph-margin-widgets .cgmr.codicon-modifier-spin::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ============================================================================
+   9. INDENT GUIDES
+   ============================================================================ */
+
+.monaco-editor .lines-content .core-guide {
+  position: absolute;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+/* ============================================================================
+   10. RULERS (Vertical guides at specified columns)
+   ============================================================================ */
+
+.monaco-editor .view-ruler {
+  position: absolute;
+  top: 0;
+  box-shadow: 1px 0 0 0 var(--vscode-editorRuler-foreground, rgba(90, 193, 254, 0.15)) inset;
+}
+
+/* ============================================================================
+   11. WHITESPACE RENDERING
+   ============================================================================ */
+
+.monaco-editor .mwh {
+  position: absolute;
+  color: var(--vscode-editorWhitespace-foreground, var(--cortex-text-disabled)) !important;
+}
+
+.monaco-editor .mtkw {
+  color: var(--vscode-editorWhitespace-foreground, var(--cortex-text-disabled)) !important;
+}
+
+.monaco-editor .mtkz {
+  display: inline-block;
+  color: var(--vscode-editorWhitespace-foreground, var(--cortex-text-disabled)) !important;
+}
+
+/* ============================================================================
+   12. SCROLL DECORATION (Top shadow when scrolled)
+   ============================================================================ */
+
+.monaco-editor .scroll-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  box-shadow: var(--vscode-scrollbar-shadow, rgba(0, 0, 0, 0.35)) 0 6px 6px -6px inset;
+}
+
+/* ============================================================================
+   13. OVERLAY WIDGETS
+   ============================================================================ */
+
+.monaco-editor .overlayWidgets {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* ============================================================================
+   14. BLOCK DECORATIONS
+   ============================================================================ */
+
+.monaco-editor .blockDecorations-container {
+  position: absolute;
+  top: 0;
+  pointer-events: none;
+}
+
+.monaco-editor .blockDecorations-block {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+/* ============================================================================
+   15. VIEW LINES
+   ============================================================================ */
+
+.monaco-editor .view-lines {
+  white-space: nowrap;
+}
+
+.monaco-editor .view-line {
+  box-sizing: border-box;
+  position: absolute;
+  width: 100%;
+}
+
+.monaco-editor .lines-content > .view-lines > .view-line > span {
+  top: 0;
+  bottom: 0;
+  position: absolute;
+}
+
+/* ============================================================================
+   16. OVERFLOW GUARD (Viewport container)
+   ============================================================================ */
+
+.monaco-editor .overflow-guard {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ============================================================================
+   17. TOKEN SPECIAL CHARACTERS
+   ============================================================================ */
+
+/* Control characters - red background */
+.monaco-editor .mtkcontrol {
+  color: rgb(255, 255, 255) !important;
+  background: rgb(150, 0, 0) !important;
+}
+
+/* Overflow indicator button */
+.monaco-editor .mtkoverflow {
+  background-color: var(--vscode-button-background, var(--cortex-surface-raised));
+  color: var(--vscode-button-foreground, var(--cortex-text-primary));
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--vscode-contrastBorder, var(--cortex-border-base));
+  border-radius: 2px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.monaco-editor .mtkoverflow:hover {
+  background-color: var(--vscode-button-hoverBackground, var(--cortex-surface-hover));
+}
+
+/* ============================================================================
+   18. USER SELECTION BEHAVIOR
+   ============================================================================ */
+
+.monaco-editor.no-user-select .lines-content,
+.monaco-editor.no-user-select .view-line,
+.monaco-editor.no-user-select .view-lines {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.monaco-editor.enable-user-select {
+  user-select: initial;
+  -webkit-user-select: initial;
+}
+
+/* macOS Lookup feature support */
+.monaco-editor.mac .lines-content:hover,
+.monaco-editor.mac .view-line:hover,
+.monaco-editor.mac .view-lines:hover {
+  user-select: text;
+  -webkit-user-select: text;
+  -ms-user-select: text;
+}
+
+/* ============================================================================
+   19. GPU MARK (Debug indicator)
+   ============================================================================ */
+
+.monaco-editor .margin-view-overlays .gpu-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: inline-block;
+  border-left: solid 2px var(--vscode-editorWarning-foreground, var(--cortex-warning));
+  opacity: 0.2;
+  transition: background-color 0.1s linear;
+}
+
+.monaco-editor .margin-view-overlays .gpu-mark:hover {
+  background-color: var(--vscode-editorWarning-foreground, var(--cortex-warning));
+}
+
+/* ============================================================================
+   20. RANGE AND SYMBOL HIGHLIGHTS
+   ============================================================================ */
+
+/* Range highlight */
+.monaco-editor .rangeHighlight {
+  background-color: var(--vscode-editor-rangeHighlightBackground, rgba(90, 193, 254, 0.07));
+  border: 1px solid var(--vscode-editor-rangeHighlightBorder, transparent);
+}
+
+/* High contrast range highlight */
+.monaco-editor.hc-black .rangeHighlight,
+.monaco-editor.hc-light .rangeHighlight {
+  border-style: dotted;
+}
+
+/* Symbol highlight */
+.monaco-editor .symbolHighlight {
+  background-color: var(--vscode-editor-symbolHighlightBackground, rgba(90, 193, 254, 0.15));
+  border: 1px solid var(--vscode-editor-symbolHighlightBorder, transparent);
+}
+
+/* High contrast symbol highlight */
+.monaco-editor.hc-black .symbolHighlight,
+.monaco-editor.hc-light .symbolHighlight {
+  border-style: dotted;
+}
+
+/* ============================================================================
+   21. LINES DECORATIONS
+   ============================================================================ */
+
+.monaco-editor .lines-decorations {
+  position: absolute;
+  top: 0;
+  background: white;
+}
+
+.monaco-editor .margin-view-overlays .cldr {
+  position: absolute;
+  height: 100%;
+}
+
+/* ============================================================================
+   22. MARGIN DECORATIONS
+   ============================================================================ */
+
+.monaco-editor .margin-view-overlays .cmdr {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================================================
+   23. VIEW OVERLAYS
+   ============================================================================ */
+
+.monaco-editor .view-overlays {
+  position: absolute;
+  top: 0;
+}
+
+.monaco-editor .view-overlays > div,
+.monaco-editor .margin-view-overlays > div {
+  position: absolute;
+  width: 100%;
+}
+
+/* ============================================================================
+   24. TEST COVERAGE DECORATIONS
+   ============================================================================ */
+
+/* Coverage glyph margin indicators */
+.monaco-editor .coverage-glyph-covered {
+  background-color: rgba(78, 201, 176, 0.3);
+  border-left: 2px solid var(--cortex-success);
+}
+
+.monaco-editor .coverage-glyph-uncovered {
+  background-color: rgba(241, 76, 76, 0.3);
+  border-left: 2px solid var(--cortex-error);
+}
+
+.monaco-editor .coverage-glyph-partial {
+  background-color: rgba(204, 167, 0, 0.3);
+  border-left: 2px solid var(--cortex-warning);
+}
+
+/* ============================================================================
+   25. EDITOR CONTAINER BASE STYLES
+   ============================================================================ */
+
+.monaco-editor {
+  position: relative;
+  overflow: visible;
+  -webkit-text-size-adjust: 100%;
+  color: var(--vscode-editor-foreground, var(--cortex-text-primary));
+  background-color: var(--vscode-editor-background, var(--cortex-bg-base));
+  overflow-wrap: initial;
+}
+
+.monaco-editor-background {
+  background-color: var(--vscode-editor-background, var(--cortex-bg-base));
+}
+
+/* Margin/gutter background */
+.monaco-editor .margin {
+  background-color: var(--vscode-editorGutter-background, var(--cortex-bg-base));
+}
+
+/* ============================================================================
+   26. GIT GUTTER DECORATIONS (QuickDiff)
+   ============================================================================ */
+
+/* Git gutter line decorations - shown in the lines decorations area (left of line numbers) */
+
+/* Added lines - Green bar */
+.monaco-editor .git-gutter-added {
+  background-color: var(--cortex-success);
+  width: 2px !important;
+  margin-left: 3px;
+}
+
+/* Modified lines - Blue bar */
+.monaco-editor .git-gutter-modified {
+  background-color: var(--cortex-info);
+  width: 2px !important;
+  margin-left: 3px;
+}
+
+/* Deleted lines - Red triangle indicator */
+.monaco-editor .git-gutter-deleted {
+  width: 0 !important;
+  height: 0 !important;
+  margin-left: 1px;
+  margin-top: -3px;
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+  border-bottom: 2px solid var(--cortex-error);
+  background-color: transparent;
+}
+
+/* Hover states for git gutter indicators */
+.monaco-editor .git-gutter-added:hover,
+.monaco-editor .git-gutter-modified:hover {
+  opacity: 0.8;
+}
+
+/* Clickable git gutter decorations */
+.monaco-editor .git-gutter-clickable {
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.monaco-editor .git-gutter-clickable:hover {
+  opacity: 1 !important;
+  transform: scaleX(1.5);
+}
+
+.monaco-editor .git-gutter-clickable:active {
+  transform: scaleX(2);
+}
+
+/* Overview ruler (scrollbar) colors - VS Code compatible variables */
+.monaco-editor .git-gutter-added-overview-ruler {
+  background-color: var(--vscode-editorOverviewRuler-addedForeground, var(--cortex-success));
+}
+
+.monaco-editor .git-gutter-modified-overview-ruler {
+  background-color: var(--vscode-editorOverviewRuler-modifiedForeground, var(--cortex-info));
+}
+
+.monaco-editor .git-gutter-deleted-overview-ruler {
+  background-color: var(--vscode-editorOverviewRuler-deletedForeground, var(--cortex-error));
+}
+
+/* ============================================================================
+   27. FIND WIDGET STYLING
+   ============================================================================ */
+
+/* Find widget - VS Code style with shadow and rounded corners */
+.monaco-editor .find-widget {
+  box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.36);
+  border-radius: 4px;
+}
+
+/* ============================================================================
+   28. FIND & REPLACE DECORATIONS (Custom FindReplaceWidget)
+   ============================================================================ */
+
+/* Match highlight decoration - golden background for found matches */
+.monaco-editor .find-match-decoration {
+  background-color: rgba(255, 215, 0, 0.3);
+}
+
+/* Current match decoration - brighter highlight for active match */
+.monaco-editor .find-current-match-decoration {
+  background-color: rgba(249, 230, 79, 0.5);
+}
+
+/* Inline match styling - subtle border around matches */
+.monaco-editor .find-match-inline {
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  border-radius: 2px;
+}
+
+/* Current match inline styling - prominent border with glow */
+.monaco-editor .find-current-inline {
+  border: 2px solid #F9E64F;
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(249, 230, 79, 0.5);
+}
+
+/* Match in overview ruler (scrollbar) */
+.monaco-editor .findMatch {
+  background-color: rgba(255, 215, 0, 0.4);
+}
+
+/* Current match in overview ruler */
+.monaco-editor .currentFindMatch {
+  background-color: #F9E64F;
+}
+
+/* High contrast theme adjustments */
+.monaco-editor.hc-black .find-match-inline,
+.monaco-editor.hc-light .find-match-inline {
+  border-width: 2px;
+  border-style: solid;
+}
+
+.monaco-editor.hc-black .find-current-inline,
+.monaco-editor.hc-light .find-current-inline {
+  border-width: 3px;
+  outline: 1px solid var(--cortex-accent);
+}
+
+/* Animation for match highlighting when navigating */
+@keyframes find-match-pulse {
+  0% { 
+    background-color: rgba(249, 230, 79, 0.8);
+    box-shadow: 0 0 8px rgba(249, 230, 79, 0.6);
+  }
+  100% { 
+    background-color: rgba(249, 230, 79, 0.5);
+    box-shadow: 0 0 4px rgba(249, 230, 79, 0.5);
+  }
+}
+
+.monaco-editor .find-current-match-decoration.animated {
+  animation: find-match-pulse 300ms ease-out;
+}

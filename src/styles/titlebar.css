@@ -1,0 +1,335 @@
+/* =============================================================================
+   TITLE BAR STYLES - VS Code Style Custom Title Bar
+   =============================================================================
+   
+   Custom title bar styling with:
+   - Draggable regions
+   - Window controls (minimize, maximize, close)
+   - Theme-aware colors
+   - Platform-specific adjustments (Windows, macOS, Linux)
+   - Focused/unfocused states
+   - Maximized state handling
+   
+   ============================================================================= */
+
+/* =============================================================================
+   SECTION 1: BASE TITLE BAR
+   ============================================================================= */
+
+.titlebar {
+  position: relative;
+  z-index: var(--cortex-z-titlebar);
+  flex-shrink: 0;
+  
+  /* Draggable by default */
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+/* Non-draggable elements within titlebar */
+.titlebar button,
+.titlebar input,
+.titlebar select,
+.titlebar a,
+.titlebar [data-no-drag],
+.titlebar-menu,
+.titlebar-menu-item,
+.titlebar-command-center button,
+.titlebar-workspace,
+.titlebar-layout-controls,
+.window-controls-container {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+/* =============================================================================
+   SECTION 2: WINDOW STATE STYLES
+   ============================================================================= */
+
+/* Unfocused state - subtle dimming */
+.titlebar[data-focused="false"] {
+  opacity: 0.85;
+}
+
+.titlebar[data-focused="false"] .titlebar-menu-item,
+.titlebar[data-focused="false"] .command-center-button,
+.titlebar[data-focused="false"] .titlebar-workspace {
+  opacity: 0.7;
+}
+
+/* Fullscreen state - hide title bar */
+:root[data-fullscreen="true"] .titlebar {
+  display: none;
+}
+
+/* =============================================================================
+   SECTION 3: MENU BAR STYLES
+   ============================================================================= */
+
+.titlebar-menu {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.titlebar-menu-item {
+  position: relative;
+  white-space: nowrap;
+}
+
+.titlebar-menu-item:focus-visible {
+  outline: 1px solid var(--jb-border-focus);
+  outline-offset: -1px;
+}
+
+/* Menu item active state */
+.titlebar-menu-item[aria-expanded="true"] {
+  background: var(--jb-surface-hover);
+  color: var(--jb-text-body-color);
+}
+
+/* =============================================================================
+   SECTION 4: COMMAND CENTER
+   ============================================================================= */
+
+.titlebar-command-center {
+  /* Center-positioned */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.command-center-button {
+  pointer-events: auto;
+}
+
+.command-center-button:focus-visible {
+  outline: 1px solid var(--jb-border-focus);
+  outline-offset: 1px;
+}
+
+/* Command center hover animation */
+.command-center-button:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* =============================================================================
+   SECTION 5: WINDOW CONTROLS
+   ============================================================================= */
+
+.window-controls-container {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+.window-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 100ms ease, color 100ms ease;
+}
+
+.window-control:focus-visible {
+  outline: 1px solid var(--jb-border-focus);
+  outline-offset: -1px;
+}
+
+/* Close button hover - red background */
+.window-close:hover {
+  background: var(--cortex-error) !important;
+  color: #ffffff !important;
+}
+
+/* =============================================================================
+   SECTION 6: PLATFORM-SPECIFIC STYLES
+   ============================================================================= */
+
+/* Windows */
+[data-platform="win32"] .titlebar {
+  /* Windows uses right-aligned controls */
+}
+
+[data-platform="win32"] .window-controls-container {
+  /* Width for 3 buttons at 46px each */
+  width: calc(138px / var(--zoom-factor, 1));
+}
+
+/* macOS */
+[data-platform="darwin"] .titlebar {
+  /* macOS traffic light controls on left */
+  flex-direction: row-reverse;
+}
+
+[data-platform="darwin"] .window-controls-container {
+  /* Native controls - we might hide these on macOS */
+  display: none;
+}
+
+[data-platform="darwin"]:not([data-fullscreen="true"]) .titlebar {
+  /* Leave space for traffic lights */
+  padding-left: 78px;
+}
+
+/* macOS Tahoe (macOS 26+) has larger corner radius */
+[data-platform="darwin"][data-os-version="tahoe"]:not([data-fullscreen="true"]) .titlebar {
+  padding-left: 82px;
+}
+
+/* Linux */
+[data-platform="linux"] .titlebar {
+  /* Linux follows Windows conventions */
+}
+
+[data-platform="linux"] .window-controls-container {
+  width: calc(138px / var(--zoom-factor, 1));
+}
+
+/* =============================================================================
+   SECTION 7: WORKSPACE INDICATOR
+   ============================================================================= */
+
+.titlebar-workspace {
+  user-select: none;
+}
+
+.titlebar-workspace:hover {
+  background: var(--jb-surface-hover);
+}
+
+/* =============================================================================
+   SECTION 8: LAYOUT CONTROLS
+   ============================================================================= */
+
+.titlebar-layout-controls:focus-visible {
+  outline: 1px solid var(--jb-border-focus);
+  outline-offset: -1px;
+}
+
+/* =============================================================================
+   SECTION 9: TITLE BAR ICON
+   ============================================================================= */
+
+.titlebar-icon {
+  flex-shrink: 0;
+  cursor: default;
+}
+
+.titlebar-icon:hover svg {
+  transform: scale(1.1);
+  transition: transform 150ms ease;
+}
+
+/* =============================================================================
+   SECTION 10: ANIMATIONS
+   ============================================================================= */
+
+@keyframes titlebar-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.titlebar {
+  animation: titlebar-fade-in 200ms ease-out;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .titlebar {
+    animation: none;
+  }
+  
+  .titlebar-icon:hover svg {
+    transform: none;
+  }
+}
+
+/* =============================================================================
+   SECTION 11: COMPACT MENU BAR (compact visibility setting)
+   ============================================================================= */
+
+.titlebar-menu[data-compact="true"] .titlebar-menu-item {
+  padding: 0 6px;
+  font-size: 11px;
+}
+
+/* =============================================================================
+   SECTION 12: HIDDEN MENU BAR (toggle/hidden visibility settings)
+   ============================================================================= */
+
+.titlebar[data-menu-visibility="hidden"] .titlebar-menu,
+.titlebar[data-menu-visibility="toggle"] .titlebar-menu:not([data-visible="true"]) {
+  display: none;
+}
+
+/* Show menu on Alt key (toggle mode) */
+.titlebar[data-menu-visibility="toggle"] .titlebar-menu[data-visible="true"] {
+  display: flex;
+  animation: titlebar-fade-in 150ms ease-out;
+}
+
+/* =============================================================================
+   SECTION 13: MAXIMIZED STATE ADJUSTMENTS
+   ============================================================================= */
+
+:root[data-maximized="true"] .titlebar {
+  /* Slightly reduce padding when maximized */
+  border-radius: 0;
+}
+
+/* Hide resize handles when maximized */
+:root[data-maximized="true"] .window-resizer {
+  display: none;
+  pointer-events: none;
+}
+
+/* =============================================================================
+   SECTION 14: HIGH CONTRAST MODE
+   ============================================================================= */
+
+@media (prefers-contrast: high) {
+  .titlebar {
+    border-bottom-width: 2px;
+  }
+  
+  .titlebar-menu-item:focus-visible,
+  .command-center-button:focus-visible,
+  .window-control:focus-visible {
+    outline-width: 2px;
+  }
+  
+  .window-close:hover {
+    background: #dc2626 !important;
+  }
+}
+
+/* =============================================================================
+   SECTION 15: DARK/LIGHT THEME OVERRIDES
+   ============================================================================= */
+
+[data-theme="light"] .titlebar {
+  background: var(--jb-panel);
+  border-bottom-color: var(--jb-border-default);
+}
+
+[data-theme="light"] .command-center-button {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .command-center-button:hover {
+  background: rgba(0, 0, 0, 0.07);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .window-control:hover:not(.window-close) {
+  background: rgba(0, 0, 0, 0.08);
+}

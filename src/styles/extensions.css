@@ -1,0 +1,1144 @@
+/**
+ * Extensions UI Styles - VS Code Specifications
+ * Based on VS Code extensionActions.css and extensionsWidgets.css
+ */
+
+/* ==========================================================================
+   1. CSS Custom Properties / Design Tokens (17 color variables)
+   ========================================================================== */
+
+:root {
+  /* Extension Button Colors */
+  --vscode-extensionButton-background: var(--jb-btn-primary-bg);
+  --vscode-extensionButton-foreground: var(--jb-btn-primary-color);
+  --vscode-extensionButton-hoverBackground: var(--jb-btn-primary-bg);
+  --vscode-extensionButton-separator: rgba(255, 255, 255, 0.4);
+  --vscode-extensionButton-prominentBackground: var(--jb-btn-primary-bg);
+  --vscode-extensionButton-prominentForeground: var(--jb-btn-primary-color);
+  --vscode-extensionButton-prominentHoverBackground: var(--jb-btn-primary-bg);
+
+  /* Extension Icon Colors */
+  --vscode-extensionIcon-preReleaseForeground: #1d9271;
+  --vscode-extensionIcon-verifiedForeground: var(--jb-btn-primary-bg);
+
+  /* Status Colors */
+  --vscode-editorError-foreground: #f14c4c;
+  --vscode-editorWarning-foreground: #cca700;
+  --vscode-editorInfo-foreground: #3794ff;
+
+  /* Text Colors */
+  --vscode-descriptionForeground: #8e8e90;
+  --vscode-disabledForeground: #6b6b6b;
+  --vscode-textLink-foreground: #3794ff;
+  --vscode-textLink-activeForeground: #3794ff;
+  --vscode-foreground: #cccccc;
+
+  /* Panel Colors */
+  --vscode-panelSection-border: #2d2d2d;
+  --vscode-panelTitle-inactiveForeground: #8e8e90;
+  --vscode-panelTitle-activeForeground: #e7e7e7;
+  --vscode-panelTitle-activeBorder: var(--jb-btn-primary-bg);
+
+  /* UI Element Colors */
+  --vscode-toolbar-hoverBackground: rgba(90, 93, 94, 0.31);
+  --vscode-toolbar-hoverOutline: transparent;
+  --vscode-button-border: transparent;
+  --vscode-contrastBorder: transparent;
+  --vscode-editor-background: var(--jb-canvas);
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] {
+  --vscode-extensionButton-background: var(--jb-btn-primary-bg);
+  --vscode-extensionButton-foreground: var(--jb-btn-primary-color);
+  --vscode-extensionButton-hoverBackground: var(--jb-btn-primary-bg);
+  --vscode-extensionButton-prominentBackground: var(--jb-btn-primary-bg);
+  --vscode-extensionButton-prominentForeground: var(--jb-btn-primary-color);
+}
+
+/* Light theme adjustments */
+[data-theme="light"] {
+  --vscode-extensionButton-background: var(--jb-btn-primary-bg);
+  --vscode-extensionButton-foreground: var(--jb-btn-primary-color);
+  --vscode-extensionButton-hoverBackground: var(--jb-btn-primary-bg);
+  --vscode-descriptionForeground: #717171;
+  --vscode-foreground: #3b3b3b;
+}
+
+/* High contrast theme */
+[data-theme="hc-black"] {
+  --vscode-extensionButton-separator: var(--vscode-button-border);
+  --vscode-contrastBorder: var(--jb-border-focus);
+}
+
+/* ==========================================================================
+   2. Extension List Item Base Styles
+   ========================================================================== */
+
+.extension-list-item {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 0 0 0 16px;
+  overflow: hidden;
+  display: flex;
+}
+
+.extension-list-item > .icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Default icon dimensions */
+.extension-list-item > .icon-container > .icon {
+  width: 42px;
+  height: 42px;
+  padding-right: 14px;
+}
+
+/* Narrow view icon dimensions */
+.extensions-viewlet.narrow .extension-list-item > .icon-container > .icon {
+  width: 24px;
+  height: 24px;
+  padding-right: 8px;
+}
+
+/* Extension editor icon dimensions */
+.extension-editor .icon-container > .icon {
+  width: 128px;
+  height: 128px;
+}
+
+/* ==========================================================================
+   3. Extension Badge Styling
+   ========================================================================== */
+
+.extension-badge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--jb-radius-lg, 8px);
+}
+
+/* Badge in list view */
+.extension-list-item .extension-badge {
+  bottom: 10px;
+  left: -8px;
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
+}
+
+/* Badge in editor view */
+.extension-editor .extension-badge {
+  top: 88px;
+  right: 0;
+  width: 38px;
+  height: 38px;
+  line-height: 38px;
+}
+
+/* ==========================================================================
+   4. Rating Stars Widget - VS Code Specifications
+   ========================================================================== */
+
+.extension-ratings {
+  display: inline-block;
+}
+
+.extension-ratings.small {
+  font-size: 80%;
+}
+
+/* Star spacing: 3px margin-left between stars */
+.extension-ratings > .star:not(:first-child),
+.extension-ratings > .codicon[class*='codicon-extensions-rating']:not(:first-child) {
+  margin-left: 3px;
+}
+
+/* Rating count spacing */
+.extension-ratings > .count {
+  margin-left: 6px;
+}
+
+.extension-ratings.small > .count {
+  margin-left: 0;
+}
+
+/* Empty star opacity: 0.75 */
+.extension-ratings .star-empty,
+.extension-ratings .codicon-extensions-star-empty {
+  opacity: 0.75;
+}
+
+/* Rating display in list items */
+.extension-list-item .extension-ratings {
+  display: flex;
+  align-items: center;
+  text-align: right;
+}
+
+/* Rating display in editor (small variant) */
+.extension-editor .extension-ratings {
+  font-size: var(--jb-text-muted-size, 11px);
+}
+
+/* ==========================================================================
+   5. Extension Action Buttons - VS Code Specifications
+   ========================================================================== */
+
+/* Base extension action button */
+.monaco-action-bar .action-item .action-label.extension-action {
+  line-height: initial;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.monaco-action-bar .action-item > .action-label.extension-action.label,
+.monaco-action-bar .action-dropdown-item > .action-label.extension-action.label {
+  padding: 0 5px;
+}
+
+/* Text/Label actions: line-height 14px for list */
+.monaco-action-bar .action-item .action-label.extension-action.text,
+.monaco-action-bar .action-item .action-label.extension-action.label,
+.monaco-action-bar .action-dropdown-item .action-label.extension-action.label {
+  width: auto;
+  height: auto;
+  line-height: 14px;
+}
+
+/* Button background colors */
+.monaco-action-bar .action-item .action-label.extension-action.label,
+.monaco-action-bar .action-item.action-dropdown-item > .action-dropdown-item-separator {
+  background-color: var(--vscode-extensionButton-background);
+  border: 1px solid var(--vscode-button-border, transparent);
+}
+
+/* Button text color */
+.monaco-action-bar .action-item .action-label.extension-action.label {
+  color: var(--vscode-extensionButton-foreground);
+}
+
+/* Button hover state */
+.monaco-action-bar .action-item:not(.disabled) .action-label.extension-action.label:hover {
+  background-color: var(--vscode-extensionButton-hoverBackground);
+}
+
+/* ==========================================================================
+   6. Prominent Button Variant
+   ========================================================================== */
+
+.monaco-action-bar .action-item .action-label.extension-action.label.prominent,
+.monaco-action-bar .action-item.action-dropdown-item > .action-dropdown-item-separator.prominent {
+  background-color: var(--vscode-extensionButton-prominentBackground);
+}
+
+.monaco-action-bar .action-item .action-label.extension-action.label.prominent {
+  color: var(--vscode-extensionButton-prominentForeground) !important;
+}
+
+.monaco-action-bar .action-item:not(.disabled) .action-label.extension-action.label.prominent:hover {
+  background-color: var(--vscode-extensionButton-prominentHoverBackground);
+}
+
+/* ==========================================================================
+   7. Button Shapes & Border Radius (2px)
+   ========================================================================== */
+
+/* Single install button: 4px border-radius */
+.extension-list-item .monaco-action-bar > .actions-container > .action-item.action-dropdown-item.empty > .extension-action,
+.extension-action-button {
+  border-radius: var(--jb-radius-sm, 4px);
+}
+
+/* Split install button (dropdown) - left part */
+.extension-list-item .monaco-action-bar > .actions-container > .action-item.action-dropdown-item:not(.empty) > .extension-action.label:not(.dropdown) {
+  border-radius: var(--jb-radius-sm, 4px) 0 0 var(--jb-radius-sm, 4px);
+}
+
+/* Split install button (dropdown) - right dropdown */
+.extension-list-item .monaco-action-bar > .actions-container > .action-item.action-dropdown-item > .monaco-dropdown .extension-action {
+  border-radius: 0 var(--jb-radius-sm, 4px) var(--jb-radius-sm, 4px) 0;
+}
+
+/* ==========================================================================
+   8. Split Button Separator Styling
+   ========================================================================== */
+
+.monaco-action-bar .action-item.action-dropdown-item > .action-dropdown-item-separator > div,
+.extension-split-button-separator {
+  background-color: var(--vscode-extensionButton-separator);
+}
+
+/* High contrast separator */
+.vscode-high-contrast .monaco-action-bar .action-item.action-dropdown-item > .action-dropdown-item-separator > div {
+  background-color: var(--vscode-button-border);
+}
+
+/* Separator dimensions for extension editor: 22px outer, 16px inner */
+.extension-editor > .header > .details > .actions-status-container > .monaco-action-bar > .actions-container > .action-item.action-dropdown-item > .action-dropdown-item-separator,
+.extension-editor .extension-split-button-separator-outer {
+  height: 22px;
+}
+
+.extension-editor > .header > .details > .actions-status-container > .monaco-action-bar > .actions-container > .action-item.action-dropdown-item > .action-dropdown-item-separator > div,
+.extension-editor .extension-split-button-separator-inner {
+  height: 16px;
+}
+
+/* Separator dimensions for list item: 16px outer with 2px margin-top, 10px inner */
+.extension-list-item .monaco-action-bar > .actions-container > .action-item.action-dropdown-item > .action-dropdown-item-separator,
+.extension-list-item .extension-split-button-separator-outer {
+  height: 16px;
+  margin-top: 2px;
+}
+
+.extension-list-item .monaco-action-bar > .actions-container > .action-item.action-dropdown-item > .action-dropdown-item-separator > div,
+.extension-list-item .extension-split-button-separator-inner {
+  height: 10px;
+}
+
+/* ==========================================================================
+   9. Disabled State
+   ========================================================================== */
+
+.monaco-action-bar .action-item.disabled .action-label.extension-action.label,
+.extension-action-button:disabled {
+  opacity: 0.4 !important;
+}
+
+.monaco-action-bar .action-item.disabled .action-label.extension-action {
+  opacity: 1;
+}
+
+.monaco-action-bar .action-item.disabled .action-label.extension-action.text {
+  opacity: 0.9;
+  font-style: italic;
+}
+
+/* ==========================================================================
+   10. Action Button Sizing & Max-Widths
+   ========================================================================== */
+
+/* List item actions: max-width 150px, line-height 16px */
+.extension-list-item > .details > .footer > .monaco-action-bar > .actions-container .extension-action.label,
+.extension-list-item .extension-action-button {
+  max-width: 150px;
+  line-height: 16px;
+}
+
+.extension-list-item .monaco-action-bar > .actions-container > .action-item.action-dropdown-item,
+.extension-list-item .monaco-action-bar > .actions-container > .action-item:not(.action-dropdown-item) > .extension-action {
+  margin-left: 6px;
+}
+
+/* Narrow view: max-width 100px */
+.extensions-viewlet.narrow > .extensions .extension-list-item > .details > .footer > .monaco-action-bar > .actions-container .extension-action,
+.extensions-viewlet.narrow .extension-action-button {
+  max-width: 100px;
+}
+
+/* Extension editor actions: max-width 300px, font-weight 600, line-height 22px */
+.extension-editor > .header > .details > .actions-status-container > .monaco-action-bar > .actions-container > .action-item > .extension-action.label,
+.extension-editor > .header > .details > .actions-status-container > .monaco-action-bar > .actions-container > .action-item.action-dropdown-item .extension-action.label,
+.extension-editor .extension-action-button {
+  font-weight: 600;
+  max-width: 300px;
+}
+
+.extension-editor > .header > .details > .actions-status-container > .monaco-action-bar > .actions-container > .action-item > .extension-action,
+.extension-editor > .header > .details > .actions-status-container > .monaco-action-bar > .actions-container > .action-item.action-dropdown-item > .monaco-dropdown .extension-action.action-dropdown,
+.extension-editor .extension-action-button {
+  line-height: 22px;
+}
+
+/* ==========================================================================
+   11. Responsive Breakpoints
+   ========================================================================== */
+
+/* Normal View - Full layout */
+.extensions-viewlet {
+  /* Default state - all elements visible */
+}
+
+/* Narrow View (.extensions-viewlet.narrow) */
+.extensions-viewlet.narrow .extension-list-item > .icon-container > .icon {
+  width: 24px;
+  height: 24px;
+  padding-right: 8px;
+}
+
+.extensions-viewlet.narrow .extension-badge {
+  display: none;
+}
+
+.extensions-viewlet.narrow .extension-action-button {
+  max-width: 100px;
+}
+
+/* Mini View (.extensions-viewlet.mini) */
+.extensions-viewlet.mini .extension-list-item > .icon-container {
+  display: none;
+}
+
+.extensions-viewlet.mini .extension-ratings {
+  display: none;
+}
+
+.extensions-viewlet.mini .extension-bookmark {
+  display: none;
+}
+
+/* Extension Editor Narrow Layout */
+.extension-editor > .body > .content > .details > .content-container {
+  margin: 0 auto;
+  max-width: 75%;
+}
+
+.extension-editor > .body > .content > .details > .additional-details-container {
+  width: 25%;
+  min-width: 175px;
+}
+
+.extension-editor > .body > .content > .details.narrow > .content-container {
+  margin: inherit;
+  max-width: inherit;
+  min-width: 0;
+}
+
+.extension-editor > .body > .content > .details.narrow > .additional-details-container {
+  display: none;
+}
+
+/* ==========================================================================
+   12. Header Styles
+   ========================================================================== */
+
+.extension-list-item > .details > .header-container {
+  height: 19px;
+  display: flex;
+  overflow: hidden;
+  padding-right: 11px;
+}
+
+.extension-list-item > .details > .header-container > .name {
+  font-weight: bold;
+  flex: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Deprecated state */
+.extension-list-item > .details > .header-container > .name.deprecated {
+  text-decoration: line-through;
+}
+
+/* ==========================================================================
+   13. Footer Styles
+   ========================================================================== */
+
+.extension-list-item > .details > .footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 7px;
+  height: 24px;
+  overflow: hidden;
+  align-items: center;
+}
+
+.extension-list-item > .details > .footer > .publisher-container {
+  flex: 1;
+  line-height: 24px;
+}
+
+.extension-list-item > .details > .footer > .publisher-container > .publisher-name {
+  font-size: 90%;
+  font-weight: 600;
+  color: var(--vscode-descriptionForeground);
+}
+
+/* ==========================================================================
+   14. Extension Editor Header
+   ========================================================================== */
+
+.extension-editor > .header > .details > .title {
+  display: flex;
+  align-items: center;
+}
+
+.extension-editor > .header > .details > .title > .name {
+  flex: 0;
+  font-size: 26px;
+  line-height: 30px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Version badge */
+.extension-editor > .header > .details > .title > .version {
+  margin-left: 10px;
+  user-select: text;
+  white-space: nowrap;
+}
+
+/* Pre-release badge */
+.extension-editor > .header > .details > .title > .pre-release {
+  margin-left: 10px;
+  padding: 0 4px;
+  border-radius: var(--jb-radius-sm, 4px);
+  background-color: var(--vscode-extensionIcon-preReleaseForeground);
+  color: var(--jb-btn-primary-color);
+  display: flex;
+  align-items: center;
+}
+
+.extension-editor > .header > .details > .title > .pre-release > .pre-release-text {
+  font-size: var(--jb-text-muted-size, 11px);
+  padding-left: 3px;
+}
+
+/* Preview badge */
+.extension-editor > .header > .details > .title > .preview {
+  background: rgb(214, 63, 38);
+  font-size: var(--jb-text-muted-size, 11px);
+  font-style: italic;
+  margin-left: 10px;
+  padding: 0 4px;
+  border-radius: var(--jb-radius-sm, 4px);
+  user-select: none;
+}
+
+/* Subtitle section */
+.extension-editor > .header > .details > .subtitle {
+  padding-top: 6px;
+  white-space: nowrap;
+  height: 20px;
+  line-height: 20px;
+}
+
+.extension-editor > .header > .details > .subtitle > .subtitle-entry:not(:empty):not(.last-non-empty) {
+  border-right: 1px solid rgba(128, 128, 128, 0.7);
+  margin-right: 14px;
+  padding-right: 14px;
+}
+
+/* ==========================================================================
+   15. Navbar / Tab Navigation
+   ========================================================================== */
+
+.extension-editor > .navbar {
+  height: 36px;
+  padding-left: 20px;
+  border-bottom: 1px solid var(--vscode-panelSection-border);
+}
+
+.extension-editor > .navbar > .tab {
+  font-size: var(--jb-text-muted-size, 11px);
+  line-height: 36px;
+}
+
+.extension-editor > .navbar > .tab.inactive {
+  color: var(--vscode-panelTitle-inactiveForeground);
+}
+
+.extension-editor > .navbar > .tab.active {
+  border-bottom: 1px solid var(--vscode-panelTitle-activeBorder);
+  color: var(--vscode-panelTitle-activeForeground);
+}
+
+.extension-editor > .navbar > .tab:hover {
+  color: var(--vscode-panelTitle-activeForeground);
+}
+
+/* ==========================================================================
+   16. Bookmark Widget
+   ========================================================================== */
+
+.extension-bookmark {
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+}
+
+.extension-bookmark > .recommendation,
+.extension-bookmark > .pre-release {
+  border-right: 20px solid transparent;
+  border-top: 20px solid;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.extension-bookmark > .pre-release {
+  border-top-color: var(--vscode-extensionIcon-preReleaseForeground);
+  color: var(--jb-btn-primary-color);
+}
+
+.extension-bookmark > .recommendation {
+  border-top-color: var(--vscode-extensionButton-prominentBackground);
+  color: var(--vscode-extensionButton-prominentForeground);
+}
+
+.extension-bookmark > .recommendation > .codicon,
+.extension-bookmark > .pre-release > .codicon {
+  position: absolute;
+  bottom: 9px;
+  left: 1px;
+  color: inherit;
+  font-size: 80% !important;
+}
+
+/* High contrast bookmark override */
+.hc-black .extension-bookmark .recommendation,
+.hc-light .extension-bookmark .recommendation,
+.hc-black .extension-bookmark .pre-release,
+.hc-light .extension-bookmark .pre-release {
+  border-top-color: var(--vscode-contrastBorder);
+  color: var(--vscode-editor-background);
+}
+
+/* ==========================================================================
+   17. Verified Publisher Widget
+   ========================================================================== */
+
+.verified-publisher {
+  display: flex;
+  align-items: center;
+}
+
+.verified-publisher > .extension-verified-publisher-domain {
+  padding-left: 2px;
+  color: var(--vscode-extensionIcon-verifiedForeground);
+  text-decoration: var(--text-link-decoration);
+}
+
+/* ==========================================================================
+   18. List Item Interactions
+   ========================================================================== */
+
+.monaco-list-row.selected .extension-list-item > .details > .description {
+  color: unset;
+}
+
+.monaco-list-row.selected .extension-list-item > .details > .footer .publisher > .publisher-name {
+  color: unset;
+}
+
+.monaco-list-row.disabled:not(.selected) .extension-list-item {
+  color: var(--vscode-disabledForeground);
+}
+
+.monaco-workbench.vs .extensions-viewlet > .extensions .monaco-list-row.disabled:not(.selected) > .extension-list-item > .icon-container > .extension-icon .icon {
+  opacity: 0.5;
+}
+
+/* High contrast description color override */
+.hc-black .extension-list-item > .details > .description,
+.hc-light .extension-list-item > .details > .description {
+  color: unset;
+}
+
+/* ==========================================================================
+   19. Link Interactions
+   ========================================================================== */
+
+.extension-editor a {
+  color: var(--vscode-textLink-foreground);
+}
+
+.extension-editor a:hover {
+  text-decoration: underline;
+  color: var(--vscode-textLink-activeForeground);
+}
+
+.extension-editor a:active {
+  color: var(--vscode-textLink-activeForeground);
+}
+
+/* ==========================================================================
+   20. Table Row Interactions
+   ========================================================================== */
+
+.extension-editor table tr:nth-child(odd) {
+  background-color: rgba(130, 130, 130, 0.04);
+}
+
+.extension-editor table tr:not(:first-child):hover {
+  background-color: rgba(128, 128, 128, 0.15);
+}
+
+/* ==========================================================================
+   21. Extension Pack Grid View
+   ========================================================================== */
+
+.extension-editor .extensions-grid-view {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.extension-editor .extensions-grid-view > .extension-container {
+  width: 350px;
+  margin: 5px 10px;
+}
+
+.extension-editor .extensions-grid-view > .extension-container:focus > .extension-list-item > .details .header > .name,
+.extension-editor .extensions-grid-view > .extension-container:hover > .extension-list-item > .details .header > .name {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   22. Runtime Extensions Editor
+   ========================================================================== */
+
+.runtime-extensions-editor .monaco-list .monaco-list-rows > .monaco-list-row.odd:not(:hover):not(.focused) {
+  background-color: rgba(130, 130, 130, 0.08);
+}
+
+.runtime-extensions-editor .extension {
+  display: flex;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.runtime-extensions-editor .extension .desc {
+  flex: 1;
+  padding: 4px 0;
+}
+
+.runtime-extensions-editor .extension .time {
+  padding: 4px;
+  text-align: right;
+}
+
+.runtime-extensions-editor .extension .desc > .msg > span:not(:last-child)::after {
+  content: '\2022';
+  padding: 0 4px;
+  opacity: 0.8;
+}
+
+/* ==========================================================================
+   23. Loading States
+   ========================================================================== */
+
+@keyframes extension-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.extension-loading {
+  animation: extension-spin 1s linear infinite;
+}
+
+/* ==========================================================================
+   24. Category Badge
+   ========================================================================== */
+
+.extension-category-badge {
+  font-size: 90%;
+  border-radius: var(--jb-radius-sm, 4px);
+}
+
+/* ==========================================================================
+   25. Spacing Scale Reference (from VS Code)
+   ========================================================================== */
+/*
+  2px  - Margin for outlines, small gaps
+  3px  - Icon margin-left for stars
+  4px  - Padding general, search box padding
+  5px  - Message container padding
+  6px  - Margin between elements, install count margin
+  7px  - Footer padding-right
+  8px  - Narrow view icon padding
+  10px - Margin-left for version, padding for extension items
+  11px - Header padding-right
+  12px - Panel details padding, header search padding
+  14px - Icon padding-right, subtitle margin separators
+  16px - Extension list item padding-left, additional details padding
+  20px - Header padding-left, navbar padding-left
+*/
+
+/* ==========================================================================
+   26. VS Code Marketplace Component (Open VSX)
+   ========================================================================== */
+
+.vscode-marketplace {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-foreground);
+  overflow: hidden;
+}
+
+/* Marketplace Header */
+.vscode-marketplace .marketplace-header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--vscode-panelSection-border);
+}
+
+.vscode-marketplace .marketplace-header h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
+
+.vscode-marketplace .marketplace-header .subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+}
+
+/* Search Section */
+.vscode-marketplace .marketplace-search {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--vscode-panelSection-border);
+}
+
+.vscode-marketplace .search-input-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vscode-marketplace .search-input-wrapper .search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--vscode-descriptionForeground);
+  pointer-events: none;
+}
+
+.vscode-marketplace .search-input-wrapper input {
+  width: 100%;
+  padding: 6px 32px;
+  font-size: 13px;
+  background-color: var(--vscode-input-background, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--vscode-input-border, transparent);
+  border-radius: var(--jb-radius-sm, 4px);
+  color: var(--vscode-input-foreground, var(--vscode-foreground));
+  outline: none;
+}
+
+.vscode-marketplace .search-input-wrapper input:focus {
+  border-color: var(--vscode-focusBorder, var(--jb-border-focus));
+}
+
+.vscode-marketplace .search-input-wrapper input::placeholder {
+  color: var(--vscode-input-placeholderForeground, var(--vscode-descriptionForeground));
+}
+
+.vscode-marketplace .search-input-wrapper .clear-btn {
+  position: absolute;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--jb-radius-sm, 4px);
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+}
+
+.vscode-marketplace .search-input-wrapper .clear-btn:hover {
+  background-color: var(--vscode-toolbar-hoverBackground);
+  color: var(--vscode-foreground);
+}
+
+.vscode-marketplace .marketplace-search select {
+  padding: 6px 24px 6px 8px;
+  font-size: 13px;
+  background-color: var(--vscode-dropdown-background, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--vscode-dropdown-border, transparent);
+  border-radius: var(--jb-radius-sm, 4px);
+  color: var(--vscode-dropdown-foreground, var(--vscode-foreground));
+  cursor: pointer;
+  outline: none;
+}
+
+.vscode-marketplace .marketplace-search select:focus {
+  border-color: var(--vscode-focusBorder, var(--jb-border-focus));
+}
+
+.vscode-marketplace .search-btn {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  background-color: var(--vscode-extensionButton-background);
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: var(--jb-radius-sm, 4px);
+  color: var(--vscode-extensionButton-foreground);
+  cursor: pointer;
+}
+
+.vscode-marketplace .search-btn:hover {
+  background-color: var(--vscode-extensionButton-hoverBackground);
+}
+
+/* Tabs Section */
+.vscode-marketplace .marketplace-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--vscode-panelSection-border);
+}
+
+.vscode-marketplace .marketplace-tabs button {
+  padding: 10px 16px;
+  font-size: 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--vscode-panelTitle-inactiveForeground);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.vscode-marketplace .marketplace-tabs button:hover {
+  color: var(--vscode-panelTitle-activeForeground);
+}
+
+.vscode-marketplace .marketplace-tabs button.active {
+  color: var(--vscode-panelTitle-activeForeground);
+  border-bottom-color: var(--vscode-panelTitle-activeBorder);
+}
+
+/* Error Banner */
+.vscode-marketplace .error-banner {
+  padding: 10px 20px;
+  background-color: rgba(244, 76, 76, 0.15);
+  border-bottom: 1px solid var(--vscode-editorError-foreground);
+  color: var(--vscode-editorError-foreground);
+  font-size: 13px;
+}
+
+/* Extensions Grid */
+.vscode-marketplace .extensions-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 16px 20px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.vscode-marketplace .loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background-color: rgba(30, 30, 30, 0.8);
+  color: var(--vscode-foreground);
+  z-index: 10;
+}
+
+.vscode-marketplace .loading-overlay .spinner {
+  animation: extension-spin 1s linear infinite;
+}
+
+.vscode-marketplace .empty-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 20px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.vscode-marketplace .empty-state p {
+  margin: 0;
+  font-size: var(--jb-text-body-size, 14px);
+}
+
+/* Extension Card */
+.vscode-marketplace .extension-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background-color: var(--vscode-list-hoverBackground, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--vscode-panelSection-border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.vscode-marketplace .extension-card:hover {
+  background-color: var(--vscode-list-activeSelectionBackground, rgba(255, 255, 255, 0.08));
+  border-color: var(--vscode-focusBorder, var(--jb-border-focus));
+}
+
+.vscode-marketplace .extension-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.vscode-marketplace .extension-icon img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.vscode-marketplace .extension-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vscode-marketplace .extension-name {
+  margin: 0;
+  font-size: var(--jb-text-body-size, 14px);
+  font-weight: 600;
+  color: var(--vscode-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vscode-marketplace .extension-publisher {
+  margin: 0;
+  font-size: var(--jb-text-muted-size, 11px);
+  color: var(--vscode-descriptionForeground);
+}
+
+.vscode-marketplace .extension-description {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.vscode-marketplace .extension-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  font-size: var(--jb-text-muted-size, 11px);
+  color: var(--vscode-descriptionForeground);
+}
+
+.vscode-marketplace .extension-meta .downloads,
+.vscode-marketplace .extension-meta .rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vscode-marketplace .extension-meta .rating svg {
+  color: var(--vscode-editorWarning-foreground);
+}
+
+.vscode-marketplace .extension-meta .version {
+  color: var(--vscode-descriptionForeground);
+}
+
+/* Extension Actions */
+.vscode-marketplace .extension-actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.vscode-marketplace .install-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: var(--vscode-extensionButton-background);
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: var(--jb-radius-sm, 4px);
+  color: var(--vscode-extensionButton-foreground);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.vscode-marketplace .install-btn:hover:not(:disabled) {
+  background-color: var(--vscode-extensionButton-hoverBackground);
+}
+
+.vscode-marketplace .install-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.vscode-marketplace .install-btn .spinner {
+  animation: extension-spin 1s linear infinite;
+}
+
+.vscode-marketplace .installed-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  background-color: transparent;
+  border: 1px solid var(--vscode-extensionIcon-verifiedForeground);
+  border-radius: var(--jb-radius-sm, 4px);
+  color: var(--vscode-extensionIcon-verifiedForeground);
+  cursor: default;
+}
+
+.vscode-marketplace .uninstall-btn {
+  padding: 4px 12px;
+  font-size: var(--jb-text-muted-size, 11px);
+  background-color: transparent;
+  border: 1px solid var(--vscode-editorError-foreground);
+  border-radius: var(--jb-radius-sm, 4px);
+  color: var(--vscode-editorError-foreground);
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.vscode-marketplace .uninstall-btn:hover {
+  opacity: 1;
+  background-color: rgba(244, 76, 76, 0.15);
+}
+
+/* Load More Button */
+.vscode-marketplace .load-more-btn {
+  display: block;
+  margin: 0 20px 20px;
+  padding: 10px 20px;
+  font-size: 13px;
+  text-align: center;
+  background-color: var(--vscode-extensionButton-background);
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: var(--jb-radius-sm, 4px);
+  color: var(--vscode-extensionButton-foreground);
+  cursor: pointer;
+}
+
+.vscode-marketplace .load-more-btn:hover {
+  background-color: var(--vscode-extensionButton-hoverBackground);
+}

@@ -1,0 +1,62 @@
+/* =============================================================================
+   FEATURES (CONSOLIDATED) - Orion IDE Design System
+   =============================================================================
+   Consolidated from: tree.css, terminal.css, editor.css, editor-features.css,
+                      settings.css, debug.css, extensions.css, agent-panel.css
+   
+   This file imports all feature-specific styles. Each feature retains its
+   original file for maintainability, and this file serves as the single
+   import point.
+   
+   Contents:
+   - Tree (file explorer, list/tree components)
+   - Terminal (integrated terminal)
+   - Editor (Monaco editor core styling)
+   - Editor Features (find, suggest, hover, parameter hints, etc.)
+   - Settings (settings editor, keybindings)
+   - Debug (debug toolbar, breakpoints, call stack)
+   - Extensions (extension marketplace, actions)
+   - Agent Panel (AI chat, inline chat)
+   
+   Dependencies: design-tokens.css, base.css, layout.css
+   ============================================================================= */
+
+/* =============================================================================
+   TREE - File Explorer & List/Tree Components
+   ============================================================================= */
+@import './tree.css';
+
+/* =============================================================================
+   TERMINAL - Integrated Terminal
+   ============================================================================= */
+@import './terminal.css';
+
+/* =============================================================================
+   EDITOR - Monaco Editor Core Styling
+   ============================================================================= */
+@import './editor.css';
+
+/* =============================================================================
+   EDITOR FEATURES - Find, Suggest, Hover, etc.
+   ============================================================================= */
+@import './editor-features.css';
+
+/* =============================================================================
+   SETTINGS - Settings Editor & Keybindings
+   ============================================================================= */
+@import './settings.css';
+
+/* =============================================================================
+   DEBUG - Debug Toolbar, Breakpoints, Call Stack
+   ============================================================================= */
+@import './debug.css';
+
+/* =============================================================================
+   EXTENSIONS - Extension Marketplace & Actions
+   ============================================================================= */
+@import './extensions.css';
+
+/* =============================================================================
+   AGENT PANEL - AI Chat & Inline Chat
+   ============================================================================= */
+@import './agent-panel.css';

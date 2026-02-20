@@ -1,0 +1,1185 @@
+/**
+ * VS Code Debug UI Styles - Pixel-Perfect Implementation
+ * Based on VS Code debug UI analysis specifications
+ */
+
+/* ========================================
+   1. CSS Custom Properties / Design Tokens
+   ======================================== */
+
+:root {
+  /* Debug Toolbar Colors */
+  --debug-toolbar-background: #333333;
+  --debug-toolbar-border: transparent;
+
+  /* Debug Icon Colors */
+  --debug-icon-start-foreground: #89D185;
+  --debug-icon-pause-foreground: #75BEFF;
+  --debug-icon-stop-foreground: #F48771;
+  --debug-icon-disconnect-foreground: #F48771;
+  --debug-icon-restart-foreground: #89D185;
+  --debug-icon-step-over-foreground: #75BEFF;
+  --debug-icon-step-into-foreground: #75BEFF;
+  --debug-icon-step-out-foreground: #75BEFF;
+  --debug-icon-continue-foreground: #75BEFF;
+  --debug-icon-step-back-foreground: #75BEFF;
+
+  /* Breakpoint Icon Colors */
+  --debug-icon-breakpoint-foreground: #E51400;
+  --debug-icon-breakpoint-disabled-foreground: #848484;
+  --debug-icon-breakpoint-unverified-foreground: #848484;
+  --debug-icon-breakpoint-current-stackframe-foreground: #FFCC00;
+  --debug-icon-breakpoint-stackframe-foreground: #89D185;
+
+  /* Token Expression Colors (Dark Theme) */
+  --debug-token-expression-name: #c586c0;
+  --debug-token-expression-type: #4A90E2;
+  --debug-token-expression-value: #cccccc99;
+  --debug-token-expression-string: #ce9178;
+  --debug-token-expression-boolean: #4e94ce;
+  --debug-token-expression-number: #b5cea8;
+  --debug-token-expression-error: #f48771;
+
+  /* Debug View Labels */
+  --debug-view-exception-label-foreground: var(--text-base);
+  --debug-view-exception-label-background: #6C2022;
+  --debug-view-state-label-foreground: var(--text-base);
+  --debug-view-state-label-background: #88888844;
+  --debug-view-value-changed-highlight: #569CD6;
+
+  /* Debug Console Colors */
+  --debug-console-info-foreground: #75BEFF;
+  --debug-console-warning-foreground: #CCA700;
+  --debug-console-error-foreground: #F48771;
+  --debug-console-source-foreground: #808080;
+  --debug-console-input-icon-foreground: #569CD6;
+
+  /* Editor Highlight Colors */
+  --editor-stackframe-highlight-background: rgba(255, 255, 0, 0.2);
+  --editor-focused-stackframe-highlight-background: rgba(124, 252, 0, 0.2);
+  --editor-inline-values-background: rgba(255, 200, 0, 0.2);
+  --editor-inline-values-foreground: #dbb732;
+
+  /* Debug Hover */
+  --debug-hover-highlight-background: rgba(173, 214, 255, 0.15);
+
+  /* Notification Badge */
+  --debug-notification-badge: #CC6633;
+
+  /* List Filter Match */
+  --list-filter-match-background: rgba(234, 92, 0, 0.33);
+  --list-filter-match-border: rgba(234, 92, 0, 0.5);
+
+  /* Multi-frame Header */
+  --multi-diff-editor-header-background: var(--surface-raised);
+  --multi-diff-editor-border: var(--border-weak);
+
+  /* Monaco Monospace Font */
+  --monaco-monospace-font: "SF Mono", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", monospace;
+}
+
+/* Light Theme Overrides */
+[data-theme="light"] {
+  --debug-toolbar-background: #F3F3F3;
+  --debug-icon-start-foreground: #388A34;
+  --debug-icon-pause-foreground: #007ACC;
+  --debug-icon-stop-foreground: #A1260D;
+  --debug-icon-disconnect-foreground: #A1260D;
+  --debug-icon-restart-foreground: #388A34;
+  --debug-icon-step-over-foreground: #007ACC;
+  --debug-icon-step-into-foreground: #007ACC;
+  --debug-icon-step-out-foreground: #007ACC;
+  --debug-icon-continue-foreground: #007ACC;
+  --debug-icon-step-back-foreground: #007ACC;
+  --debug-icon-breakpoint-current-stackframe-foreground: #BE8700;
+  --debug-token-expression-name: #9b46b0;
+  --debug-token-expression-value: #6c6c6ccc;
+  --debug-token-expression-string: #a31515;
+  --debug-token-expression-boolean: #0000ff;
+  --debug-token-expression-number: #098658;
+  --debug-token-expression-error: #e51400;
+  --debug-view-exception-label-foreground: #FFF;
+  --debug-view-exception-label-background: #A31515;
+  --debug-hover-highlight-background: rgba(173, 214, 255, 0.15);
+}
+
+/* High Contrast Dark Theme */
+[data-theme="hc-dark"] {
+  --debug-toolbar-background: #09090b;
+  --debug-token-expression-name: var(--text-base);
+  --debug-token-expression-type: var(--text-base);
+  --debug-token-expression-value: var(--text-base);
+  --debug-token-expression-string: #f48771;
+  --debug-token-expression-boolean: #75bdfe;
+  --debug-token-expression-number: #89d185;
+  --debug-hover-highlight-background: rgba(38, 79, 120, 0.25);
+}
+
+/* High Contrast Light Theme */
+[data-theme="hc-light"] {
+  --debug-toolbar-background: #FFFFFF;
+  --debug-icon-start-foreground: #388A34;
+  --debug-icon-pause-foreground: #007ACC;
+  --debug-icon-stop-foreground: #A1260D;
+  --debug-icon-disconnect-foreground: #A1260D;
+  --debug-icon-restart-foreground: #388A34;
+  --debug-token-expression-string: #a31515;
+  --debug-token-expression-boolean: #0000ff;
+  --debug-token-expression-number: #098658;
+  --debug-token-expression-error: #e51400;
+}
+
+/* ========================================
+   2. Debug Toolbar Styles
+   ======================================== */
+
+.debug-toolbar {
+  position: absolute;
+  z-index: 2520;
+  height: 28px;
+  display: flex;
+  padding-left: 2px;
+  border-radius: 5px;
+  left: 0;
+  top: 0;
+  -webkit-app-region: no-drag;
+  background: var(--debug-toolbar-background);
+}
+
+.debug-toolbar.relative {
+  position: relative;
+}
+
+.debug-toolbar .action-item {
+  margin-right: 4px;
+}
+
+.debug-toolbar .select-container {
+  margin-right: 2px;
+}
+
+.debug-toolbar .action-label {
+  margin-right: 0;
+  background-size: 16px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.debug-toolbar .drag-area {
+  cursor: grab;
+  width: 20px;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.debug-toolbar .drag-area.dragged {
+  cursor: grabbing;
+}
+
+/* ========================================
+   3. Debug Pane & Viewlet Styles
+   ======================================== */
+
+.debug-pane {
+  height: 100%;
+}
+
+.debug-view-content {
+  height: 100%;
+}
+
+/* Notification Badge */
+.debug-action.notification:after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background-color: var(--debug-notification-badge);
+  position: absolute;
+  top: 10px;
+  right: 6px;
+  border-radius: 10px;
+  border: 1px solid white;
+}
+
+/* Start Debug Action Item */
+.start-debug-action-item {
+  display: flex;
+  align-items: center;
+  line-height: 20px;
+  flex-shrink: 1;
+}
+
+/* Platform-specific border radius */
+.platform-mac .start-debug-action-item {
+  border-radius: 5px;
+}
+
+.codicon-debug-start {
+  width: 18px;
+  height: 22px;
+  padding-left: 3px;
+  padding-right: 1px;
+}
+
+/* Disabled State */
+.disabled {
+  opacity: 0.65;
+  cursor: initial;
+}
+
+/* ========================================
+   4. Call Stack View Styles
+   ======================================== */
+
+.debug-call-stack .thread,
+.debug-call-stack .session,
+.debug-call-stack .stack-frame {
+  display: flex;
+  padding-right: 12px;
+}
+
+.debug-call-stack .thread,
+.debug-call-stack .session {
+  align-items: center;
+}
+
+.debug-call-stack .thread > .name,
+.debug-call-stack .session > .name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.debug-call-stack .thread > .state.label,
+.debug-call-stack .session > .state.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0 10px;
+  text-transform: uppercase;
+  align-self: center;
+  font-size: 0.8em;
+}
+
+.debug-call-stack .call-stack-state-message {
+  flex: 1;
+  text-align: right;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 0px 10px;
+}
+
+.debug-call-stack .call-stack-state-message > .label {
+  border-radius: 3px;
+  padding: 1px 2px;
+  font-size: 9px;
+}
+
+.debug-call-stack .stack-frame {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.debug-call-stack .stack-frame.label {
+  text-align: center;
+  font-style: italic;
+}
+
+.debug-call-stack .stack-frame .label {
+  flex: 1;
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+.debug-call-stack .stack-frame > .file {
+  display: flex;
+  overflow: hidden;
+  justify-content: flex-end;
+}
+
+.debug-call-stack .stack-frame > .file > .file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 0.8em;
+}
+
+.debug-call-stack .stack-frame > .file:not(:first-child) {
+  margin-left: 0.8em;
+}
+
+.debug-call-stack .load-all {
+  text-align: center;
+}
+
+.debug-call-stack .show-more {
+  opacity: 0.5;
+  text-align: center;
+}
+
+.debug-call-stack .error {
+  font-style: italic;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.debug-call-stack .session .codicon {
+  line-height: 22px;
+  margin-right: 2px;
+}
+
+/* ========================================
+   5. Variables & Watch View Styles
+   ======================================== */
+
+.debug-variables .scope {
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.debug-variables .expression .actionbar-spacer {
+  flex-grow: 1;
+}
+
+.debug-variables .expression .value {
+  height: 22px;
+  overflow: hidden;
+  white-space: pre;
+  text-overflow: ellipsis;
+}
+
+.debug-variables .expression .value.changed {
+  border-radius: 4px;
+}
+
+/* Watch Input Box */
+.debug-watch .monaco-inputbox {
+  font-family: var(--monaco-monospace-font);
+}
+
+.monaco-inputbox {
+  width: 100%;
+  line-height: normal;
+}
+
+.monaco-inputbox > .ibwrapper {
+  height: 19px;
+}
+
+.monaco-inputbox > .ibwrapper > .input {
+  padding: 0px;
+  color: initial;
+}
+
+/* Watch Expression Container */
+.watch-expression {
+  display: flex;
+}
+
+.watch-expression .expression {
+  flex: 1;
+}
+
+/* Error Display */
+.debug-variables .scope .error {
+  font-style: italic;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-family: var(--monaco-monospace-font);
+  font-weight: normal;
+}
+
+/* Filter Match Highlight */
+.debug-highlight {
+  color: unset !important;
+  background-color: var(--list-filter-match-background);
+  outline: 1px dotted var(--list-filter-match-border);
+  outline-offset: -1px;
+}
+
+/* ========================================
+   6. Breakpoints View Styles
+   ======================================== */
+
+.debug-breakpoints .monaco-list-row {
+  line-height: 22px;
+}
+
+.debug-breakpoints .breakpoint {
+  display: flex;
+  padding-right: 0.8em;
+  flex: 1;
+  align-items: center;
+  margin-left: -19px;
+}
+
+.debug-breakpoints .breakpoint-folder,
+.debug-breakpoints .exception {
+  margin-left: 0;
+}
+
+.debug-breakpoints .breakpoint > .codicon {
+  width: 19px;
+  height: 19px;
+  min-width: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.debug-breakpoints .breakpoint > .access-type,
+.debug-breakpoints .breakpoint > .file-path,
+.debug-breakpoints .breakpoint > .condition {
+  opacity: 0.7;
+  margin-left: 0.9em;
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.debug-breakpoints .breakpoint .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Breakpoint Warning Badge */
+.debug-breakpoints .pane-header .breakpoint-warning {
+  margin-left: 3px;
+}
+
+.debug-breakpoints .breakpoint-warning .monaco-icon-label .codicon {
+  display: flex;
+  align-items: center;
+}
+
+/* Line Number Badge */
+.debug-breakpoints .line-number {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* ========================================
+   7. Debug Hover Widget Styles
+   ======================================== */
+
+.debug-hover-widget {
+  position: absolute;
+  z-index: 50;
+  animation-duration: 0.15s;
+  animation-name: debugFadeIn;
+  user-select: text;
+  -webkit-user-select: text;
+  word-break: break-all;
+  white-space: pre;
+}
+
+.debug-hover-widget .complex-value {
+  max-width: 550px;
+}
+
+.debug-hover-widget .complex-value .title,
+.debug-hover-widget .complex-value .tip {
+  padding-left: 15px;
+  padding-right: 2px;
+  font-size: 11px;
+  line-height: 18px;
+  word-break: normal;
+  text-overflow: ellipsis;
+  height: 18px;
+  overflow: hidden;
+  white-space: pre;
+}
+
+.debug-hover-widget .complex-value .title {
+  border-bottom: 1px solid rgba(128, 128, 128, 0.35);
+}
+
+.debug-hover-widget .complex-value .tip {
+  border-top: 1px solid rgba(128, 128, 128, 0.35);
+  opacity: 0.5;
+}
+
+.debug-hover-tree {
+  line-height: 18px;
+  cursor: pointer;
+}
+
+.debug-hover-tree .monaco-list-row .monaco-tl-contents {
+  user-select: text;
+  -webkit-user-select: text;
+  white-space: pre;
+}
+
+.debug-hover-tree .monaco-list-row:hover:not(.highlighted):not(.selected):not(.focused) {
+  background-color: inherit;
+}
+
+.debug-hover-widget > .monaco-scrollable-element > .value {
+  color: rgba(108, 108, 108, 0.8);
+  overflow: auto;
+  font-family: var(--monaco-monospace-font);
+  max-height: 500px;
+  padding: 4px 5px;
+  white-space: pre-wrap;
+}
+
+/* Debug Hover Highlight in Editor */
+.debugHoverHighlight {
+  background-color: var(--debug-hover-highlight-background);
+}
+
+/* ========================================
+   8. Expression Display Styles
+   ======================================== */
+
+.monaco-list-row .expression {
+  display: flex;
+}
+
+.debug-pane .monaco-list-row .expression,
+.debug-hover-widget .monaco-list-row .expression {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--monaco-monospace-font);
+  white-space: pre;
+}
+
+/* Platform-specific font sizes */
+.platform-mac .debug-pane .monaco-list-row .expression,
+.platform-mac .debug-hover-widget .monaco-list-row .expression {
+  font-size: 11px;
+}
+
+.platform-windows .debug-pane .monaco-list-row .expression,
+.platform-linux .debug-pane .monaco-list-row .expression,
+.platform-windows .debug-hover-widget .monaco-list-row .expression,
+.platform-linux .debug-hover-widget .monaco-list-row .expression {
+  font-size: 13px;
+}
+
+/* Expression Value Margin */
+.monaco-list-row .expression .value {
+  margin-left: 6px;
+}
+
+/* Lazy Button */
+.monaco-list-row .expression .lazy-button {
+  margin-left: 3px;
+  display: none;
+  border-radius: 5px;
+  align-self: center;
+}
+
+.monaco-list-row .expression.lazy .lazy-button {
+  display: inline;
+}
+
+/* Links */
+.monaco-list-row .expression .value a.link:hover {
+  text-decoration: underline;
+}
+
+.monaco-list-row .expression .value a.link.pointer {
+  cursor: pointer;
+}
+
+/* Selected State */
+.monaco-list:focus .monaco-list-row.selected .expression .name,
+.monaco-list:focus .monaco-list-row.selected .expression .value {
+  color: inherit;
+}
+
+/* Variable Modifiers */
+.expression .name.virtual {
+  opacity: 0.5;
+}
+
+.expression .name.internal {
+  opacity: 0.5;
+}
+
+.expression .unavailable {
+  font-style: italic;
+}
+
+/* Inline Values */
+.debug-inline-value {
+  background-color: var(--editor-inline-values-background);
+  color: var(--editor-inline-values-foreground);
+}
+
+/* ========================================
+   9. Exception Widget Styles
+   ======================================== */
+
+.exception-widget-container {
+  overflow: hidden;
+}
+
+.zone-widget-container.exception-widget {
+  padding: 6px 10px;
+  white-space: pre-wrap;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.exception-widget .title {
+  display: flex;
+}
+
+.exception-widget .title .label {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.exception-widget .title .actions {
+  flex: 1;
+}
+
+.exception-widget .description,
+.exception-widget .stack-trace {
+  font-family: var(--monaco-monospace-font);
+}
+
+.exception-widget .stack-trace {
+  margin-top: 0.5em;
+}
+
+.exception-widget .stack-trace a {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Platform-specific font sizes */
+.platform-mac .exception-widget {
+  font-size: 11px;
+}
+
+.platform-windows .exception-widget,
+.platform-linux .exception-widget {
+  font-size: 13px;
+}
+
+/* ========================================
+   10. Breakpoint Widget Styles
+   ======================================== */
+
+.zone-widget-container.breakpoint-widget {
+  display: flex;
+  border-color: #007ACC;
+  background: var(--surface-base);
+}
+
+.breakpoint-select-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 10px;
+  flex-shrink: 0;
+}
+
+.breakpoint-select-container:after {
+  right: 14px;
+}
+
+.breakpoint-widget .monaco-select-box {
+  min-width: 100px;
+  min-height: 18px;
+  padding: 2px 20px 2px 8px;
+}
+
+.breakpoint-widget .inputContainer {
+  flex: 1;
+}
+
+.select-breakpoint-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-grow: 1;
+  width: 0;
+}
+
+.select-breakpoint-container .monaco-button {
+  padding-left: 8px;
+  padding-right: 8px;
+  line-height: 14px;
+  flex-grow: 0;
+  width: initial;
+}
+
+.select-breakpoint-container .select-box-container,
+.select-mode-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 300px;
+}
+
+.select-mode-container .select-box-container {
+  width: 100px;
+  margin-right: 10px;
+}
+
+/* ========================================
+   11. Stack Frame Line Highlighting
+   ======================================== */
+
+.debug-top-stack-frame-line {
+  background-color: var(--editor-stackframe-highlight-background);
+}
+
+.debug-focused-stack-frame-line {
+  background-color: var(--editor-focused-stackframe-highlight-background);
+}
+
+/* ========================================
+   12. Inline Breakpoint Widget
+   ======================================== */
+
+.codicon-debug-hint {
+  cursor: pointer;
+}
+
+.codicon-debug-hint:not([class*='codicon-debug-breakpoint']):not([class*='codicon-debug-stackframe']) {
+  opacity: 0.4 !important;
+}
+
+.inline-breakpoint-widget.codicon {
+  display: flex !important;
+  align-items: center;
+}
+
+.inline-breakpoint-widget.codicon-debug-breakpoint-disabled {
+  opacity: 0.7;
+}
+
+.inline-breakpoint-widget.line-start {
+  left: -8px !important;
+}
+
+/* Breakpoint Placeholder */
+.debug-breakpoint-placeholder {
+  width: 0.9em;
+  display: inline-flex;
+  vertical-align: middle;
+  margin-top: -1px;
+}
+
+/* ========================================
+   13. Top Stack Frame Column Marker
+   ======================================== */
+
+.debug-top-stack-frame-column {
+  font: normal normal normal 16px/1 codicon;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin-left: 0;
+  margin-right: 4px;
+  margin-top: -1px;
+  align-items: center;
+  width: 0.9em;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.debug-top-stack-frame-column.start-of-line {
+  position: absolute;
+  top: 50%;
+  transform: translate(-17px, -50%);
+  margin-top: 0px;
+}
+
+/* ========================================
+   14. Multi-Frame Call Stack Widget
+   ======================================== */
+
+.multiCallStackFrame .header {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  background: var(--multi-diff-editor-header-background);
+  border-top: 1px solid var(--multi-diff-editor-border);
+  color: var(--text-base);
+  padding: 0 5px;
+}
+
+.multiCallStackFrame .title {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multiCallStackFrame .title[role="link"] {
+  cursor: pointer;
+}
+
+.multiCallStackFrame .title .monaco-icon-label::before {
+  height: auto;
+}
+
+.multiCallStackFrame.collapsed .header {
+  border-bottom: 1px solid var(--multi-diff-editor-border);
+}
+
+.multiCallStackFrame.collapsed .editorParent {
+  display: none;
+}
+
+.multiCallStackFrame .collapse-button {
+  width: 16px;
+  min-height: 1px;
+  line-height: 0;
+}
+
+.multiCallStackFrame .collapse-button a {
+  cursor: pointer;
+}
+
+.multiCallStackFrame .actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 12px;
+}
+
+.multiCallStackWidget .multiCallStackFrameContainer {
+  background: none !important;
+}
+
+.call-stack-go-to-file-link {
+  text-decoration: underline;
+  cursor: pointer;
+  color: var(--accent) !important;
+}
+
+/* ========================================
+   15. Animations
+   ======================================== */
+
+/* Fade In Animation (Debug Hover) */
+@keyframes debugFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Value Changed Animation */
+@keyframes debugViewletValueChanged {
+  0% {
+    background-color: transparent;
+  }
+  5% {
+    background-color: rgba(86, 156, 214, 0.9);
+  }
+  100% {
+    background-color: rgba(86, 156, 214, 0.3);
+  }
+}
+
+.expression .value.changed {
+  animation-name: debugViewletValueChanged;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+/* Blink Animation (ANSI Codes) */
+@keyframes code-blink-key {
+  to {
+    opacity: 0.4;
+  }
+}
+
+.code-blink {
+  animation: code-blink-key 1s cubic-bezier(1, 0, 0, 1) infinite alternate;
+}
+
+.code-rapid-blink {
+  animation: code-blink-key 0.3s cubic-bezier(1, 0, 0, 1) infinite alternate;
+}
+
+/* ========================================
+   16. ANSI Code Text Decorations
+   ======================================== */
+
+.code-bold {
+  font-weight: bold;
+}
+
+.code-italic {
+  font-style: italic;
+}
+
+.code-underline {
+  text-decoration: underline;
+  text-decoration-style: solid;
+}
+
+.code-double-underline {
+  text-decoration: underline;
+  text-decoration-style: double;
+}
+
+.code-strike-through {
+  text-decoration: line-through;
+  text-decoration-style: solid;
+}
+
+.code-overline {
+  text-decoration: overline;
+  text-decoration-style: solid;
+}
+
+/* Combined Decorations */
+.code-overline.code-underline.code-strike-through {
+  text-decoration: overline underline line-through;
+}
+
+.code-overline.code-underline {
+  text-decoration: overline underline;
+}
+
+.code-overline.code-strike-through {
+  text-decoration: overline line-through;
+}
+
+.code-underline.code-strike-through {
+  text-decoration: underline line-through;
+}
+
+/* Double Underline Variants */
+.code-overline.code-double-underline.code-strike-through {
+  text-decoration: overline underline line-through;
+  text-decoration-style: double;
+}
+
+.code-overline.code-double-underline {
+  text-decoration: overline underline;
+  text-decoration-style: double;
+}
+
+.code-double-underline.code-strike-through {
+  text-decoration: underline line-through;
+  text-decoration-style: double;
+}
+
+/* Visibility Effects */
+.code-dim {
+  opacity: 0.4;
+}
+
+.code-hidden {
+  opacity: 0;
+}
+
+/* Script Positioning */
+.code-subscript {
+  vertical-align: sub;
+  font-size: smaller;
+  line-height: normal;
+}
+
+.code-superscript {
+  vertical-align: super;
+  font-size: smaller;
+  line-height: normal;
+}
+
+/* ========================================
+   17. Hover & Focus Interactions
+   ======================================== */
+
+/* List Row Hover */
+.debug-list-row:hover .state-label {
+  display: none;
+}
+
+.debug-list-row:hover .stack-frame.has-actions .file .line-number {
+  display: none;
+}
+
+.debug-list-row:hover .monaco-action-bar,
+.debug-list-row.focused .monaco-action-bar {
+  display: initial;
+}
+
+/* Lazy Button Hover */
+.lazy-button:hover {
+  background-color: var(--surface-raised);
+}
+
+/* ========================================
+   18. Breakpoint Icon Types & States
+   ======================================== */
+
+/* Standard Breakpoint */
+.breakpoint-icon-standard {
+  color: var(--debug-icon-breakpoint-foreground);
+}
+
+.breakpoint-icon-standard.disabled {
+  color: var(--debug-icon-breakpoint-disabled-foreground);
+}
+
+.breakpoint-icon-standard.unverified {
+  color: var(--debug-icon-breakpoint-unverified-foreground);
+}
+
+.breakpoint-icon-standard.pending {
+  color: var(--debug-icon-breakpoint-unverified-foreground);
+  opacity: 0.7;
+}
+
+/* Function Breakpoint */
+.breakpoint-icon-function {
+  color: var(--debug-icon-breakpoint-foreground);
+}
+
+.breakpoint-icon-function.disabled {
+  color: var(--debug-icon-breakpoint-disabled-foreground);
+}
+
+.breakpoint-icon-function.unverified {
+  color: var(--debug-icon-breakpoint-unverified-foreground);
+}
+
+.breakpoint-icon-function.pending {
+  color: var(--debug-icon-breakpoint-unverified-foreground);
+  opacity: 0.7;
+}
+
+/* Conditional Breakpoint */
+.breakpoint-icon-conditional {
+  color: #f59e0b;
+}
+
+.breakpoint-icon-conditional.disabled {
+  color: var(--debug-icon-breakpoint-disabled-foreground);
+}
+
+.breakpoint-icon-conditional.unverified {
+  color: var(--debug-icon-breakpoint-unverified-foreground);
+}
+
+.breakpoint-icon-conditional.pending {
+  color: var(--debug-icon-breakpoint-unverified-foreground);
+  opacity: 0.7;
+}
+
+/* Data Breakpoint */
+.breakpoint-icon-data {
+  color: #a855f7;
+}
+
+.breakpoint-icon-data.disabled {
+  color: var(--debug-icon-breakpoint-disabled-foreground);
+}
+
+.breakpoint-icon-data.unverified {
+  color: var(--debug-icon-breakpoint-unverified-foreground);
+}
+
+.breakpoint-icon-data.pending {
+  color: var(--debug-icon-breakpoint-unverified-foreground);
+  opacity: 0.7;
+}
+
+/* Log Breakpoint (Logpoint) */
+.breakpoint-icon-log {
+  color: #60a5fa;
+}
+
+.breakpoint-icon-log.disabled {
+  color: var(--debug-icon-breakpoint-disabled-foreground);
+}
+
+.breakpoint-icon-log.unverified {
+  color: var(--debug-icon-breakpoint-unverified-foreground);
+}
+
+.breakpoint-icon-log.pending {
+  color: var(--debug-icon-breakpoint-unverified-foreground);
+  opacity: 0.7;
+}
+
+/* ========================================
+   19. Debug Token Expression Value Colors
+   ======================================== */
+
+.debug-value-string {
+  color: var(--debug-token-expression-string);
+}
+
+.debug-value-number {
+  color: var(--debug-token-expression-number);
+}
+
+.debug-value-boolean {
+  color: var(--debug-token-expression-boolean);
+}
+
+.debug-value-null {
+  color: var(--debug-token-expression-value);
+}
+
+.debug-value-error {
+  color: var(--debug-token-expression-error);
+}
+
+.debug-value-function {
+  color: #dcdcaa;
+}
+
+.debug-value-type {
+  color: var(--debug-token-expression-type);
+}
+
+.debug-value-name {
+  color: var(--debug-token-expression-name);
+}
+
+/* ========================================
+   20. Debug Select Box
+   ======================================== */
+
+.debug-toolbar .monaco-select-box {
+  padding: 0 24px 0 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.start-debug-action-item .monaco-select-box {
+  border: none;
+  margin-top: 0px;
+  cursor: pointer;
+  line-height: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  min-width: 90px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.disabled .monaco-select-box {
+  opacity: 0.7;
+  font-style: italic;
+  cursor: initial;
+}
+
+/* Safari-specific fix */
+@supports (-webkit-touch-callout: none) {
+  .monaco-select-box {
+    margin-bottom: 0px;
+  }
+}

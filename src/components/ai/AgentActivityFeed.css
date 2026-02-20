@@ -1,0 +1,663 @@
+/* ============================================================================
+   AGENT ACTIVITY FEED - Real-time Agent Action Display
+   Matches VS Code / Orion dark theme conventions
+   ============================================================================ */
+
+/* ============================================================================
+   1. MAIN CONTAINER
+   ============================================================================ */
+
+.activity-feed {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 200px;
+  background: var(--surface-base, var(--cortex-bg-primary));
+  border: 1px solid var(--border-weak, rgba(255, 255, 255, 0.1));
+  border-radius: var(--cortex-radius-md);
+  overflow: hidden;
+  font-size: 13px;
+  color: var(--text-base, var(--cortex-text-primary));
+}
+
+.activity-feed--compact {
+  font-size: 12px;
+}
+
+.activity-feed--paused {
+  opacity: 0.8;
+}
+
+/* ============================================================================
+   2. HEADER
+   ============================================================================ */
+
+.activity-feed__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--surface-raised, var(--cortex-bg-hover));
+  border-bottom: 1px solid var(--border-weak, rgba(255, 255, 255, 0.1));
+  flex-shrink: 0;
+}
+
+.activity-feed__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-base, var(--cortex-text-primary));
+}
+
+.activity-feed__running-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  background: var(--accent, var(--cortex-info));
+  color: white;
+  border-radius: var(--cortex-radius-lg);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.activity-feed__controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.activity-feed__control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--cortex-radius-sm);
+  color: var(--text-weak, rgba(255, 255, 255, 0.6));
+  cursor: pointer;
+  transition: 
+    background-color 0.15s ease,
+    color 0.15s ease;
+  position: relative;
+}
+
+.activity-feed__control-btn:hover {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.08));
+  color: var(--text-base, var(--cortex-text-primary));
+}
+
+.activity-feed__control-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.activity-feed__control-btn--active {
+  background: var(--accent, var(--cortex-info));
+  color: white;
+}
+
+.activity-feed__control-btn--active:hover {
+  background: var(--accent-hover, var(--cortex-info));
+}
+
+.activity-feed__filter-indicator {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  background: var(--accent, var(--cortex-info));
+  border-radius: 50%;
+}
+
+/* ============================================================================
+   3. FILTER DROPDOWN
+   ============================================================================ */
+
+.activity-feed__filter-dropdown {
+  position: relative;
+}
+
+.activity-feed__dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  min-width: 160px;
+  padding: 4px;
+  background: var(--surface-raised, var(--cortex-bg-hover));
+  border: 1px solid var(--border-weak, rgba(255, 255, 255, 0.1));
+  border-radius: var(--cortex-radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
+.activity-feed__dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  border-radius: var(--cortex-radius-sm);
+  color: var(--text-weak, rgba(255, 255, 255, 0.6));
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: 
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.activity-feed__dropdown-item:hover {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.08));
+  color: var(--text-base, var(--cortex-text-primary));
+}
+
+.activity-feed__dropdown-item--active {
+  background: var(--accent, var(--cortex-info));
+  color: white;
+}
+
+.activity-feed__dropdown-item--active:hover {
+  background: var(--accent-hover, var(--cortex-info));
+}
+
+.activity-feed__check {
+  margin-left: auto;
+  font-size: 10px;
+}
+
+/* ============================================================================
+   4. SESSION SUMMARY
+   ============================================================================ */
+
+.activity-feed__summary {
+  padding: 0;
+  background: var(--surface-base, var(--cortex-bg-primary));
+  border-bottom: 1px solid var(--border-weak, rgba(255, 255, 255, 0.1));
+  flex-shrink: 0;
+}
+
+.activity-feed__summary-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-weak, rgba(255, 255, 255, 0.6));
+  font-size: 11px;
+  cursor: pointer;
+  transition: 
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.activity-feed__summary-toggle:hover {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.05));
+  color: var(--text-base, var(--cortex-text-primary));
+}
+
+.activity-feed__summary-label {
+  font-weight: 500;
+}
+
+.activity-feed__summary-duration {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-weaker, rgba(255, 255, 255, 0.4));
+}
+
+.activity-feed__summary-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px 12px 12px;
+}
+
+.activity-feed__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 48px;
+}
+
+.activity-feed__stat-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-base, var(--cortex-text-primary));
+  font-variant-numeric: tabular-nums;
+}
+
+.activity-feed__stat-label {
+  font-size: 10px;
+  color: var(--text-weaker, rgba(255, 255, 255, 0.4));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.activity-feed__stat--error .activity-feed__stat-value {
+  color: var(--vscode-errorForeground, var(--cortex-error));
+}
+
+/* ============================================================================
+   5. FEED CONTENT
+   ============================================================================ */
+
+.activity-feed__content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 0;
+  scroll-behavior: smooth;
+}
+
+.activity-feed__content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.activity-feed__content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.activity-feed__content::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, rgba(255, 255, 255, 0.15));
+  border-radius: var(--cortex-radius-sm);
+}
+
+.activity-feed__content::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover, rgba(255, 255, 255, 0.25));
+}
+
+.activity-feed__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  min-height: 120px;
+  padding: 24px;
+  color: var(--text-weaker, rgba(255, 255, 255, 0.4));
+  text-align: center;
+}
+
+.activity-feed__empty-hint {
+  font-size: 11px;
+  color: var(--text-weaker, rgba(255, 255, 255, 0.3));
+}
+
+/* ============================================================================
+   6. FOOTER
+   ============================================================================ */
+
+.activity-feed__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: var(--surface-raised, var(--cortex-bg-hover));
+  border-top: 1px solid var(--border-weak, rgba(255, 255, 255, 0.1));
+  flex-shrink: 0;
+}
+
+.activity-feed__autoscroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-weak, rgba(255, 255, 255, 0.6));
+  cursor: pointer;
+}
+
+.activity-feed__autoscroll input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--accent, var(--cortex-info));
+  cursor: pointer;
+}
+
+.activity-feed__count {
+  font-size: 11px;
+  color: var(--text-weaker, rgba(255, 255, 255, 0.4));
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================================
+   7. ACTION ENTRY
+   ============================================================================ */
+
+.action-entry {
+  padding: 6px 12px;
+  margin: 2px 4px;
+  border-radius: var(--cortex-radius-sm);
+  transition: background 0.15s ease;
+}
+
+.action-entry:hover {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.05));
+}
+
+.action-entry--compact {
+  padding: 4px 8px;
+  margin: 1px 4px;
+}
+
+.action-entry--expandable .action-entry__header {
+  cursor: pointer;
+}
+
+.action-entry--running {
+  background: rgba(116, 173, 232, 0.05);
+  border-left: 2px solid var(--accent, var(--cortex-info));
+  padding-left: 10px;
+}
+
+.action-entry--error {
+  background: rgba(248, 113, 113, 0.05);
+  border-left: 2px solid var(--vscode-errorForeground, var(--cortex-error));
+  padding-left: 10px;
+}
+
+/* Entry animation */
+.action-entry--animate {
+  animation: slideInFade 0.3s ease-out;
+}
+
+@keyframes slideInFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================================
+   8. ACTION ENTRY HEADER
+   ============================================================================ */
+
+.action-entry__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+}
+
+.action-entry--expandable .action-entry__header:hover {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.03));
+  margin: -4px -8px;
+  padding: 4px 8px;
+  border-radius: var(--cortex-radius-sm);
+}
+
+.action-entry__chevron {
+  flex-shrink: 0;
+  width: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-weak, rgba(255, 255, 255, 0.6));
+}
+
+.action-entry__chevron-placeholder {
+  width: 14px;
+  flex-shrink: 0;
+}
+
+.action-entry__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-entry__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-entry__title {
+  font-size: 12px;
+  color: var(--text-base, var(--cortex-text-primary));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action-entry--compact .action-entry__title {
+  font-size: 11px;
+}
+
+.action-entry__subtitle {
+  font-size: 11px;
+  color: var(--text-weaker, rgba(255, 255, 255, 0.4));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================================
+   9. ACTION ENTRY BADGES & STATS
+   ============================================================================ */
+
+.action-entry__badge {
+  padding: 1px 6px;
+  border-radius: var(--cortex-radius-sm);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.action-entry__badge--success {
+  background: rgba(74, 222, 128, 0.2);
+  color: var(--vscode-chat-linesAddedForeground, var(--cortex-success));
+}
+
+.action-entry__badge--error {
+  background: rgba(248, 113, 113, 0.2);
+  color: var(--vscode-chat-linesRemovedForeground, var(--cortex-error));
+}
+
+.action-entry__diff-stats {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.action-entry__diff-added {
+  color: var(--vscode-chat-linesAddedForeground, var(--cortex-success));
+}
+
+.action-entry__diff-removed {
+  color: var(--vscode-chat-linesRemovedForeground, var(--cortex-error));
+}
+
+.action-entry__duration {
+  font-size: 10px;
+  color: var(--text-weaker, rgba(255, 255, 255, 0.4));
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.action-entry__status {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.action-entry__timestamp {
+  font-size: 10px;
+  color: var(--text-weaker, rgba(255, 255, 255, 0.4));
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   10. ACTION ENTRY BODY (Expanded Content)
+   ============================================================================ */
+
+.action-entry__body {
+  margin-top: 8px;
+  padding: 8px 12px;
+  padding-left: 30px;
+  background: var(--surface-raised, rgba(255, 255, 255, 0.03));
+  border-radius: var(--cortex-radius-sm);
+  overflow: hidden;
+}
+
+.action-entry__code {
+  margin: 0;
+  padding: 0;
+  font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-weak, rgba(255, 255, 255, 0.7));
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.action-entry__code::-webkit-scrollbar {
+  width: 6px;
+}
+
+.action-entry__code::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, rgba(255, 255, 255, 0.15));
+  border-radius: var(--cortex-radius-sm);
+}
+
+/* ============================================================================
+   11. COMPACT VARIANT (Sidebar)
+   ============================================================================ */
+
+.activity-feed-compact {
+  padding: 8px;
+  background: var(--surface-base, var(--cortex-bg-primary));
+  border-radius: var(--cortex-radius-md);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.activity-feed-compact:hover {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.05));
+}
+
+.activity-feed-compact__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-weak, rgba(255, 255, 255, 0.6));
+  margin-bottom: 6px;
+}
+
+.activity-feed-compact__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.activity-feed-compact__empty {
+  font-size: 11px;
+  color: var(--text-weaker, rgba(255, 255, 255, 0.4));
+  text-align: center;
+  padding: 8px;
+}
+
+/* ============================================================================
+   12. RESPONSIVE ADJUSTMENTS
+   ============================================================================ */
+
+@media (max-width: 400px) {
+  .activity-feed__header {
+    padding: 6px 8px;
+  }
+
+  .activity-feed__summary-details {
+    gap: 8px;
+    padding: 6px 8px 10px;
+  }
+
+  .activity-feed__stat {
+    min-width: 40px;
+  }
+
+  .activity-feed__stat-value {
+    font-size: 14px;
+  }
+
+  .action-entry {
+    padding: 4px 8px;
+    margin: 1px 2px;
+  }
+
+  .action-entry__timestamp {
+    display: none;
+  }
+}
+
+/* ============================================================================
+   13. DARK MODE ADJUSTMENTS (for high contrast)
+   ============================================================================ */
+
+.hc-black .activity-feed {
+  border: 1px solid var(--border-base);
+}
+
+.hc-black .activity-feed__header,
+.hc-black .activity-feed__footer {
+  border-color: var(--border-base);
+}
+
+.hc-black .action-entry--running,
+.hc-black .action-entry--error {
+  border-left-width: 3px;
+}
+
+/* ============================================================================
+   14. PRINT STYLES
+   ============================================================================ */
+
+@media print {
+  .activity-feed {
+    background: white;
+    color: black;
+    border: 1px solid #ccc;
+  }
+
+  .activity-feed__control-btn,
+  .activity-feed__autoscroll {
+    display: none;
+  }
+
+  .action-entry {
+    break-inside: avoid;
+  }
+}
+

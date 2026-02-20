@@ -1,0 +1,566 @@
+/* =============================================================================
+   SCROLLBAR COMPONENTS - Orion IDE Design System
+   =============================================================================
+   Unified scrollbar and sash (resize handle) component styles.
+   Merges all scrollbar-related functionality into a single module.
+   
+   Contents:
+   1. CSS Variables / Design Tokens
+   2. Base Scrollbar Styles
+   3. Auto-Hide Scrollbar
+   4. Scroll Shadow Effects
+   5. Sash (Resize Handle) Styles
+   6. Split View / Grid View Styles
+   7. Cortex Desktop Resize Handle
+   8. Accessibility (Reduced Motion)
+   
+   Prefix: --cortex-scrollbar-* for scrollbar tokens
+           --cortex-sash-* for sash/resize tokens
+   ============================================================================= */
+
+/* =============================================================================
+   1. CSS VARIABLES / DESIGN TOKENS
+   ============================================================================= */
+
+:root {
+  /* ---------------------------------------------------------------------
+     Scrollbar Design Tokens
+     --------------------------------------------------------------------- */
+  --cortex-scrollbar-width: 8px;
+  --cortex-scrollbar-height: 8px;
+  --cortex-scrollbar-width-thin: 6px;
+  --cortex-scrollbar-slider-min-size: 20px;
+  
+  /* Scrollbar Colors - JetBrains tokens */
+  --cortex-scrollbar-shadow: rgba(0, 0, 0, 0.35);
+  --cortex-scrollbar-track-bg: transparent;
+  --cortex-scrollbar-thumb-bg: var(--jb-scrollbar-thumb, #43454A);
+  --cortex-scrollbar-thumb-hover-bg: var(--jb-scrollbar-thumb-hover, #5A5D63);
+  --cortex-scrollbar-thumb-active-bg: var(--jb-scrollbar-thumb-hover, #5A5D63);
+  
+  /* Scrollbar Timing */
+  --cortex-scrollbar-hide-timeout: 500ms;
+  --cortex-scrollbar-reveal-transition: 100ms;
+  --cortex-scrollbar-fade-transition: 800ms;
+  
+  /* ---------------------------------------------------------------------
+     Sash (Resize Handle) Design Tokens - JetBrains Islands Style
+     Invisible by default, subtle indigo highlight on hover
+     --------------------------------------------------------------------- */
+  --cortex-sash-size: 0px;
+  --cortex-sash-hover-size: 4px;
+  --cortex-sash-hover-border: rgba(99, 102, 241, 0.5); /* Subtle indigo on hover */
+  
+  /* Sash Timing */
+  --cortex-sash-hover-delay: 300ms;
+  --cortex-sash-transition: 100ms;
+}
+
+/* =============================================================================
+   2. BASE SCROLLBAR STYLES
+   ============================================================================= */
+
+/* Default scrollbar styling */
+::-webkit-scrollbar {
+  width: var(--cortex-scrollbar-width-thin);
+  height: var(--cortex-scrollbar-width-thin);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cortex-scrollbar-track-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--jb-scrollbar-thumb, #43454A);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--jb-scrollbar-thumb-hover, #5A5D63);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* VS Code-style scrollbar classes */
+.scrollbar-vscode::-webkit-scrollbar,
+.monaco-scrollable-element::-webkit-scrollbar {
+  width: var(--cortex-scrollbar-width);
+  height: var(--cortex-scrollbar-height);
+}
+
+.scrollbar-vscode::-webkit-scrollbar-track,
+.monaco-scrollable-element::-webkit-scrollbar-track {
+  background: var(--cortex-scrollbar-track-bg);
+}
+
+.scrollbar-vscode::-webkit-scrollbar-thumb,
+.monaco-scrollable-element::-webkit-scrollbar-thumb {
+  background: var(--cortex-scrollbar-thumb-bg);
+  border-radius: 4px;
+  min-height: var(--cortex-scrollbar-slider-min-size);
+  min-width: var(--cortex-scrollbar-slider-min-size);
+}
+
+.scrollbar-vscode::-webkit-scrollbar-thumb:hover,
+.monaco-scrollable-element::-webkit-scrollbar-thumb:hover {
+  background: var(--cortex-scrollbar-thumb-hover-bg);
+}
+
+.scrollbar-vscode::-webkit-scrollbar-thumb:active,
+.monaco-scrollable-element::-webkit-scrollbar-thumb:active {
+  background: var(--cortex-scrollbar-thumb-active-bg);
+}
+
+.scrollbar-vscode::-webkit-scrollbar-corner,
+.monaco-scrollable-element::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Thin scrollbar variant */
+.scrollbar-thin::-webkit-scrollbar {
+  width: var(--cortex-scrollbar-width-thin);
+  height: var(--cortex-scrollbar-width-thin);
+}
+
+/* No scrollbar utility */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* =============================================================================
+   3. AUTO-HIDE SCROLLBAR
+   ============================================================================= */
+
+.scrollbar-auto-hide {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color var(--cortex-scrollbar-fade-transition) linear;
+}
+
+.scrollbar-auto-hide:hover {
+  scrollbar-color: var(--cortex-scrollbar-thumb-bg) transparent;
+  transition: scrollbar-color var(--cortex-scrollbar-reveal-transition) linear;
+}
+
+/* WebKit auto-hide implementation */
+.scrollbar-auto-hide::-webkit-scrollbar-thumb {
+  background: transparent;
+  transition: background-color var(--cortex-scrollbar-fade-transition) linear;
+}
+
+.scrollbar-auto-hide:hover::-webkit-scrollbar-thumb {
+  background: var(--cortex-scrollbar-thumb-bg);
+  transition: background-color var(--cortex-scrollbar-reveal-transition) linear;
+}
+
+.scrollbar-auto-hide:hover::-webkit-scrollbar-thumb:hover {
+  background: var(--cortex-scrollbar-thumb-hover-bg);
+}
+
+.scrollbar-auto-hide:hover::-webkit-scrollbar-thumb:active {
+  background: var(--cortex-scrollbar-thumb-active-bg);
+}
+
+/* =============================================================================
+   4. SCROLL SHADOW EFFECTS
+   ============================================================================= */
+
+.scroll-shadow {
+  position: relative;
+}
+
+.scroll-shadow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 3px;
+  right: 0;
+  height: 3px;
+  box-shadow: var(--cortex-scrollbar-shadow) 0 6px 6px -6px inset;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+  z-index: 10;
+}
+
+.scroll-shadow.scroll-shadow-top::before {
+  opacity: 1;
+}
+
+.scroll-shadow-left::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  box-shadow: var(--cortex-scrollbar-shadow) 6px 0 6px -6px inset;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* =============================================================================
+   5. SASH (RESIZE HANDLE) STYLES - Monaco Editor Compatible
+   ============================================================================= */
+
+.monaco-sash {
+  position: absolute;
+  z-index: 35;
+  touch-action: none;
+  user-select: none;
+}
+
+/* Vertical sash - left/right resize */
+.monaco-sash.vertical {
+  width: var(--cortex-sash-size);
+  height: 100%;
+  cursor: ew-resize;
+  top: 0;
+}
+
+/* Horizontal sash - up/down resize */
+.monaco-sash.horizontal {
+  width: 100%;
+  height: var(--cortex-sash-size);
+  cursor: ns-resize;
+  left: 0;
+}
+
+/* Hover indicator using ::before pseudo-element */
+.monaco-sash::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  transition: background-color var(--cortex-sash-transition) ease-out;
+}
+
+/* Vertical sash centered indicator */
+.monaco-sash.vertical::before {
+  width: var(--cortex-sash-hover-size);
+  left: calc(50% - (var(--cortex-sash-hover-size) / 2));
+  height: 100%;
+}
+
+/* Horizontal sash centered indicator */
+.monaco-sash.horizontal::before {
+  height: var(--cortex-sash-hover-size);
+  top: calc(50% - (var(--cortex-sash-hover-size) / 2));
+  width: 100%;
+}
+
+/* Hover and active states */
+.monaco-sash.hover::before,
+.monaco-sash.active::before,
+.monaco-sash:hover::before {
+  background: var(--cortex-sash-hover-border);
+}
+
+/* Disabled state */
+.monaco-sash.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.monaco-sash.disabled::before {
+  background: transparent !important;
+}
+
+/* macOS-specific cursor styles */
+.monaco-sash.mac.vertical {
+  cursor: col-resize;
+}
+
+.monaco-sash.mac.horizontal {
+  cursor: row-resize;
+}
+
+/* Constraint states - at min/max */
+.monaco-sash.minimum.vertical {
+  cursor: e-resize;
+}
+
+.monaco-sash.maximum.vertical {
+  cursor: w-resize;
+}
+
+.monaco-sash.minimum.horizontal {
+  cursor: s-resize;
+}
+
+.monaco-sash.maximum.horizontal {
+  cursor: n-resize;
+}
+
+/* =============================================================================
+   6. CORNER DRAG HANDLES (Orthogonal) - 8x8px
+   ============================================================================= */
+
+.monaco-sash:not(.disabled) > .orthogonal-drag-handle {
+  content: " ";
+  height: calc(var(--cortex-sash-size) * 2);
+  width: calc(var(--cortex-sash-size) * 2);
+  z-index: 100;
+  display: block;
+  cursor: all-scroll;
+  position: absolute;
+  background: transparent;
+}
+
+/* Vertical sash corners */
+.monaco-sash.vertical > .orthogonal-drag-handle.start {
+  left: calc(var(--cortex-sash-size) * -0.5);
+  top: calc(var(--cortex-sash-size) * -1);
+}
+
+.monaco-sash.vertical > .orthogonal-drag-handle.end {
+  left: calc(var(--cortex-sash-size) * -0.5);
+  bottom: calc(var(--cortex-sash-size) * -1);
+}
+
+/* Horizontal sash corners */
+.monaco-sash.horizontal > .orthogonal-drag-handle.start {
+  top: calc(var(--cortex-sash-size) * -0.5);
+  left: calc(var(--cortex-sash-size) * -1);
+}
+
+.monaco-sash.horizontal > .orthogonal-drag-handle.end {
+  top: calc(var(--cortex-sash-size) * -0.5);
+  right: calc(var(--cortex-sash-size) * -1);
+}
+
+/* =============================================================================
+   7. SPLITVIEW & GRIDVIEW STYLES
+   ============================================================================= */
+
+.monaco-split-view2 {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.monaco-split-view2 > .sash-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.monaco-split-view2 > .sash-container > .monaco-sash {
+  pointer-events: initial;
+}
+
+.monaco-split-view2 > .monaco-scrollable-element {
+  width: 100%;
+  height: 100%;
+}
+
+.monaco-split-view2 > .monaco-scrollable-element > .split-view-container {
+  width: 100%;
+  height: 100%;
+  white-space: nowrap;
+  position: relative;
+}
+
+/* Split view item positioning */
+.split-view-view {
+  white-space: initial;
+  position: absolute;
+}
+
+.split-view-view:not(.visible) {
+  display: none;
+}
+
+/* Vertical orientation - items stack vertically */
+.monaco-split-view2.vertical > .split-view-container > .split-view-view {
+  width: 100%;
+}
+
+/* Horizontal orientation - items stack horizontally */
+.monaco-split-view2.horizontal > .split-view-container > .split-view-view {
+  height: 100%;
+}
+
+/* Separator border styles */
+.monaco-split-view2.separator-border > .split-view-container > .split-view-view:not(:first-child)::before {
+  content: ' ';
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  pointer-events: none;
+  /* Glassmorphism: Same tint as panels for uniform transparency */
+  background-color: var(--glass-sidebar-bg);
+}
+
+/* Horizontal separator - vertical line */
+.monaco-split-view2.separator-border.horizontal > .split-view-container > .split-view-view:not(:first-child)::before {
+  height: 100%;
+  width: 1px;
+}
+
+/* Vertical separator - horizontal line */
+.monaco-split-view2.separator-border.vertical > .split-view-container > .split-view-view:not(:first-child)::before {
+  height: 1px;
+  width: 100%;
+}
+
+/* Grid View */
+.monaco-grid-view {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.monaco-grid-branch-node {
+  width: 100%;
+  height: 100%;
+}
+
+/* =============================================================================
+   8. CORTEX DESKTOP RESIZE HANDLE COMPONENT
+   ============================================================================= */
+
+.resize-handle {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 35;
+  touch-action: none;
+  user-select: none;
+  /* Remove from gap calculation */
+  margin: 0 -2px;
+}
+
+/* Use 4px hit area */
+.resize-handle--horizontal,
+.resize-handle[data-direction="horizontal"] {
+  width: var(--cortex-sash-size);
+  height: 100%;
+  cursor: ew-resize;
+}
+
+.resize-handle--vertical,
+.resize-handle[data-direction="vertical"] {
+  width: 100%;
+  height: var(--cortex-sash-size);
+  cursor: ns-resize;
+}
+
+/* Hover indicator via ::before */
+.resize-handle::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  background: transparent;
+  transition: background-color var(--cortex-sash-transition) ease-out;
+}
+
+/* Horizontal handle - vertical indicator centered */
+.resize-handle--horizontal::before,
+.resize-handle[data-direction="horizontal"]::before {
+  width: var(--cortex-sash-hover-size);
+  height: 100%;
+  left: calc(50% - (var(--cortex-sash-hover-size) / 2));
+  top: 0;
+}
+
+/* Vertical handle - horizontal indicator centered */
+.resize-handle--vertical::before,
+.resize-handle[data-direction="vertical"]::before {
+  width: 100%;
+  height: var(--cortex-sash-hover-size);
+  top: calc(50% - (var(--cortex-sash-hover-size) / 2));
+  left: 0;
+}
+
+/* Hover state */
+.resize-handle:hover::before,
+.resize-handle--hover::before {
+  background: var(--cortex-sash-hover-border);
+}
+
+/* Active/dragging state */
+.resize-handle:active::before,
+.resize-handle--active::before,
+.resize-handle--dragging::before {
+  background: var(--cortex-sash-hover-border);
+}
+
+/* Disabled state */
+.resize-handle--disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.resize-handle--disabled::before {
+  background: transparent !important;
+}
+
+/* Extended hit area for easier grabbing */
+.resize-handle-hitarea {
+  position: absolute;
+  /* Glassmorphism: Transparent to inherit from .layout */
+  background: transparent;
+}
+
+.resize-handle--horizontal .resize-handle-hitarea,
+.resize-handle[data-direction="horizontal"] .resize-handle-hitarea {
+  top: 0;
+  left: -4px;
+  right: -4px;
+  bottom: 0;
+}
+
+.resize-handle--vertical .resize-handle-hitarea,
+.resize-handle[data-direction="vertical"] .resize-handle-hitarea {
+  top: -4px;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+}
+
+/* Corner Handles */
+.resize-handle-corner {
+  position: absolute;
+  width: calc(var(--cortex-sash-size) * 2);
+  height: calc(var(--cortex-sash-size) * 2);
+  z-index: 100;
+  cursor: all-scroll;
+  background: transparent;
+}
+
+.resize-handle-corner:hover {
+  background: var(--cortex-sash-hover-border);
+  border-radius: 4px;
+}
+
+/* =============================================================================
+   9. ACCESSIBILITY - REDUCED MOTION
+   ============================================================================= */
+
+.monaco-enable-motion .monaco-sash::before,
+.monaco-enable-motion .resize-handle::before {
+  transition: background-color var(--cortex-sash-transition) ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .monaco-sash::before,
+  .resize-handle::before {
+    transition: none;
+  }
+  
+  .scrollbar-auto-hide::-webkit-scrollbar-thumb {
+    transition: none;
+  }
+}

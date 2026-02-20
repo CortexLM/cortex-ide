@@ -1,0 +1,489 @@
+/* =============================================================================
+   ACTIVITY BAR STYLES - VS Code-style Vertical Icon Bar
+   =============================================================================
+   
+   Styles for the Activity Bar component with JetBrains-inspired dark theme.
+   Uses CSS custom properties from design-tokens.css.
+   
+   Dependencies: design-tokens.css
+   ============================================================================= */
+
+/* =============================================================================
+   SECTION 1: ACTIVITY BAR CONTAINER
+   ============================================================================= */
+
+.activity-bar {
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  width: var(--cortex-width-activitybar, 48px);
+  height: 100%;
+  flex-shrink: 0;
+  
+  /* Visual */
+  background: rgba(16, 18, 20, 0.7);
+  
+  /* Behavior */
+  user-select: none;
+  contain: layout style;
+  
+  /* Animation */
+  transition: width var(--cortex-transition-normal);
+}
+
+/* Position variants */
+.activity-bar[data-position="left"] {
+  order: -1;
+  border-right: none;
+}
+
+.activity-bar[data-position="right"] {
+  order: 1;
+  border-left: none;
+}
+
+/* Hidden state (for location: hidden setting) */
+.activity-bar[data-visible="false"] {
+  display: none;
+}
+
+/* =============================================================================
+   SECTION 2: ACTIVITY BAR SECTIONS
+   ============================================================================= */
+
+.activity-bar-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--cortex-space-sm) var(--cortex-space-sm);
+  gap: var(--cortex-space-2);
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  /* Hide scrollbar but keep scrollable */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.activity-bar-top::-webkit-scrollbar {
+  display: none;
+}
+
+.activity-bar-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--cortex-space-sm) var(--cortex-space-sm);
+  gap: var(--cortex-space-2);
+  border-top: 1px solid var(--jb-border-divider);
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   SECTION 3: ACTIVITY BAR ITEMS
+   ============================================================================= */
+
+.activity-bar-item {
+  /* Layout */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  
+  /* Visual */
+  border: none;
+  background: transparent;
+  color: var(--jb-icon-color-inactive);
+  opacity: 0.7;
+  border-radius: var(--jb-radius-sm);
+  
+  /* Behavior */
+  cursor: pointer;
+  
+  /* Animation */
+  transition: 
+    background-color 0.15s ease, 
+    color 0.15s ease, 
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.activity-bar-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FAFAFA;
+  opacity: 1;
+}
+
+.activity-bar-item:active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FAFAFA;
+  opacity: 1;
+}
+
+.activity-bar-item:focus-visible {
+  outline: 1px solid var(--cortex-focus-color);
+  outline-offset: -1px;
+}
+
+/* Active state */
+.activity-bar-item[aria-pressed="true"],
+.activity-bar-item.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FAFAFA;
+  opacity: 1;
+}
+
+/* Dragging states */
+.activity-bar-item[data-dragging="true"] {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+.activity-bar-item[data-drag-over="true"] {
+  outline: 2px solid var(--cortex-accent);
+  outline-offset: -2px;
+}
+
+/* =============================================================================
+   SECTION 4: ACTIVE INDICATOR
+   ============================================================================= */
+
+.activity-bar-item-indicator {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--cortex-primary);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+/* Left position - indicator on left */
+.activity-bar[data-position="left"] .activity-bar-item-indicator {
+  left: 0;
+}
+
+/* Right position - indicator on right */
+.activity-bar[data-position="right"] .activity-bar-item-indicator {
+  right: 0;
+}
+
+/* =============================================================================
+   SECTION 5: BADGES
+   ============================================================================= */
+
+.activity-bar-item-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  
+  /* Visual */
+  background: var(--cortex-primary);
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--jb-font-ui);
+  line-height: 1;
+  border-radius: 8px;
+  
+  /* Ensure badge is above icon */
+  z-index: var(--cortex-z-badge);
+  
+  /* Prevent pointer events on badge */
+  pointer-events: none;
+}
+
+/* Animate badge when count changes */
+@keyframes badge-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.activity-bar-item-badge[data-updated="true"] {
+  animation: badge-pulse 0.3s ease;
+}
+
+/* =============================================================================
+   SECTION 6: ICONS
+   ============================================================================= */
+
+.activity-bar-item-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Codicon support */
+.activity-bar-item .codicon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* =============================================================================
+   SECTION 7: TOOLTIP
+   ============================================================================= */
+
+.activity-bar-tooltip {
+  position: fixed;
+  z-index: var(--cortex-z-highest);
+  pointer-events: none;
+}
+
+.activity-bar-tooltip-content {
+  background: var(--jb-popup);
+  color: var(--jb-text-body-color);
+  font-size: 12px;
+  font-family: var(--jb-font-ui);
+  padding: var(--cortex-space-sm) var(--cortex-space-md);
+  border-radius: var(--jb-radius-md);
+  box-shadow: var(--jb-shadow-popup);
+  border: 1px solid var(--jb-border-default);
+  white-space: nowrap;
+}
+
+.activity-bar-tooltip-badge {
+  margin-left: var(--cortex-space-md);
+  padding: 2px var(--cortex-space-sm);
+  background: var(--cortex-primary);
+  color: #FFFFFF;
+  font-size: 11px;
+  border-radius: var(--jb-radius-sm);
+}
+
+/* =============================================================================
+   SECTION 8: CONTEXT MENU
+   ============================================================================= */
+
+.activity-bar-context-menu {
+  position: fixed;
+  z-index: var(--cortex-z-dropdown, 100);
+  min-width: 180px;
+  max-width: 300px;
+  
+  /* Visual */
+  background: var(--jb-popup);
+  border: 1px solid var(--jb-border-default);
+  border-radius: var(--jb-radius-md);
+  box-shadow: var(--jb-shadow-popup);
+  padding: var(--cortex-space-sm) 0;
+  
+  /* Prevent overflow */
+  overflow: hidden;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--cortex-space-md);
+  width: 100%;
+  padding: var(--cortex-space-sm) var(--cortex-space-lg);
+  
+  /* Visual */
+  border: none;
+  background: transparent;
+  color: var(--jb-text-body-color);
+  font-size: 13px;
+  font-family: var(--jb-font-ui);
+  text-align: left;
+  
+  /* Behavior */
+  cursor: pointer;
+  
+  /* Animation */
+  transition: background-color 0.1s ease;
+}
+
+.context-menu-item:hover:not(:disabled) {
+  background: var(--jb-surface-hover);
+}
+
+.context-menu-item:focus-visible {
+  background: var(--jb-surface-hover);
+  outline: none;
+}
+
+.context-menu-item:disabled {
+  color: var(--jb-text-disabled);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.context-menu-item-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.context-menu-item-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.context-menu-item-check {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--cortex-primary);
+}
+
+.context-menu-separator {
+  height: 1px;
+  background: var(--jb-border-divider);
+  margin: var(--cortex-space-sm) var(--cortex-space-md);
+}
+
+/* =============================================================================
+   SECTION 9: DRAG AND DROP
+   ============================================================================= */
+
+/* Drop zone indicator */
+.activity-bar-drop-zone {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: var(--cortex-primary);
+  border-radius: 1px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.activity-bar-drop-zone[data-visible="true"] {
+  opacity: 1;
+}
+
+.activity-bar-drop-zone[data-position="before"] {
+  top: -1px;
+}
+
+.activity-bar-drop-zone[data-position="after"] {
+  bottom: -1px;
+}
+
+/* =============================================================================
+   SECTION 10: LOCATION VARIANTS
+   ============================================================================= */
+
+/* Top position (horizontal) - not implemented in this version */
+.activity-bar[data-location="top"] {
+  flex-direction: row;
+  width: 100%;
+  height: var(--cortex-width-activitybar);
+}
+
+.activity-bar[data-location="top"] .activity-bar-top {
+  flex-direction: row;
+  padding: var(--cortex-space-sm);
+}
+
+.activity-bar[data-location="top"] .activity-bar-bottom {
+  flex-direction: row;
+  border-top: none;
+  border-left: 1px solid var(--jb-border-divider);
+}
+
+.activity-bar[data-location="top"] .activity-bar-item-indicator {
+  left: 8px;
+  right: 8px;
+  top: auto;
+  bottom: 0;
+  width: auto;
+  height: 2px;
+}
+
+/* =============================================================================
+   SECTION 11: RESPONSIVE / COMPACT MODE
+   ============================================================================= */
+
+/* Compact mode for smaller screens */
+@media (max-height: 600px) {
+  .activity-bar-item {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .activity-bar-item-icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .activity-bar-item-badge {
+    min-width: 14px;
+    height: 14px;
+    font-size: 9px;
+    top: 4px;
+    right: 4px;
+  }
+}
+
+/* =============================================================================
+   SECTION 12: ACCESSIBILITY
+   ============================================================================= */
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .activity-bar {
+    background: #000000;
+    border-color: #FFFFFF;
+  }
+  
+  .activity-bar-item {
+    color: #FFFFFF;
+  }
+  
+  .activity-bar-item:hover,
+  .activity-bar-item:active,
+  .activity-bar-item[aria-pressed="true"] {
+    background: #333333;
+    outline: 1px solid #FFFFFF;
+  }
+  
+  .activity-bar-item-indicator {
+    background: #FFFFFF;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .activity-bar-item,
+  .activity-bar-item-badge,
+  .context-menu-item,
+  .activity-bar-drop-zone {
+    transition: none;
+  }
+  
+  .activity-bar-item-badge[data-updated="true"] {
+    animation: none;
+  }
+}
+
+/* =============================================================================
+   SECTION 13: PRINT STYLES
+   ============================================================================= */
+
+@media print {
+  .activity-bar {
+    display: none;
+  }
+}

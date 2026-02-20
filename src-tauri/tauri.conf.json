@@ -1,0 +1,83 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Cortex Desktop",
+  "identifier": "ai.cortex.desktop",
+  "version": "0.1.0",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* wss://localhost:* wss://127.0.0.1:* https://api.openai.com https://api.anthropic.com https://api.cohere.com https://*.sentry.io https://api.github.com wss://api.openai.com https://openrouter.ai https://*.openrouter.ai; worker-src 'self' blob:"
+    },
+    "windows": [
+      {
+        "title": "Cortex Desktop",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 800,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true,
+        "decorations": false,
+        "transparent": false,
+        "visible": false
+      }
+    ],
+    "macOSPrivateApi": true
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg", "deb", "rpm", "nsis"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "DeveloperTool",
+    "shortDescription": "Modern AI coding agent",
+    "longDescription": "Cortex Desktop is a modern AI coding agent with a beautiful GUI interface. It helps you write, edit, and understand code with powerful AI assistance.",
+
+    "macOS": {
+      "entitlements": null,
+      "minimumSystemVersion": "10.15"
+    },
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "",
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    },
+    "linux": {
+      "appimage": {
+        "bundleMediaFramework": false
+      }
+    }
+  },
+  "plugins": {
+    "shell": {
+      "open": true
+    },
+    "updater": {
+      "active": false,
+      "endpoints": [
+        "https://github.com/CortexLM/cortex/releases/latest/download/latest.json"
+      ],
+      "pubkey": ""
+    },
+    "deep-link": {
+      "desktop": {
+        "schemes": ["cortex"]
+      }
+    }
+  }
+}
