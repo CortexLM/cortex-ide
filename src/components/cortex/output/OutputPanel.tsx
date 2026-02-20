@@ -1,8 +1,20 @@
-import { Component, JSX, createSignal, createMemo, Show, onMount, onCleanup } from "solid-js";
+import { Component, JSX, createSignal, createMemo, Show } from "solid-js";
 import { CortexIcon, CortexTooltip, CortexDropdown } from "../primitives";
 import { useOutput, LOG_LEVELS, LOG_LEVEL_LABELS, type LogLevel } from "@/context/OutputContext";
 import { OutputChannelSelector } from "./OutputChannelSelector";
 import { CortexOutputChannel } from "./OutputChannel";
+import { useTauriListen } from "@/hooks/useTauriListen";
+import { EVENTS } from "@/utils/events";
+
+interface OutputAppendPayload {
+  channelId: string;
+  text: string;
+}
+
+interface OutputChannelPayload {
+  channelId: string;
+  channelName: string;
+}
 
 export interface OutputPanelProps {
   onClose?: () => void;
@@ -30,32 +42,29 @@ export const OutputPanel: Component<OutputPanelProps> = (props) => {
     }))
   );
 
-  onMount(() => {
-    const handleAppend = (e: Event) => {
-      const detail = (e as CustomEvent<{ channel: string; text: string; source?: string; severity?: "info" | "warning" | "error" | "success" }>).detail;
-      if (detail?.channel && detail?.text) {
-        output.appendLine(detail.channel, detail.text, {
-          source: detail.source,
-          severity: detail.severity,
-        });
-      }
-    };
+  useTauriListen<OutputAppendPayload>(EVENTS.OUTPUT.APPEND, (payload) => {
+    if (payload?.channelId && payload?.text) {
+      output.appendLine(payload.channelId, payload.text);
+    }
+  });
 
-    const handleClear = (e: Event) => {
-      const detail = (e as CustomEvent<{ channel?: string }>).detail;
-      const channel = detail?.channel ?? activeChannel();
-      if (channel) {
-        output.clear(channel);
-      }
-    };
+  useTauriListen<OutputChannelPayload>(EVENTS.OUTPUT.CLEAR, (payload) => {
+    const channel = payload?.channelName ?? payload?.channelId ?? activeChannel();
+    if (channel) {
+      output.clear(channel);
+    }
+  });
 
-    window.addEventListener("output:append", handleAppend);
-    window.addEventListener("output:clear", handleClear);
+  useTauriListen<OutputChannelPayload>(EVENTS.OUTPUT.CREATED, (payload) => {
+    if (payload?.channelName) {
+      output.createChannel(payload.channelName);
+    }
+  });
 
-    onCleanup(() => {
-      window.removeEventListener("output:append", handleAppend);
-      window.removeEventListener("output:clear", handleClear);
-    });
+  useTauriListen<OutputChannelPayload>(EVENTS.OUTPUT.DELETED, (payload) => {
+    if (payload?.channelName) {
+      output.removeChannel(payload.channelName);
+    }
   });
 
   const handleChannelSelect = (name: string) => {

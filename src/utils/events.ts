@@ -673,6 +673,10 @@ COMMAND: {
     SHOW_LOG_LEVEL_PICKER: 'output:show-log-level-picker',
     REGISTER_LOG_LEVEL_COMMAND: 'output:register-log-level-command',
     LOG_LEVEL_CHANGED: 'output:log-level-changed',
+    APPEND: 'output:append',
+    CLEAR: 'output:clear',
+    CREATED: 'output:created',
+    DELETED: 'output:deleted',
   },
 
   // -------------------------------------------------------------------------
