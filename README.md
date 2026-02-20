@@ -16,6 +16,7 @@
 
 <p align="center">
   <a href="./docs/BUILD.md"><img src="https://img.shields.io/badge/Build_the_Project-blue?style=for-the-badge&logo=rust&logoColor=white" alt="Build the Project"></a>
+  <a href="./docs/MCP-SERVER.md"><img src="https://img.shields.io/badge/MCP_Server-purple?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAydjIwTTIgMTJoMjAiLz48L3N2Zz4=&logoColor=white" alt="MCP Server"></a>
 </p>
 
 <p align="center">
@@ -23,6 +24,7 @@
   <a href="#alpha-status">Alpha Status</a> •
   <a href="#bug-bounty">Bug Bounty</a> •
   <a href="./docs/BUILD.md">Build</a> •
+  <a href="./docs/MCP-SERVER.md">MCP Server</a> •
   <a href="https://discord.gg/cortexfoundation">Discord</a> •
   <a href="https://twitter.com/CortexLM">Twitter</a>
 </p>
