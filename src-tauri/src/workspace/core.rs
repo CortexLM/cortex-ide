@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Manager, command};
 use tracing::{error, info, warn};
 
@@ -36,6 +37,63 @@ pub struct FolderGitStatus {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 struct TrustedWorkspaces {
     paths: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TrustedFolderInfo {
+    pub path: String,
+    pub trusted_at: u64,
+    pub description: Option<String>,
+    pub trust_parent: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WorkspaceTrustInfo {
+    pub is_trusted: bool,
+    pub trust_level: String,
+    pub workspace_path: Option<String>,
+    pub trusted_folders: Vec<TrustedFolderInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WorkspaceTrustSettings {
+    pub enabled: bool,
+    pub trust_all_workspaces: bool,
+    pub show_banner: bool,
+    pub restricted_mode_enabled: bool,
+    pub prompt_for_parent_folder_trust: bool,
+}
+
+impl Default for WorkspaceTrustSettings {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            trust_all_workspaces: false,
+            show_banner: true,
+            restricted_mode_enabled: true,
+            prompt_for_parent_folder_trust: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PartialWorkspaceTrustSettings {
+    pub enabled: Option<bool>,
+    pub trust_all_workspaces: Option<bool>,
+    pub show_banner: Option<bool>,
+    pub restricted_mode_enabled: Option<bool>,
+    pub prompt_for_parent_folder_trust: Option<bool>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
+struct TrustedWorkspacesData {
+    folders: Vec<TrustedFolderInfo>,
+    settings: WorkspaceTrustSettings,
 }
 
 // ============================================================================
@@ -108,6 +166,55 @@ async fn write_trusted_workspaces(path: &Path, data: &TrustedWorkspaces) -> Resu
     tokio::fs::write(path, content)
         .await
         .map_err(|e| format!("Failed to write trusted workspaces: {}", e))
+}
+
+fn trust_data_file_path(app: &AppHandle) -> Result<PathBuf, String> {
+    let app_data_dir = app.path().app_data_dir().unwrap_or_else(|_| {
+        dirs::config_dir()
+            .unwrap_or_else(|| PathBuf::from("."))
+            .join("Cortex-desktop")
+    });
+    Ok(app_data_dir.join("workspace_trust_data.json"))
+}
+
+async fn read_trust_data(path: &Path) -> TrustedWorkspacesData {
+    match tokio::fs::read_to_string(path).await {
+        Ok(content) => serde_json::from_str(&content).unwrap_or_default(),
+        Err(_) => TrustedWorkspacesData::default(),
+    }
+}
+
+async fn write_trust_data(path: &Path, data: &TrustedWorkspacesData) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        tokio::fs::create_dir_all(parent)
+            .await
+            .map_err(|e| format!("Failed to create app data directory: {}", e))?;
+    }
+    let content = serde_json::to_string_pretty(data)
+        .map_err(|e| format!("Failed to serialize workspace trust data: {}", e))?;
+    tokio::fs::write(path, content)
+        .await
+        .map_err(|e| format!("Failed to write workspace trust data: {}", e))
+}
+
+fn now_millis() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis() as u64
+}
+
+fn is_path_within(child: &str, parent: &str) -> bool {
+    let child_path = Path::new(child);
+    let parent_path = Path::new(parent);
+    if let (Ok(child_canon), Ok(parent_canon)) = (
+        std::fs::canonicalize(child_path),
+        std::fs::canonicalize(parent_path),
+    ) {
+        child_canon.starts_with(&parent_canon)
+    } else {
+        child.starts_with(parent)
+    }
 }
 
 // ============================================================================
@@ -252,6 +359,207 @@ pub async fn workspace_trust_set(
     }
 
     write_trusted_workspaces(&trust_path, &data).await
+}
+
+#[command]
+pub async fn workspace_trust_get_info(
+    workspace_path: Option<String>,
+    app: AppHandle,
+) -> Result<WorkspaceTrustInfo, String> {
+    let data_path = trust_data_file_path(&app)?;
+    let data = read_trust_data(&data_path).await;
+
+    let is_trusted = if data.settings.trust_all_workspaces {
+        true
+    } else if let Some(ref ws_path) = workspace_path {
+        data.folders
+            .iter()
+            .any(|f| is_path_within(ws_path, &f.path))
+    } else {
+        false
+    };
+
+    let trust_level = if !data.settings.enabled || is_trusted {
+        "trusted".to_string()
+    } else if workspace_path.is_some() {
+        "restricted".to_string()
+    } else {
+        "unknown".to_string()
+    };
+
+    Ok(WorkspaceTrustInfo {
+        is_trusted,
+        trust_level,
+        workspace_path,
+        trusted_folders: data.folders,
+    })
+}
+
+#[command]
+pub async fn workspace_trust_set_decision(
+    workspace_path: String,
+    trust_level: String,
+    remember: bool,
+    trust_parent: Option<bool>,
+    description: Option<String>,
+    app: AppHandle,
+) -> Result<(), String> {
+    let data_path = trust_data_file_path(&app)?;
+    let mut data = read_trust_data(&data_path).await;
+
+    if trust_level == "trusted" && remember {
+        let path_to_trust = if trust_parent.unwrap_or(false) {
+            Path::new(&workspace_path)
+                .parent()
+                .map(|p| p.to_string_lossy().to_string())
+                .unwrap_or_else(|| workspace_path.clone())
+        } else {
+            workspace_path.clone()
+        };
+
+        if !data.folders.iter().any(|f| f.path == path_to_trust) {
+            data.folders.push(TrustedFolderInfo {
+                path: path_to_trust.clone(),
+                trusted_at: now_millis(),
+                description,
+                trust_parent: trust_parent.unwrap_or(false),
+            });
+            info!("[Workspace] Trust decision: trusted {}", path_to_trust);
+        }
+    } else if trust_level == "restricted" {
+        let before = data.folders.len();
+        data.folders.retain(|f| f.path != workspace_path);
+        if data.folders.len() < before {
+            info!("[Workspace] Trust decision: restricted {}", workspace_path);
+        }
+    }
+
+    write_trust_data(&data_path, &data).await
+}
+
+#[command]
+pub async fn workspace_trust_add_folder(
+    path: String,
+    trust_parent: Option<bool>,
+    description: Option<String>,
+    app: AppHandle,
+) -> Result<(), String> {
+    let data_path = trust_data_file_path(&app)?;
+    let mut data = read_trust_data(&data_path).await;
+
+    if !data.folders.iter().any(|f| f.path == path) {
+        data.folders.push(TrustedFolderInfo {
+            path: path.clone(),
+            trusted_at: now_millis(),
+            description,
+            trust_parent: trust_parent.unwrap_or(false),
+        });
+        info!("[Workspace] Added trusted folder: {}", path);
+    }
+
+    write_trust_data(&data_path, &data).await
+}
+
+#[command]
+pub async fn workspace_trust_remove_folder(path: String, app: AppHandle) -> Result<(), String> {
+    let data_path = trust_data_file_path(&app)?;
+    let mut data = read_trust_data(&data_path).await;
+
+    let before = data.folders.len();
+    data.folders.retain(|f| f.path != path);
+    if data.folders.len() < before {
+        info!("[Workspace] Removed trusted folder: {}", path);
+    }
+
+    write_trust_data(&data_path, &data).await
+}
+
+#[command]
+pub async fn workspace_trust_get_folders(app: AppHandle) -> Result<Vec<TrustedFolderInfo>, String> {
+    let data_path = trust_data_file_path(&app)?;
+    let data = read_trust_data(&data_path).await;
+    Ok(data.folders)
+}
+
+#[command]
+pub async fn workspace_trust_clear_all(app: AppHandle) -> Result<(), String> {
+    let data_path = trust_data_file_path(&app)?;
+    let mut data = read_trust_data(&data_path).await;
+    data.folders.clear();
+    info!("[Workspace] Cleared all trust decisions");
+    write_trust_data(&data_path, &data).await
+}
+
+#[command]
+pub async fn workspace_trust_get_settings(
+    app: AppHandle,
+) -> Result<WorkspaceTrustSettings, String> {
+    let data_path = trust_data_file_path(&app)?;
+    let data = read_trust_data(&data_path).await;
+    Ok(data.settings)
+}
+
+#[command]
+pub async fn workspace_trust_update_settings(
+    settings: PartialWorkspaceTrustSettings,
+    app: AppHandle,
+) -> Result<(), String> {
+    let data_path = trust_data_file_path(&app)?;
+    let mut data = read_trust_data(&data_path).await;
+    if let Some(v) = settings.enabled {
+        data.settings.enabled = v;
+    }
+    if let Some(v) = settings.trust_all_workspaces {
+        data.settings.trust_all_workspaces = v;
+    }
+    if let Some(v) = settings.show_banner {
+        data.settings.show_banner = v;
+    }
+    if let Some(v) = settings.restricted_mode_enabled {
+        data.settings.restricted_mode_enabled = v;
+    }
+    if let Some(v) = settings.prompt_for_parent_folder_trust {
+        data.settings.prompt_for_parent_folder_trust = v;
+    }
+    info!("[Workspace] Updated trust settings");
+    write_trust_data(&data_path, &data).await
+}
+
+#[command]
+pub async fn workspace_trust_is_path_trusted(path: String, app: AppHandle) -> Result<bool, String> {
+    let data_path = trust_data_file_path(&app)?;
+    let data = read_trust_data(&data_path).await;
+
+    if data.settings.trust_all_workspaces {
+        return Ok(true);
+    }
+
+    let trusted = data.folders.iter().any(|f| is_path_within(&path, &f.path));
+    Ok(trusted)
+}
+
+#[command]
+pub async fn workspace_trust_prompt(
+    workspace_path: String,
+    app: AppHandle,
+) -> Result<String, String> {
+    let data_path = trust_data_file_path(&app)?;
+    let data = read_trust_data(&data_path).await;
+
+    if !data.settings.enabled || data.settings.trust_all_workspaces {
+        return Ok("trusted".to_string());
+    }
+
+    let is_trusted = data
+        .folders
+        .iter()
+        .any(|f| is_path_within(&workspace_path, &f.path));
+
+    if is_trusted {
+        Ok("trusted".to_string())
+    } else {
+        Ok("cancelled".to_string())
+    }
 }
 
 #[command]
