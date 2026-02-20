@@ -15,9 +15,14 @@
 </p>
 
 <p align="center">
+  <a href="./docs/BUILD.md"><img src="https://img.shields.io/badge/Build_the_Project-blue?style=for-the-badge&logo=rust&logoColor=white" alt="Build the Project"></a>
+</p>
+
+<p align="center">
   <a href="#roadmap">Roadmap</a> •
   <a href="#alpha-status">Alpha Status</a> •
   <a href="#bug-bounty">Bug Bounty</a> •
+  <a href="./docs/BUILD.md">Build</a> •
   <a href="https://discord.gg/cortexfoundation">Discord</a> •
   <a href="https://twitter.com/CortexLM">Twitter</a>
 </p>
