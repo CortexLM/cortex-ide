@@ -1,118 +1,95 @@
 <h1 align="center">
-  <img src="./assets/banner.jpg" alt="Cortex" width="100%">
+  <img src="./assets/banner.jpg" alt="Cortex IDE" width="100%">
 </h1>
 
-<h3 align="center">The Agent-Native Development CLI</h3>
+<h3 align="center">The AI-Native IDE for Agent Orchestration</h3>
 
 <p align="center">
-  Our agent is continuously <strong>fine-tuned</strong> through community-driven incentives, enabling contributors to collaborate and compete to produce the best possible AI agent.
+  <strong>Cortex IDE</strong> is a specialized development environment designed from the ground up for AI integration and agent orchestration. Our goal is to build the most comprehensive IDE for AI-powered development workflows.
 </p>
 
 <p align="center">
-  <a href="https://github.com/CortexLM/cortex/releases"><img src="https://img.shields.io/github/v/release/CortexLM/cortex?style=flat-square&color=blue" alt="Release"></a>
+  <a href="https://github.com/CortexLM/cortex-ide/releases"><img src="https://img.shields.io/badge/version-alpha-orange?style=flat-square" alt="Alpha"></a>
   <a href="https://discord.gg/cortexfoundation"><img src="https://img.shields.io/badge/Discord-Join%20Us-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord"></a>
   <a href="https://twitter.com/CortexLM"><img src="https://img.shields.io/twitter/follow/CortexLM?style=flat-square&logo=twitter&color=1DA1F2" alt="Twitter"></a>
 </p>
 
 <p align="center">
-  <a href="#installation">Installation</a> •
-  <a href="#quick-start">Quick Start</a> •
+  <a href="#roadmap">Roadmap</a> •
+  <a href="#alpha-notice">Alpha Notice</a> •
+  <a href="#bug-bounty">Bug Bounty</a> •
   <a href="https://discord.gg/cortexfoundation">Discord</a> •
-  <a href="https://twitter.com/CortexLM">Twitter</a> •
-  <a href="./CHANGELOG.md">Changelog</a>
+  <a href="https://twitter.com/CortexLM">Twitter</a>
 </p>
 
 ---
 
-## Installation
+## ⚠️ Alpha Notice
 
-### Linux & macOS
-
-```bash
-curl -fsSL https://software.cortex.foundation/install.sh | sh
-```
-
-Or with wget:
-
-```bash
-wget -qO- https://software.cortex.foundation/install.sh | sh
-```
-
-### Windows (PowerShell)
-
-```powershell
-irm https://software.cortex.foundation/install.ps1 | iex
-```
-
-### Install a specific version
-
-```bash
-# Linux & macOS
-CORTEX_VERSION=0.0.1c curl -fsSL https://software.cortex.foundation/install.sh | sh
-
-# Windows PowerShell
-$env:CORTEX_VERSION="0.0.1c"; irm https://software.cortex.foundation/install.ps1 | iex
-```
-
-### Manual Download
-
-| Platform | Architecture | Download |
-|----------|--------------|----------|
-| **Linux** | x86_64 | [cortex.tar.gz](https://software.cortex.foundation/v1/assets/linux-x86_64/latest/cortex.tar.gz) |
-| **Linux** | ARM64 | [cortex.tar.gz](https://software.cortex.foundation/v1/assets/linux-aarch64/latest/cortex.tar.gz) |
-| **macOS** | Apple Silicon | [cortex.tar.gz](https://software.cortex.foundation/v1/assets/darwin-aarch64/latest/cortex.tar.gz) |
-| **macOS** | Intel | [cortex.tar.gz](https://software.cortex.foundation/v1/assets/darwin-x86_64/latest/cortex.tar.gz) |
-| **Windows** | x86_64 | [cortex.zip](https://software.cortex.foundation/v1/assets/windows-x86_64/latest/cortex.zip) |
-| **Windows** | ARM64 | [cortex.zip](https://software.cortex.foundation/v1/assets/windows-aarch64/latest/cortex.zip) |
+> **This project is currently in early alpha development and is NOT usable for production.**
+>
+> The alpha version is designed so that miners can test and report all bugs through our [Bug Bounty Program](https://github.com/PlatformNetwork/bounty-challenge).
+>
+> Commits will be **very frequent** during the alpha phase. Expect rapid updates and breaking changes as we iterate quickly toward a stable release.
 
 ---
 
-## Quick Start
+## Vision
 
-```bash
-# Start a new session
-cortex
-
-# Or run a specific command
-cortex "explain this codebase"
-```
+Cortex IDE aims to be the most complete IDE for AI, specialized in **agent orchestration**. Unlike traditional IDEs with AI bolted on, Cortex IDE is built AI-first — every feature is designed around intelligent agent workflows.
 
 ---
 
-## Update
+## Roadmap
 
-Cortex can update itself:
+### Timeline
 
-```bash
-cortex upgrade
+```mermaid
+gantt
+    title Cortex IDE - Alpha Roadmap
+    dateFormat  YYYY-MM-DD
+    axisFormat  %b %d
+
+    section Alpha Launch
+    Project kickoff (Alpha)           :milestone, m1, 2026-02-20, 0d
+
+    section February 2026
+    Core IDE framework                :active, f1, 2026-02-20, 8d
+    AI integration layer              :f2, 2026-02-22, 6d
+    Agent orchestration engine        :f3, 2026-02-24, 5d
+    Full AI integration into IDE      :f4, 2026-02-20, 8d
+    Functional IDE release            :milestone, m2, 2026-02-28, 0d
 ```
 
-Or reinstall using the installation script.
+### Detailed Roadmap
+
+| Date | Milestone | Status |
+|------|-----------|--------|
+| **Feb 20, 2026** | Project kickoff — Alpha development begins | ✅ Done |
+| **Feb 20–28** | Integrate all AI aspects into the IDE | 🔄 In Progress |
+| **Feb 20–28** | Agent orchestration system | 🔄 In Progress |
+| **Feb 28, 2026** | IDE functional and usable for testing | 📋 Planned |
+| **March 2026+** | Beta release, stability improvements, community feedback | 📋 Planned |
+
+### February Goals
+
+- **Full AI Integration**: Embed AI capabilities deeply into every layer of the IDE — code completion, agent chat, inline suggestions, and autonomous task execution.
+- **Agent Orchestration**: Build a first-class orchestration system to manage, coordinate, and monitor multiple AI agents working in parallel.
+- **Functional IDE by end of February**: The IDE will be functional enough to be used and tested by the community.
 
 ---
 
-## Uninstall
+## Bug Bounty
 
-### Linux & macOS
+We rely on miners and community members to help us find and report bugs during the alpha phase.
 
-```bash
-sudo rm /usr/local/bin/Cortex
-# Or if installed to ~/.local/bin
-rm ~/.local/bin/Cortex
-```
-
-### Windows
-
-```powershell
-Remove-Item "$env:LOCALAPPDATA\Cortex\Cortex.exe"
-# Remove from PATH via System Properties > Environment Variables
-```
+🔗 **Report bugs and earn rewards**: [https://github.com/PlatformNetwork/bounty-challenge](https://github.com/PlatformNetwork/bounty-challenge)
 
 ---
 
 ## Contributing
 
-We welcome contributions from the community! See our [Contributing Guide](./docs/CONTRIBUTING.md) for details.
+We welcome contributions from the community! This is an open-source project and every contribution helps shape the future of AI-native development.
 
 ---
 
