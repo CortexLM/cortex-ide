@@ -282,20 +282,12 @@ describe("SearchContext", () => {
   });
 
   describe("Search Events", () => {
-    it("should listen for search:results event", async () => {
+    it("should listen for search:streaming-result event", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("search:results", () => {});
+      await listen("search:streaming-result", () => {});
 
-      expect(listen).toHaveBeenCalledWith("search:results", expect.any(Function));
-    });
-
-    it("should listen for search:progress event", async () => {
-      vi.mocked(listen).mockResolvedValueOnce(() => {});
-
-      await listen("search:progress", () => {});
-
-      expect(listen).toHaveBeenCalledWith("search:progress", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("search:streaming-result", expect.any(Function));
     });
 
     it("should listen for search:complete event", async () => {

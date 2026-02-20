@@ -595,32 +595,11 @@ export function SearchProvider(props: ParentProps) {
     updateFrequentPatterns(history);
   });
 
-  // Listen for external search events
+  // Listen for streaming search results from the backend
   onMount(() => {
-    let unlistenSearch: UnlistenFn | null = null;
-    let unlistenProgress: UnlistenFn | null = null;
-    let unlistenResult: UnlistenFn | null = null;
     let unlistenStreamingResult: UnlistenFn | null = null;
 
     const setupListeners = async () => {
-      unlistenSearch = await listen("search:start", (event) => {
-        const payload = event.payload as { query?: Partial<SearchQuery> };
-        if (payload.query) {
-          performSearch(payload.query);
-        }
-      });
-
-      unlistenProgress = await listen("search:progress", (event) => {
-        const payload = event.payload as Partial<SearchProgress>;
-        setState("progress", (prev) => ({ ...prev, ...payload }));
-      });
-
-      unlistenResult = await listen("search:result", (event) => {
-        const payload = event.payload as SearchResult;
-        setState("results", (prev) => [...prev, payload]);
-      });
-
-      // Also listen for streaming results from workspace search
       unlistenStreamingResult = await listen("search:streaming-result", (event) => {
         const payload = event.payload as { file: string; matches: Array<{ line: number; column: number; text: string; matchStart: number; matchEnd: number }> };
         if (payload && payload.file && payload.matches) {
@@ -655,9 +634,6 @@ export function SearchProvider(props: ParentProps) {
     setupListeners();
 
     onCleanup(() => {
-      unlistenSearch?.();
-      unlistenProgress?.();
-      unlistenResult?.();
       unlistenStreamingResult?.();
     });
   });
