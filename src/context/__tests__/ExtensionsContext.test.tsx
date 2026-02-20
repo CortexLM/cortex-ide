@@ -65,11 +65,11 @@ describe("ExtensionsContext", () => {
     it("should install extension via invoke", async () => {
       vi.mocked(invoke).mockResolvedValueOnce({ success: true });
 
-      const result = await invoke("extension_install", {
+      const result = await invoke("install_extension", {
         extensionId: "publisher.extension-name",
       });
 
-      expect(invoke).toHaveBeenCalledWith("extension_install", {
+      expect(invoke).toHaveBeenCalledWith("install_extension", {
         extensionId: "publisher.extension-name",
       });
       expect(result).toEqual({ success: true });
@@ -90,7 +90,7 @@ describe("ExtensionsContext", () => {
     it("should handle installation error", async () => {
       vi.mocked(invoke).mockRejectedValueOnce(new Error("Network error"));
 
-      await expect(invoke("extension_install", { extensionId: "invalid" }))
+      await expect(invoke("install_extension", { extensionId: "invalid" }))
         .rejects.toThrow("Network error");
     });
 
@@ -107,11 +107,11 @@ describe("ExtensionsContext", () => {
     it("should uninstall extension via invoke", async () => {
       vi.mocked(invoke).mockResolvedValueOnce(undefined);
 
-      await invoke("extension_uninstall", {
+      await invoke("uninstall_extension", {
         extensionId: "publisher.extension-name",
       });
 
-      expect(invoke).toHaveBeenCalledWith("extension_uninstall", {
+      expect(invoke).toHaveBeenCalledWith("uninstall_extension", {
         extensionId: "publisher.extension-name",
       });
     });
@@ -133,11 +133,11 @@ describe("ExtensionsContext", () => {
     it("should enable extension", async () => {
       vi.mocked(invoke).mockResolvedValueOnce(undefined);
 
-      await invoke("extension_enable", {
+      await invoke("enable_extension", {
         extensionId: "publisher.extension-name",
       });
 
-      expect(invoke).toHaveBeenCalledWith("extension_enable", {
+      expect(invoke).toHaveBeenCalledWith("enable_extension", {
         extensionId: "publisher.extension-name",
       });
     });
@@ -145,11 +145,11 @@ describe("ExtensionsContext", () => {
     it("should disable extension", async () => {
       vi.mocked(invoke).mockResolvedValueOnce(undefined);
 
-      await invoke("extension_disable", {
+      await invoke("disable_extension", {
         extensionId: "publisher.extension-name",
       });
 
-      expect(invoke).toHaveBeenCalledWith("extension_disable", {
+      expect(invoke).toHaveBeenCalledWith("disable_extension", {
         extensionId: "publisher.extension-name",
       });
     });
@@ -167,12 +167,12 @@ describe("ExtensionsContext", () => {
     it("should disable extension for workspace only", async () => {
       vi.mocked(invoke).mockResolvedValueOnce(undefined);
 
-      await invoke("extension_disable", {
+      await invoke("disable_extension", {
         extensionId: "publisher.extension-name",
         workspaceOnly: true,
       });
 
-      expect(invoke).toHaveBeenCalledWith("extension_disable", {
+      expect(invoke).toHaveBeenCalledWith("disable_extension", {
         extensionId: "publisher.extension-name",
         workspaceOnly: true,
       });

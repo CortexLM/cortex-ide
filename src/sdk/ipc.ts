@@ -513,7 +513,7 @@ export async function dapDisassemble(
 
 export async function extensionInstall(path: string): Promise<ExtensionInfo | null> {
   try {
-    return await invoke<ExtensionInfo>("extension_install", { path });
+    return await invoke<ExtensionInfo>("install_extension", { path });
   } catch {
     return null;
   }
@@ -521,7 +521,7 @@ export async function extensionInstall(path: string): Promise<ExtensionInfo | nu
 
 export async function extensionUninstall(extensionId: string): Promise<boolean> {
   try {
-    await invoke("extension_uninstall", { extensionId });
+    await invoke("uninstall_extension", { extensionId });
     return true;
   } catch {
     return false;
@@ -530,7 +530,7 @@ export async function extensionUninstall(extensionId: string): Promise<boolean> 
 
 export async function extensionEnable(extensionId: string): Promise<boolean> {
   try {
-    await invoke("extension_enable", { extensionId });
+    await invoke("enable_extension", { extensionId });
     return true;
   } catch {
     return false;
@@ -539,7 +539,7 @@ export async function extensionEnable(extensionId: string): Promise<boolean> {
 
 export async function extensionDisable(extensionId: string): Promise<boolean> {
   try {
-    await invoke("extension_disable", { extensionId });
+    await invoke("disable_extension", { extensionId });
     return true;
   } catch {
     return false;
@@ -548,7 +548,7 @@ export async function extensionDisable(extensionId: string): Promise<boolean> {
 
 export async function extensionGetPermissions(extensionId: string): Promise<ExtensionPermissions> {
   try {
-    return await invoke<ExtensionPermissions>("extension_get_permissions", { extensionId });
+    return await invoke<ExtensionPermissions>("get_extension_permissions", { extensionId });
   } catch {
     return { fileSystem: false, network: false, process: false, clipboard: false, env: false };
   }
@@ -559,7 +559,7 @@ export async function extensionSetPermissions(
   permissions: ExtensionPermissions,
 ): Promise<boolean> {
   try {
-    await invoke("extension_set_permissions", { extensionId, permissions });
+    await invoke("set_extension_permissions", { extensionId, permissions });
     return true;
   } catch {
     return false;
@@ -568,7 +568,7 @@ export async function extensionSetPermissions(
 
 export async function extensionGetLifecycleState(extensionId: string): Promise<ExtensionLifecycleState> {
   try {
-    return await invoke<ExtensionLifecycleState>("extension_get_lifecycle_state", { extensionId });
+    return await invoke<ExtensionLifecycleState>("get_extension_lifecycle_state", { extensionId });
   } catch {
     return { state: "error", lastError: "Failed to get lifecycle state" };
   }
@@ -580,7 +580,7 @@ export async function extensionTriggerHostFunction(
   args: unknown[],
 ): Promise<unknown> {
   try {
-    return await invoke("extension_trigger_host_function", {
+    return await invoke("trigger_extension_host_function", {
       extensionId, functionName, args,
     });
   } catch {
@@ -590,7 +590,7 @@ export async function extensionTriggerHostFunction(
 
 export async function extensionListInstalled(): Promise<ExtensionInfo[]> {
   try {
-    return await invoke<ExtensionInfo[]>("extension_list_installed");
+    return await invoke<ExtensionInfo[]>("list_installed_extensions");
   } catch {
     return [];
   }

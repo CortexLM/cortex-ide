@@ -985,7 +985,7 @@ describe("IPC Wrappers", () => {
 
         await extensionInstall("/downloads/ext.wasm");
 
-        expect(invoke).toHaveBeenCalledWith("extension_install", {
+        expect(invoke).toHaveBeenCalledWith("install_extension", {
           path: "/downloads/ext.wasm",
         });
       });
@@ -1013,7 +1013,7 @@ describe("IPC Wrappers", () => {
 
         await extensionUninstall("my-extension");
 
-        expect(invoke).toHaveBeenCalledWith("extension_uninstall", {
+        expect(invoke).toHaveBeenCalledWith("uninstall_extension", {
           extensionId: "my-extension",
         });
       });
@@ -1041,7 +1041,7 @@ describe("IPC Wrappers", () => {
 
         await extensionEnable("my-ext");
 
-        expect(invoke).toHaveBeenCalledWith("extension_enable", {
+        expect(invoke).toHaveBeenCalledWith("enable_extension", {
           extensionId: "my-ext",
         });
       });
@@ -1069,7 +1069,7 @@ describe("IPC Wrappers", () => {
 
         await extensionDisable("my-ext");
 
-        expect(invoke).toHaveBeenCalledWith("extension_disable", {
+        expect(invoke).toHaveBeenCalledWith("disable_extension", {
           extensionId: "my-ext",
         });
       });
@@ -1119,7 +1119,7 @@ describe("IPC Wrappers", () => {
 
         await extensionGetPermissions("my-ext");
 
-        expect(invoke).toHaveBeenCalledWith("extension_get_permissions", {
+        expect(invoke).toHaveBeenCalledWith("get_extension_permissions", {
           extensionId: "my-ext",
         });
       });
@@ -1167,7 +1167,7 @@ describe("IPC Wrappers", () => {
 
         await extensionSetPermissions("my-ext", permissions);
 
-        expect(invoke).toHaveBeenCalledWith("extension_set_permissions", {
+        expect(invoke).toHaveBeenCalledWith("set_extension_permissions", {
           extensionId: "my-ext",
           permissions,
         });
@@ -1203,7 +1203,7 @@ describe("IPC Wrappers", () => {
 
         await extensionGetLifecycleState("my-ext");
 
-        expect(invoke).toHaveBeenCalledWith("extension_get_lifecycle_state", {
+        expect(invoke).toHaveBeenCalledWith("get_extension_lifecycle_state", {
           extensionId: "my-ext",
         });
       });
@@ -1232,7 +1232,7 @@ describe("IPC Wrappers", () => {
 
         await extensionTriggerHostFunction("my-ext", "doWork", [1, "two", true]);
 
-        expect(invoke).toHaveBeenCalledWith("extension_trigger_host_function", {
+        expect(invoke).toHaveBeenCalledWith("trigger_extension_host_function", {
           extensionId: "my-ext",
           functionName: "doWork",
           args: [1, "two", true],
@@ -1268,7 +1268,7 @@ describe("IPC Wrappers", () => {
 
         await extensionListInstalled();
 
-        expect(invoke).toHaveBeenCalledWith("extension_list_installed");
+        expect(invoke).toHaveBeenCalledWith("list_installed_extensions");
       });
 
       it("should return empty array on error", async () => {
