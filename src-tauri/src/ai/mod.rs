@@ -169,7 +169,7 @@ pub async fn ai_complete(
 
 /// Stream a conversation response
 ///
-/// Emits "ai:stream" events with StreamChunk payloads.
+/// Emits "ai:stream_chunk" events with StreamChunk payloads.
 /// Event payload includes thread_id for routing to correct UI component.
 #[tauri::command]
 pub async fn ai_stream(
@@ -193,7 +193,7 @@ pub async fn ai_stream(
                 thread_id: thread_id_clone.clone(),
                 chunk,
             };
-            if let Err(e) = app_clone.emit("ai:stream", &event_payload) {
+            if let Err(e) = app_clone.emit("ai:stream_chunk", &event_payload) {
                 error!("Failed to emit stream event: {}", e);
             }
         }
