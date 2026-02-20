@@ -105,6 +105,22 @@ export const Icon: Component<IconProps> = (props) => {
     return fetchPromise;
   };
 
+  const parseSvgContent = (svgText: string) => {
+    // Extract viewBox
+    const viewBoxMatch = svgText.match(/viewBox="([^"]+)"/);
+    if (viewBoxMatch) {
+      setViewBox(viewBoxMatch[1]);
+    }
+
+    // Extract path content (everything inside the svg tag)
+    const pathMatch = svgText.match(/<svg[^>]*>([\s\S]*?)<\/svg>/);
+    if (pathMatch) {
+      setSvgContent(pathMatch[1]);
+    }
+
+    setError(false);
+  };
+
   createEffect(() => {
     const iconName = resolvedName();
     if (!iconName) {
@@ -142,22 +158,6 @@ export const Icon: Component<IconProps> = (props) => {
       }
     });
   });
-
-  const parseSvgContent = (svgText: string) => {
-    // Extract viewBox
-    const viewBoxMatch = svgText.match(/viewBox="([^"]+)"/);
-    if (viewBoxMatch) {
-      setViewBox(viewBoxMatch[1]);
-    }
-
-    // Extract path content (everything inside the svg tag)
-    const pathMatch = svgText.match(/<svg[^>]*>([\s\S]*?)<\/svg>/);
-    if (pathMatch) {
-      setSvgContent(pathMatch[1]);
-    }
-
-    setError(false);
-  };
 
   const sizeValue = () => {
     if (local.size === undefined) return '1em';
