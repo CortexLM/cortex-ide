@@ -7,6 +7,7 @@ import {
   createMemo,
 } from "solid-js";
 import { createStore, produce } from "solid-js/store";
+import { useTauriListen } from "@/hooks/useTauriListen";
 
 // ============================================================================
 // Activity Types
@@ -362,6 +363,93 @@ export const ActivityIndicatorProvider: ParentComponent = (props) => {
     const totalProgress = sourceTasks.reduce((sum, t) => sum + (t.progress || 0), 0);
     return Math.round(totalProgress / sourceTasks.length);
   };
+
+  // ============================================================================
+  // Tauri Backend Event Listener
+  // ============================================================================
+
+  interface ActivityUpdate {
+    eventType: string;
+    taskId?: string;
+    task?: ActivityTask;
+    historyEntry?: {
+      id: string;
+      title: string;
+      source: TaskSource;
+      status: "completed" | "failed" | "cancelled";
+      startedAt: number;
+      completedAt: number;
+      durationMs: number;
+      error?: string;
+    };
+  }
+
+  const handleActivityUpdate = (payload: ActivityUpdate) => {
+    switch (payload.eventType) {
+      case "task_created": {
+        if (payload.task) {
+          setState(
+            produce((s) => {
+              if (!s.tasks.some((t) => t.id === payload.task!.id)) {
+                s.tasks.push(payload.task!);
+              }
+            })
+          );
+        }
+        break;
+      }
+      case "task_updated":
+      case "task_progress":
+      case "task_message": {
+        if (payload.task) {
+          setState(
+            produce((s) => {
+              const idx = s.tasks.findIndex((t) => t.id === payload.task!.id);
+              if (idx >= 0) {
+                s.tasks[idx] = payload.task!;
+              } else {
+                s.tasks.push(payload.task!);
+              }
+            })
+          );
+        }
+        break;
+      }
+      case "task_completed":
+      case "task_cancelled": {
+        setState(
+          produce((s) => {
+            if (payload.taskId) {
+              s.tasks = s.tasks.filter((t) => t.id !== payload.taskId);
+            }
+            if (payload.historyEntry) {
+              const entry: TaskHistoryEntry = {
+                id: payload.historyEntry.id,
+                title: payload.historyEntry.title,
+                source: payload.historyEntry.source,
+                status: payload.historyEntry.status,
+                startedAt: payload.historyEntry.startedAt,
+                completedAt: payload.historyEntry.completedAt,
+                duration: payload.historyEntry.durationMs,
+                error: payload.historyEntry.error,
+              };
+              s.history.unshift(entry);
+              if (s.history.length > s.maxHistorySize) {
+                s.history = s.history.slice(0, s.maxHistorySize);
+              }
+            }
+          })
+        );
+        break;
+      }
+      case "history_cleared": {
+        setState("history", []);
+        break;
+      }
+    }
+  };
+
+  useTauriListen<ActivityUpdate>("activity:update", handleActivityUpdate);
 
   // ============================================================================
   // Event Handlers for Integration
