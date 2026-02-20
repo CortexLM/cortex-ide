@@ -476,19 +476,18 @@ export function WorkspaceProvider(props: ParentProps) {
     
     window.addEventListener("workspace:open-folder", handleProjectChange as EventListener);
     
-    // Also poll localStorage for changes (for compatibility with SDK's project watch)
-    // Use 2000ms interval instead of 500ms to reduce CPU overhead while still being responsive
-    // Use window-specific key for multi-window support (reuse label from above)
-    // Only use legacy fallback for main window - new windows should not inherit main's project
+    // Listen for localStorage changes from other windows (event-driven, zero-cost when idle)
+    // The 'storage' event fires when localStorage is modified from another tab/window.
+    // Same-window changes are handled by the workspace:open-folder CustomEvent above.
     const projectKey = `cortex_current_project_${label}`;
     const getLegacyFallback = () => label === "main" ? localStorage.getItem("cortex_current_project") : null;
     let lastProject = localStorage.getItem(projectKey) || getLegacyFallback();
-    const pollInterval = window.setInterval(() => {
-      const currentProject = localStorage.getItem(projectKey) || getLegacyFallback();
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key !== projectKey && e.key !== "cortex_current_project") return;
+      const currentProject = e.newValue || getLegacyFallback();
       if (currentProject && currentProject !== "." && currentProject !== lastProject) {
         lastProject = currentProject;
         const currentFolders = folders();
-        // Only update if the folder is different
         if (currentFolders.length === 0 || currentFolders[0]?.path !== currentProject.replace(/\\/g, "/")) {
           batch(() => {
             setFolders([]);
@@ -498,11 +497,12 @@ export function WorkspaceProvider(props: ParentProps) {
           addFolder(currentProject);
         }
       }
-    }, 2000);
+    };
+    window.addEventListener("storage", handleStorageChange);
     
     onCleanup(() => {
       window.removeEventListener("workspace:open-folder", handleProjectChange as EventListener);
-      window.clearInterval(pollInterval);
+      window.removeEventListener("storage", handleStorageChange);
     });
   });
 

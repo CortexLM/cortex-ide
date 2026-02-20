@@ -1101,6 +1101,9 @@ function matchGlobPattern(filename: string, pattern: string): boolean {
 // Provider
 // ============================================================================
 
+/** localStorage key for caching settings between startups */
+const SETTINGS_CACHE_KEY = "cortex_cached_settings";
+
 export function SettingsProvider(props: ParentProps) {
   const [state, setState] = createStore<SettingsState>({
     settings: DEFAULT_SETTINGS,
@@ -1171,6 +1174,12 @@ export function SettingsProvider(props: ParentProps) {
         setWsState("userSettings", reconcile(validated));
         setState("isDirty", false);
       });
+      // Update localStorage cache for next startup
+      try {
+        localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(validated));
+      } catch {
+        // Ignore quota errors
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.error("[SettingsContext] Failed to load settings, using defaults:", msg);
@@ -1269,6 +1278,12 @@ export function SettingsProvider(props: ParentProps) {
       });
       // Include the settings value in the event for other contexts to cache
       window.dispatchEvent(new CustomEvent("settings:changed", { detail: { section, settings: value } }));
+      // Update localStorage cache for next startup
+      try {
+        localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(updated));
+      } catch {
+        // Ignore quota errors
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       batch(() => {
@@ -1715,9 +1730,80 @@ const updateCommandPaletteSetting = async <K extends keyof CommandPaletteSetting
     };
   };
 
-  onMount(async () => {
-    await loadSettings();
-    await getSettingsPath();
+  /** Write current user settings to localStorage for next startup */
+  const cacheSettingsToLocalStorage = () => {
+    try {
+      localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(wsState.userSettings));
+    } catch {
+      // Ignore quota errors
+    }
+  };
+
+  onMount(() => {
+    let settingsReconciled = false;
+
+    // (1) Read cached settings from localStorage for instant startup (no IPC wait)
+    try {
+      const cached = localStorage.getItem(SETTINGS_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached) as CortexSettings;
+        const validated: CortexSettings = {
+          ...DEFAULT_SETTINGS,
+          ...parsed,
+          editor: { ...DEFAULT_SETTINGS.editor, ...parsed?.editor },
+          theme: { ...DEFAULT_SETTINGS.theme, ...parsed?.theme },
+          terminal: { ...DEFAULT_SETTINGS.terminal, ...parsed?.terminal },
+          ai: { ...DEFAULT_SETTINGS.ai, ...parsed?.ai },
+          security: { ...DEFAULT_SETTINGS.security, ...parsed?.security },
+          files: { ...DEFAULT_SETTINGS.files, ...parsed?.files },
+          explorer: { ...DEFAULT_SETTINGS.explorer, ...parsed?.explorer },
+          zenMode: { ...DEFAULT_SETTINGS.zenMode, ...parsed?.zenMode },
+          screencastMode: { ...DEFAULT_SETTINGS.screencastMode, ...parsed?.screencastMode },
+          search: { ...DEFAULT_SETTINGS.search, ...parsed?.search },
+          debug: { ...DEFAULT_SETTINGS.debug, ...parsed?.debug },
+          git: { ...DEFAULT_SETTINGS.git, ...parsed?.git },
+          http: { ...DEFAULT_SETTINGS.http, ...parsed?.http },
+          commandPalette: { ...DEFAULT_SETTINGS.commandPalette, ...parsed?.commandPalette },
+          workbench: { ...DEFAULT_SETTINGS.workbench, ...parsed?.workbench, editor: { ...DEFAULT_SETTINGS.workbench.editor, ...parsed?.workbench?.editor } },
+        };
+        batch(() => {
+          setWsState("userSettings", reconcile(validated));
+          setState("loading", false);
+          setWsState("loading", false);
+        });
+      }
+    } catch {
+      // Ignore parse errors, will load from backend
+    }
+
+    // (2) Listen for backend:ready Tauri event and reconcile with backend state
+    const setupBackendListener = async () => {
+      const unlisten = await listen<{ preloaded: string[] }>("backend:ready", async () => {
+        if (settingsReconciled) return;
+        settingsReconciled = true;
+        await loadSettings();
+        await getSettingsPath();
+        cacheSettingsToLocalStorage();
+      });
+      onCleanup(() => unlisten());
+    };
+    setupBackendListener();
+
+    // (3) Deferred fallback: if backend:ready hasn't arrived in 2s, load via IPC
+    const reconcileFallback = async () => {
+      if (settingsReconciled) return;
+      settingsReconciled = true;
+      await loadSettings();
+      await getSettingsPath();
+      cacheSettingsToLocalStorage();
+    };
+
+    if ("requestIdleCallback" in window) {
+      (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number })
+        .requestIdleCallback(() => reconcileFallback(), { timeout: 2000 });
+    } else {
+      setTimeout(() => reconcileFallback(), 2000);
+    }
   });
 
   createEffect(() => {
