@@ -19,12 +19,12 @@ use std::net::TcpListener;
 use std::sync::{Arc, Mutex};
 
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Emitter, Manager, RunEvent, WebviewWindow};
+use tauri::{AppHandle, Emitter, Manager, RunEvent};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_notification::NotificationExt;
 use tauri_plugin_shell::process::CommandChild;
 use tokio::sync::mpsc;
-use tracing::{error, info, warn};
+use tracing::{info, warn};
 
 use crate::activity::ActivityState;
 use crate::ai::{AIState, AIToolsState, AgentState, AgentStoreState};
@@ -180,15 +180,6 @@ fn find_free_port() -> Result<u32, String> {
         .and_then(|listener| listener.local_addr())
         .map(|addr| addr.port() as u32)
         .map_err(|e| format!("Failed to find free port: {}", e))
-}
-
-fn show_main_window(window: &WebviewWindow) {
-    if let Err(e) = window.show() {
-        error!("Failed to show main window: {}", e);
-    }
-    if let Err(e) = window.set_focus() {
-        warn!("Failed to focus main window: {}", e);
-    }
 }
 
 // ===== Inline Tauri Commands =====
@@ -604,10 +595,6 @@ pub fn setup_app(
     });
 
     info!("Setup phase completed in {:?}", startup_time.elapsed());
-
-    if let Some(window) = app.get_webview_window("main") {
-        show_main_window(&window);
-    }
 
     Ok(())
 }

@@ -394,6 +394,24 @@ pub async fn create_auxiliary_window(
     Ok(())
 }
 
+/// Show the main window after the frontend shell has rendered its first frame.
+/// Called by AppShell.tsx onMount to ensure users see the loading skeleton
+/// instead of a blank/white window.
+#[tauri::command]
+pub async fn show_main_window(app: AppHandle) -> Result<(), String> {
+    let window = app
+        .get_webview_window("main")
+        .ok_or_else(|| "Main window not found".to_string())?;
+    if let Err(e) = window.show() {
+        error!("Failed to show main window: {}", e);
+        return Err(format!("Failed to show main window: {}", e));
+    }
+    if let Err(e) = window.set_focus() {
+        error!("Failed to focus main window: {}", e);
+    }
+    Ok(())
+}
+
 /// Signal that the UI shell is ready - show the window
 /// Called by frontend when titlebar and background are rendered
 #[tauri::command]

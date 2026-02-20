@@ -12,6 +12,7 @@
  */
 
 import { ParentProps, ErrorBoundary, Suspense, lazy, createSignal, onMount } from "solid-js";
+import { invoke } from "@tauri-apps/api/core";
 
 // Startup timing
 const SHELL_LOAD_TIME = performance.now();
@@ -149,7 +150,13 @@ function ErrorFallback(props: { error: Error }) {
 // ============================================================================
 export default function AppShell(props: ParentProps) {
   if (import.meta.env.DEV) console.log(`[STARTUP] AppShell rendering @ ${performance.now().toFixed(1)}ms`);
-  
+
+  onMount(() => {
+    requestAnimationFrame(() => {
+      invoke("show_main_window").catch(() => {});
+    });
+  });
+
   return (
     <ErrorBoundary fallback={(err) => <ErrorFallback error={err} />}>
       <Suspense fallback={<LoadingIndicator />}>

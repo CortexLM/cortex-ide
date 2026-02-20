@@ -150,6 +150,7 @@ macro_rules! misc_commands {
             $crate::window::register_window_project,
             $crate::window::unregister_window,
             $crate::window::update_window_state,
+            $crate::window::show_main_window,
             $crate::window::show_window,
             $crate::window::toggle_devtools,
             // WSL commands
