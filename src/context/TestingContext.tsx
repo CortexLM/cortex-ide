@@ -314,8 +314,13 @@ export const TestingProvider: ParentComponent = (props) => {
     lastAutoRunFilePath: null,
   });
 
-  let unlistenTestEvent: UnlistenFn | null = null;
+  let unlistenRunStarted: UnlistenFn | null = null;
+  let unlistenRunComplete: UnlistenFn | null = null;
+  let unlistenRunError: UnlistenFn | null = null;
   let unlistenTestOutput: UnlistenFn | null = null;
+  let unlistenAutoRun: UnlistenFn | null = null;
+  let unlistenFileChanged: UnlistenFn | null = null;
+  let unlistenWatchStopped: UnlistenFn | null = null;
   let currentTerminalId: string | null = null;
   let saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   const pendingSaveFiles: Set<string> = new Set();
@@ -1980,8 +1985,13 @@ export const TestingProvider: ParentComponent = (props) => {
 
   // Register cleanup synchronously
   onCleanup(() => {
-    unlistenTestEvent?.();
+    unlistenRunStarted?.();
+    unlistenRunComplete?.();
+    unlistenRunError?.();
     unlistenTestOutput?.();
+    unlistenAutoRun?.();
+    unlistenFileChanged?.();
+    unlistenWatchStopped?.();
     window.removeEventListener("cortex:terminal_output", handleTerminalOutput);
     window.removeEventListener("cortex:terminal_status", handleTerminalStatus);
     window.removeEventListener("testing:run-all", handleRunAllTests);
@@ -2031,14 +2041,67 @@ export const TestingProvider: ParentComponent = (props) => {
     // DEFERRED - Set up Tauri event listeners after first paint
     // Testing events won't fire until user explicitly runs tests
     const initDeferredListeners = async () => {
-      // Listen for test events from backend
-      unlistenTestEvent = await listen<{ type: string; data: unknown }>("testing:event", (event) => {
-        handleTestEvent(event.payload);
-      });
+      unlistenRunStarted = await listen<{ run_id: string; framework: string }>(
+        "testing:run-started",
+        () => {
+          setState("isRunning", true);
+        },
+      );
 
-      unlistenTestOutput = await listen<{ output: string }>("testing:output", (event) => {
-        handleTestEvent({ type: "test_output", data: event.payload });
-      });
+      unlistenRunComplete = await listen<{ run_id: string; exit_code: number; success: boolean }>(
+        "testing:run-complete",
+        (event) => {
+          handleTestEvent({ type: "test_complete", data: { exitCode: event.payload.exit_code } });
+        },
+      );
+
+      unlistenRunError = await listen<{ run_id: string; error: string }>(
+        "testing:run-error",
+        (event) => {
+          setState(
+            produce((s) => {
+              s.output.push(`[Error] ${event.payload.error}`);
+              if (s.currentRun) {
+                s.currentRun.status = "error";
+                s.currentRun.finishedAt = Date.now();
+              }
+              s.isRunning = false;
+            }),
+          );
+          currentTerminalId = null;
+        },
+      );
+
+      unlistenTestOutput = await listen<{ run_id: string; output: string; stream: string }>(
+        "testing:output",
+        (event) => {
+          handleTestEvent({ type: "test_output", data: { output: event.payload.output } });
+        },
+      );
+
+      unlistenAutoRun = await listen<{ watcher_id: string; test_files: string[]; framework: string }>(
+        "testing:auto-run",
+        (event) => {
+          for (const filePath of event.payload.test_files) {
+            runTestFile(filePath);
+          }
+        },
+      );
+
+      unlistenFileChanged = await listen<{ watcher_id: string; paths: string[]; event_kind: string }>(
+        "testing:file-changed",
+        () => {
+          // Informational — watch mode file change detected
+        },
+      );
+
+      unlistenWatchStopped = await listen<{ watcher_id: string }>(
+        "testing:watch-stopped",
+        () => {
+          setState("watchMode", false);
+          setState("watcherId", null);
+        },
+      );
     };
 
     // Use requestIdleCallback if available, otherwise setTimeout

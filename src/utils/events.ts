@@ -344,8 +344,16 @@ export const EVENTS = {
     COVERAGE_UPDATED: 'testing:coverage-updated',
     COVERAGE_VISIBILITY_CHANGED: 'testing:coverage-visibility-changed',
     COVERAGE_CLEARED: 'testing:coverage-cleared',
-    EVENT: 'testing:event',
+    RUN_STARTED: 'testing:run-started',
+    RUN_COMPLETE: 'testing:run-complete',
+    RUN_ERROR: 'testing:run-error',
     OUTPUT: 'testing:output',
+    AUTO_RUN: 'testing:auto-run',
+    FILE_CHANGED: 'testing:file-changed',
+    WATCH_STARTED: 'testing:watch-started',
+    WATCH_STOPPED: 'testing:watch-stopped',
+    WATCH_ERROR: 'testing:watch-error',
+    WATCH_CREATED: 'testing:watch-created',
   },
 
   // -------------------------------------------------------------------------

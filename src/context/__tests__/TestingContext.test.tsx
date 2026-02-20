@@ -305,20 +305,20 @@ describe("TestingContext", () => {
   });
 
   describe("Test Events", () => {
-    it("should listen for test started event", async () => {
+    it("should listen for test run-started event", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("testing:started", () => {});
+      await listen("testing:run-started", () => {});
 
-      expect(listen).toHaveBeenCalledWith("testing:started", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("testing:run-started", expect.any(Function));
     });
 
-    it("should listen for test completed event", async () => {
+    it("should listen for test run-complete event", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("testing:completed", () => {});
+      await listen("testing:run-complete", () => {});
 
-      expect(listen).toHaveBeenCalledWith("testing:completed", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("testing:run-complete", expect.any(Function));
     });
 
     it("should listen for test output event", async () => {
@@ -329,12 +329,12 @@ describe("TestingContext", () => {
       expect(listen).toHaveBeenCalledWith("testing:output", expect.any(Function));
     });
 
-    it("should listen for test discovered event", async () => {
+    it("should listen for test run-error event", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("testing:discovered", () => {});
+      await listen("testing:run-error", () => {});
 
-      expect(listen).toHaveBeenCalledWith("testing:discovered", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("testing:run-error", expect.any(Function));
     });
   });
 
