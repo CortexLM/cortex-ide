@@ -143,7 +143,7 @@ export const Icon: Component<IconProps> = (props) => {
     });
   });
 
-  const parseSvgContent = (svgText: string) => {
+  function parseSvgContent(svgText: string) {
     // Extract viewBox
     const viewBoxMatch = svgText.match(/viewBox="([^"]+)"/);
     if (viewBoxMatch) {
@@ -157,7 +157,7 @@ export const Icon: Component<IconProps> = (props) => {
     }
 
     setError(false);
-  };
+  }
 
   const sizeValue = () => {
     if (local.size === undefined) return '1em';
