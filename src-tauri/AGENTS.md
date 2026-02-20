@@ -64,7 +64,6 @@ The Rust backend for Cortex Desktop. Implements all native functionality exposed
 | `themes` | `src/themes.rs` | — | Theme management: loading, storage, export (Cortex native + VS Code formats) |
 | `process` | `src/process.rs` | — | Process management |
 | `process_utils` | `src/process_utils.rs` | — | Process utilities |
-| *(undeclared)* | `src/commands/` | `ai.rs`, `collab.rs`, `debug.rs`, `extensions.rs`, `factory.rs`, `fs.rs`, `git.rs`, `lsp.rs`, `repl.rs`, `search.rs`, `settings.rs`, `system.rs`, `tasks.rs`, `terminal.rs` | Legacy command grouping directory (superseded by `app/` sub-modules, not wired into lib.rs) |
 | *(undeclared)* | `src/output_channels.rs` | — | VS Code-like output channels (not yet wired into lib.rs) |
 | *(undeclared)* | `src/snippets.rs` | — | VS Code-compatible snippet management (not yet wired into lib.rs) |
 | *(undeclared)* | `src/workspace_symbols.rs` | — | Workspace-wide symbol search (not yet wired into lib.rs) |
