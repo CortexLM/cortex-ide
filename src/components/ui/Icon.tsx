@@ -1,7 +1,7 @@
 import { Component, createSignal, createEffect, JSX, splitProps, onCleanup } from 'solid-js';
-
-// Cache for loaded SVG content
-const svgCache = new Map<string, string>();
+import { getIconName } from '../../utils/iconMap';
+import { criticalIcons } from '../../utils/criticalIcons';
+import { getFromCache, addToCache, hasInCache, clearCache } from '../../utils/iconCache';
 
 // Cache for failed icons to avoid retrying
 const failedIcons = new Set<string>();
@@ -11,7 +11,7 @@ const pendingFetches = new Map<string, Promise<string | null>>();
 
 // Request queue to limit concurrent fetches
 let activeFetches = 0;
-const MAX_CONCURRENT_FETCHES = 4;
+const MAX_CONCURRENT_FETCHES = 10;
 const fetchQueue: Array<() => void> = [];
 
 function processQueue() {
@@ -20,9 +20,6 @@ function processQueue() {
     if (next) next();
   }
 }
-
-// Icon name mapping from various libraries to Font Awesome
-import { getIconName } from '../../utils/iconMap';
 
 export interface IconProps extends JSX.SvgSVGAttributes<SVGSVGElement> {
   name: string;
@@ -59,9 +56,10 @@ export const Icon: Component<IconProps> = (props) => {
       return null;
     }
 
-    // Check cache
-    if (svgCache.has(iconName)) {
-      return svgCache.get(iconName)!;
+    // Check memory/session cache
+    const cached = getFromCache(iconName);
+    if (cached) {
+      return cached;
     }
 
     // Check if already fetching
@@ -84,7 +82,7 @@ export const Icon: Component<IconProps> = (props) => {
           }
 
           const svgText = await response.text();
-          svgCache.set(iconName, svgText);
+          addToCache(iconName, svgText);
           resolve(svgText);
         } catch {
           failedIcons.add(iconName);
@@ -114,9 +112,17 @@ export const Icon: Component<IconProps> = (props) => {
       return;
     }
 
-    // Check cache synchronously first
-    if (svgCache.has(iconName)) {
-      parseSvgContent(svgCache.get(iconName)!);
+    // Tier 1: critical icons (inlined, synchronous)
+    const inlined = criticalIcons.get(iconName);
+    if (inlined) {
+      parseSvgContent(inlined);
+      return;
+    }
+
+    // Tier 2: memory/session cache (synchronous)
+    const cached = getFromCache(iconName);
+    if (cached) {
+      parseSvgContent(cached);
       return;
     }
 
@@ -126,7 +132,7 @@ export const Icon: Component<IconProps> = (props) => {
       return;
     }
 
-    // Load async
+    // Tier 3: HTTP fetch (async)
     loadIcon(iconName).then((svgText) => {
       if (!mounted) return;
       if (svgText) {
@@ -190,16 +196,19 @@ export const Icon: Component<IconProps> = (props) => {
 export const preloadIcons = async (iconNames: string[]): Promise<void> => {
   const promises = iconNames.map(async (name) => {
     const resolvedName = getIconName(name);
-    if (!resolvedName || svgCache.has(resolvedName)) return;
+    if (!resolvedName) return;
+
+    // Skip if available in critical icons or cache
+    if (criticalIcons.has(resolvedName) || hasInCache(resolvedName)) return;
 
     try {
       const svgPath = `/kit-a943e80cf4-desktop/svgs-full/light/${resolvedName}.svg`;
       const response = await fetch(svgPath);
       if (response.ok) {
         const svgText = await response.text();
-        svgCache.set(resolvedName, svgText);
+        addToCache(resolvedName, svgText);
       }
-    } catch (err) {
+    } catch {
       // Silently fail for preloading
     }
   });
@@ -208,10 +217,48 @@ export const preloadIcons = async (iconNames: string[]): Promise<void> => {
 };
 
 /**
+ * Preload non-critical icons during idle time
+ * Uses requestIdleCallback with setTimeout fallback
+ */
+export const scheduleIdlePreload = (iconNames: string[]): void => {
+  const BATCH_SIZE = 5;
+  let index = 0;
+
+  const processBatch = (_deadline?: IdleDeadline) => {
+    const batch: string[] = [];
+    while (index < iconNames.length && batch.length < BATCH_SIZE) {
+      const name = getIconName(iconNames[index]);
+      index++;
+      if (name && !criticalIcons.has(name) && !hasInCache(name) && !failedIcons.has(name)) {
+        batch.push(name);
+      }
+    }
+
+    if (batch.length > 0) {
+      preloadIcons(batch);
+    }
+
+    if (index < iconNames.length) {
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(processBatch);
+      } else {
+        setTimeout(processBatch, 50);
+      }
+    }
+  };
+
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(processBatch);
+  } else {
+    setTimeout(processBatch, 50);
+  }
+};
+
+/**
  * Clear the icon cache (useful for memory management)
  */
 export const clearIconCache = (): void => {
-  svgCache.clear();
+  clearCache();
 };
 
 export default Icon;
