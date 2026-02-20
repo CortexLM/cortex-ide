@@ -1,4 +1,4 @@
-import { createContext, useContext, ParentComponent, onMount, onCleanup, createSignal } from "solid-js";
+import { createContext, useContext, ParentComponent, onMount, onCleanup, createSignal, type Accessor } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { invoke } from "@tauri-apps/api/core";
 import { terminalLogger } from "../utils/logger";
@@ -187,6 +187,7 @@ export interface PersistedTerminalState {
 }
 
 interface TerminalsContextValue {
+  initialized: Accessor<boolean>;
   state: TerminalsState;
   createTerminal: (options?: CreateTerminalOptions) => Promise<TerminalInfo>;
   closeTerminal: (id: string) => Promise<void>;
@@ -669,6 +670,29 @@ export const TerminalsProvider: ParentComponent = (props) => {
     profilesLoaded: false,
   });
 
+  const [initialized, setInitialized] = createSignal(false);
+  let backendInitStarted = false;
+
+  const ensureBackendInitialized = async () => {
+    if (backendInitStarted) return;
+    backendInitStarted = true;
+
+    await refreshTerminals();
+    loadGroupState();
+    loadAutoReplySettings();
+
+    setTimeout(async () => {
+      await detectProfiles();
+      loadCommandHistory();
+      loadPersistedTerminals();
+      loadRecentCommands();
+      loadTerminalEnvironments();
+      await reconnectPersistedTerminals();
+    }, 100);
+
+    setInitialized(true);
+  };
+
   // Auto-reply state
   const [autoReplyRulesState, setAutoReplyRulesState] = createSignal<AutoReplyRule[]>([]);
   const [autoReplyEnabledState, setAutoReplyEnabledState] = createSignal<boolean>(false);
@@ -867,6 +891,7 @@ export const TerminalsProvider: ParentComponent = (props) => {
   };
 
   const createTerminal = async (options?: CreateTerminalOptions): Promise<TerminalInfo> => {
+    await ensureBackendInitialized();
     try {
       const terminal = await invoke<TerminalInfo>("terminal_create", { options });
       
@@ -1071,10 +1096,14 @@ export const TerminalsProvider: ParentComponent = (props) => {
   };
 
   const togglePanel = () => {
+    if (!state.showPanel) {
+      ensureBackendInitialized();
+    }
     setState("showPanel", !state.showPanel);
   };
 
   const openTerminal = (id: string) => {
+    ensureBackendInitialized();
     setState("activeTerminalId", id);
     setState("showPanel", true);
   };
@@ -3137,22 +3166,26 @@ export const TerminalsProvider: ParentComponent = (props) => {
     }
   };
 
-  // Register cleanup synchronously
+  let listenersRegistered = false;
+
+  // Register cleanup synchronously — guard against deferred init not yet completed
   // Note: Tauri listeners are now cleaned up automatically by useTauriListen hooks
   onCleanup(() => {
-    window.removeEventListener("terminal:toggle", handleToggle);
-    window.removeEventListener("terminal:new", handleNew);
-    window.removeEventListener("terminal:split", handleSplit);
-    window.removeEventListener("terminal:clear", handleClear);
-    window.removeEventListener("terminal:kill", handleKill);
-    window.removeEventListener("terminal:write-active", handleWriteActive as unknown as EventListener);
-    window.removeEventListener("terminal:auto-reply-toggle", handleAutoReplyToggle);
-    window.removeEventListener("terminal:run-selection", handleRunSelection);
-    window.removeEventListener("terminal:run-active-file", handleRunActiveFile as unknown as EventListener);
-    window.removeEventListener("terminal:rename", handleRename as unknown as EventListener);
-    window.removeEventListener("terminal:set-color", handleSetColor as unknown as EventListener);
-    window.removeEventListener("editor:selection-for-terminal", handleEditorSelectionForTerminal as unknown as EventListener);
-    window.removeEventListener("editor:active-file-for-terminal", handleEditorActiveFileForTerminal as unknown as EventListener);
+    if (listenersRegistered) {
+      window.removeEventListener("terminal:toggle", handleToggle);
+      window.removeEventListener("terminal:new", handleNew);
+      window.removeEventListener("terminal:split", handleSplit);
+      window.removeEventListener("terminal:clear", handleClear);
+      window.removeEventListener("terminal:kill", handleKill);
+      window.removeEventListener("terminal:write-active", handleWriteActive as unknown as EventListener);
+      window.removeEventListener("terminal:auto-reply-toggle", handleAutoReplyToggle);
+      window.removeEventListener("terminal:run-selection", handleRunSelection);
+      window.removeEventListener("terminal:run-active-file", handleRunActiveFile as unknown as EventListener);
+      window.removeEventListener("terminal:rename", handleRename as unknown as EventListener);
+      window.removeEventListener("terminal:set-color", handleSetColor as unknown as EventListener);
+      window.removeEventListener("editor:selection-for-terminal", handleEditorSelectionForTerminal as unknown as EventListener);
+      window.removeEventListener("editor:active-file-for-terminal", handleEditorActiveFileForTerminal as unknown as EventListener);
+    }
     
     // Force flush any pending outputs
     outputProcessor.forceFlush();
@@ -3176,44 +3209,34 @@ export const TerminalsProvider: ParentComponent = (props) => {
     commandHistoryManagers.clear();
   });
 
-  onMount(async () => {
-    // Note: Tauri event listeners are now set up using useTauriListen hooks above
+  onMount(() => {
+    // Note: Tauri event listeners are set up using useTauriListen hooks above.
+    // Backend IPC (refreshTerminals, detectProfiles, etc.) is lazily initialized
+    // via ensureBackendInitialized() when the user first interacts with terminals.
 
-    // ESSENTIAL - load immediately for first render
-    await refreshTerminals();
-    loadGroupState();
-    loadAutoReplySettings();
-
-    // DEFERRED - run after first paint to avoid blocking startup
-    // Profile detection and terminal reconnection are slow operations
-    setTimeout(async () => {
-      await detectProfiles();
-      loadCommandHistory();
-      loadPersistedTerminals();
-      loadRecentCommands();
-      loadTerminalEnvironments();
-      await reconnectPersistedTerminals();
-    }, 100);
-
-    // Register event listeners (these are fast, keep immediate)
-    window.addEventListener("terminal:toggle", handleToggle);
-    window.addEventListener("terminal:new", handleNew);
-    window.addEventListener("terminal:split", handleSplit);
-    window.addEventListener("terminal:clear", handleClear);
-    window.addEventListener("terminal:kill", handleKill);
-    window.addEventListener("terminal:write-active", handleWriteActive as unknown as EventListener);
-    window.addEventListener("terminal:auto-reply-toggle", handleAutoReplyToggle);
-    window.addEventListener("terminal:run-selection", handleRunSelection);
-    window.addEventListener("terminal:run-active-file", handleRunActiveFile as unknown as EventListener);
-    window.addEventListener("terminal:rename", handleRename as unknown as EventListener);
-    window.addEventListener("terminal:set-color", handleSetColor as unknown as EventListener);
-    window.addEventListener("editor:selection-for-terminal", handleEditorSelectionForTerminal as unknown as EventListener);
-    window.addEventListener("editor:active-file-for-terminal", handleEditorActiveFileForTerminal as unknown as EventListener);
+    // DEFERRED — yield to main thread before registering window event listeners
+    queueMicrotask(() => {
+      window.addEventListener("terminal:toggle", handleToggle);
+      window.addEventListener("terminal:new", handleNew);
+      window.addEventListener("terminal:split", handleSplit);
+      window.addEventListener("terminal:clear", handleClear);
+      window.addEventListener("terminal:kill", handleKill);
+      window.addEventListener("terminal:write-active", handleWriteActive as unknown as EventListener);
+      window.addEventListener("terminal:auto-reply-toggle", handleAutoReplyToggle);
+      window.addEventListener("terminal:run-selection", handleRunSelection);
+      window.addEventListener("terminal:run-active-file", handleRunActiveFile as unknown as EventListener);
+      window.addEventListener("terminal:rename", handleRename as unknown as EventListener);
+      window.addEventListener("terminal:set-color", handleSetColor as unknown as EventListener);
+      window.addEventListener("editor:selection-for-terminal", handleEditorSelectionForTerminal as unknown as EventListener);
+      window.addEventListener("editor:active-file-for-terminal", handleEditorActiveFileForTerminal as unknown as EventListener);
+      listenersRegistered = true;
+    });
   });
 
   return (
     <TerminalsContext.Provider
       value={{
+        initialized,
         state,
         createTerminal,
         closeTerminal,

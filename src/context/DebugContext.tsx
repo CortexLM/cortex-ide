@@ -4,6 +4,8 @@ import {
   ParentComponent,
   onMount,
   onCleanup,
+  createSignal,
+  type Accessor,
 } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { invoke } from "@tauri-apps/api/core";
@@ -534,6 +536,7 @@ interface DebugState {
 }
 
 interface DebugContextValue {
+  initialized: Accessor<boolean>;
   state: DebugState;
   // Session management
   startSession: (config: DebugSessionConfig) => Promise<DebugSessionInfo>;
@@ -1023,6 +1026,8 @@ export const DebugProvider: ParentComponent = (props) => {
     debugBehaviorSettings: loadDebugBehaviorSettings(),
   });
 
+  const [initialized, setInitialized] = createSignal(false);
+
   let unlistenEvent: UnlistenFn | null = null;
 
   /**
@@ -1436,12 +1441,17 @@ export const DebugProvider: ParentComponent = (props) => {
     }
   };
 
-  // Register cleanup synchronously
+  let listenersRegistered = false;
+
+  // Register cleanup synchronously — guard against deferred init not yet completed
   onCleanup(() => {
+    // Tauri unlisten functions are safe to call unconditionally (null-guarded)
     unlistenEvent?.();
     unlistenProject?.();
-    window.removeEventListener("settings:workspace-loaded", handleWorkspaceLoaded);
-    window.removeEventListener("settings:changed", handleSettingsChanged);
+    if (listenersRegistered) {
+      window.removeEventListener("settings:workspace-loaded", handleWorkspaceLoaded);
+      window.removeEventListener("settings:changed", handleSettingsChanged);
+    }
   });
 
   onMount(() => {
@@ -1451,33 +1461,28 @@ export const DebugProvider: ParentComponent = (props) => {
       setState("breakpointGroups", savedGroups);
     }
 
-    // Register fast window event listeners immediately
-    window.addEventListener("settings:workspace-loaded", handleWorkspaceLoaded);
-    window.addEventListener("settings:changed", handleSettingsChanged);
+    // DEFERRED - Yield to main thread before registering IPC listeners and event handlers.
+    // Debug events won't fire until user starts debugging, so this is safe to defer.
+    queueMicrotask(async () => {
+      // Register window event listeners
+      window.addEventListener("settings:workspace-loaded", handleWorkspaceLoaded);
+      window.addEventListener("settings:changed", handleSettingsChanged);
+      listenersRegistered = true;
 
-    // Request initial debug settings by dispatching a request event
-    window.dispatchEvent(new CustomEvent("debug:request-settings"));
+      // Request initial debug settings by dispatching a request event
+      window.dispatchEvent(new CustomEvent("debug:request-settings"));
 
-    // DEFERRED - Set up Tauri event listeners after first paint
-    // These don't need to block startup since debug events won't fire until user starts debugging
-    const initDeferredListeners = async () => {
-      // Listen for debug events from backend
+      // Set up Tauri event listeners (IPC)
       unlistenEvent = await listen<DebugEvent>("debug:event", (event) => {
         handleDebugEvent(event.payload);
       });
-      
-      // Listen for workspace/project open events
+
       unlistenProject = await listen<{ path: string }>("project:opened", async (event) => {
         await loadWorkspaceConfigurations(event.payload.path);
       });
-    };
 
-    // Use requestIdleCallback if available, otherwise setTimeout
-    if ('requestIdleCallback' in window) {
-      (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback(initDeferredListeners, { timeout: 2000 });
-    } else {
-      setTimeout(initDeferredListeners, 100);
-    }
+      setInitialized(true);
+    });
   });
 
   const handleDebugEvent = (event: DebugEvent) => {
@@ -4255,6 +4260,7 @@ export const DebugProvider: ParentComponent = (props) => {
   return (
     <DebugContext.Provider
       value={{
+        initialized,
         state,
         startSession,
         stopSession,

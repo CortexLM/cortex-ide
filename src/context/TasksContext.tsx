@@ -1,4 +1,4 @@
-import { createContext, useContext, ParentComponent, onMount, onCleanup, createMemo } from "solid-js";
+import { createContext, useContext, ParentComponent, onMount, onCleanup, createMemo, createSignal, type Accessor } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { useSDK } from "./SDKContext";
 import { useTerminals } from "./TerminalsContext";
@@ -1491,6 +1491,7 @@ interface TasksState {
 }
 
 interface TasksContextValue {
+  initialized: Accessor<boolean>;
   state: TasksState;
   
   // Task management
@@ -2165,6 +2166,8 @@ export const TasksProvider: ParentComponent = (props) => {
     commandHandlers: new Map(),
     executions: new Map(),
   });
+
+  const [initialized, setInitialized] = createSignal(false);
 
   // Event listeners for task events
   const taskStartListeners = new Set<(event: TaskStartEvent) => void>();
@@ -3804,17 +3807,21 @@ export const TasksProvider: ParentComponent = (props) => {
   // ============================================================================
 
   onMount(() => {
+    // ESSENTIAL — fast localStorage reads needed for first render
     loadTasks();
     loadRecentTasks();
     loadRunOnSave();
     
-    // Initialize built-in task providers
+    // Initialize built-in task providers (sync, CPU-light)
     const builtInProviders = createBuiltInProviders();
     for (const provider of builtInProviders) {
       registerProvider(provider);
     }
     tasksLogger.debug(`Initialized ${builtInProviders.length} built-in providers`);
-    
+
+    // DEFERRED — yield to main thread before registering event listeners and IPC
+    let listenersRegistered = false;
+
     // Detect tasks when project is opened
     const handleProjectOpen = async () => {
       await detectTasks();
@@ -4052,40 +4059,22 @@ export const TasksProvider: ParentComponent = (props) => {
       saveTasksForReconnection();
     };
 
-    window.addEventListener("cortex:project_opened", handleProjectOpen);
-    window.addEventListener("cortex:terminal_status", handleTerminalStatus);
-    window.addEventListener("cortex:terminal_output", handleTerminalOutput);
-    window.addEventListener("cortex:file_saved", handleFileSavedEvent);
-    window.addEventListener("cortex:file_changed", handleFileChangedEvent);
-    window.addEventListener("tasks:open-run-dialog", handleOpenRunDialog);
-    window.addEventListener("tasks:open-panel", handleOpenPanel);
-    window.addEventListener("tasks:open-config-editor", handleOpenConfigEditor);
-    window.addEventListener("tasks:run-build", handleRunBuild);
-    window.addEventListener("tasks:run-test", handleRunTest);
-    window.addEventListener("tasks:refresh", handleRefresh);
-    window.addEventListener("tasks:global-inputs-loaded", handleGlobalInputsLoaded);
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    // Initial detection (after providers are initialized)
-    setTimeout(() => detectTasks(), 1000);
-    
-    // Try to reconnect to tasks after a short delay
-    setTimeout(() => reconnectTasks(), 1500);
-
     onCleanup(() => {
-      window.removeEventListener("cortex:project_opened", handleProjectOpen);
-      window.removeEventListener("cortex:terminal_status", handleTerminalStatus);
-      window.removeEventListener("cortex:terminal_output", handleTerminalOutput);
-      window.removeEventListener("cortex:file_saved", handleFileSavedEvent);
-      window.removeEventListener("cortex:file_changed", handleFileChangedEvent);
-      window.removeEventListener("tasks:open-run-dialog", handleOpenRunDialog);
-      window.removeEventListener("tasks:open-panel", handleOpenPanel);
-      window.removeEventListener("tasks:open-config-editor", handleOpenConfigEditor);
-      window.removeEventListener("tasks:run-build", handleRunBuild);
-      window.removeEventListener("tasks:run-test", handleRunTest);
-      window.removeEventListener("tasks:refresh", handleRefresh);
-      window.removeEventListener("tasks:global-inputs-loaded", handleGlobalInputsLoaded);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      if (listenersRegistered) {
+        window.removeEventListener("cortex:project_opened", handleProjectOpen);
+        window.removeEventListener("cortex:terminal_status", handleTerminalStatus);
+        window.removeEventListener("cortex:terminal_output", handleTerminalOutput);
+        window.removeEventListener("cortex:file_saved", handleFileSavedEvent);
+        window.removeEventListener("cortex:file_changed", handleFileChangedEvent);
+        window.removeEventListener("tasks:open-run-dialog", handleOpenRunDialog);
+        window.removeEventListener("tasks:open-panel", handleOpenPanel);
+        window.removeEventListener("tasks:open-config-editor", handleOpenConfigEditor);
+        window.removeEventListener("tasks:run-build", handleRunBuild);
+        window.removeEventListener("tasks:run-test", handleRunTest);
+        window.removeEventListener("tasks:refresh", handleRefresh);
+        window.removeEventListener("tasks:global-inputs-loaded", handleGlobalInputsLoaded);
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+      }
       
       // Save tasks for reconnection on cleanup
       saveTasksForReconnection();
@@ -4102,6 +4091,31 @@ export const TasksProvider: ParentComponent = (props) => {
       taskProcessStartListeners.clear();
       taskProcessEndListeners.clear();
     });
+
+    queueMicrotask(() => {
+      window.addEventListener("cortex:project_opened", handleProjectOpen);
+      window.addEventListener("cortex:terminal_status", handleTerminalStatus);
+      window.addEventListener("cortex:terminal_output", handleTerminalOutput);
+      window.addEventListener("cortex:file_saved", handleFileSavedEvent);
+      window.addEventListener("cortex:file_changed", handleFileChangedEvent);
+      window.addEventListener("tasks:open-run-dialog", handleOpenRunDialog);
+      window.addEventListener("tasks:open-panel", handleOpenPanel);
+      window.addEventListener("tasks:open-config-editor", handleOpenConfigEditor);
+      window.addEventListener("tasks:run-build", handleRunBuild);
+      window.addEventListener("tasks:run-test", handleRunTest);
+      window.addEventListener("tasks:refresh", handleRefresh);
+      window.addEventListener("tasks:global-inputs-loaded", handleGlobalInputsLoaded);
+      window.addEventListener("beforeunload", handleBeforeUnload);
+      listenersRegistered = true;
+
+      // Initial detection (after providers are initialized)
+      setTimeout(() => detectTasks(), 1000);
+
+      // Try to reconnect to tasks after a short delay
+      setTimeout(() => reconnectTasks(), 1500);
+
+      setInitialized(true);
+    });
   });
 
   // ============================================================================
@@ -4109,6 +4123,7 @@ export const TasksProvider: ParentComponent = (props) => {
   // ============================================================================
 
   const value: TasksContextValue = {
+    initialized,
     state,
     addTask,
     updateTask,
