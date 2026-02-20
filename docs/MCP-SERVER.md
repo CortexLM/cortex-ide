@@ -8,8 +8,8 @@ The Cortex IDE MCP (Model Context Protocol) server allows external AI agents to 
 
 ```mermaid
 flowchart LR
-    A["External AI Agent\n(Cursor, Claude Code, etc.)"] -->|"stdio\n(JSON-RPC)"| B["mcp-server\n(Node.js)"]
-    B -->|"TCP socket\n(port 4000)"| C["Cortex Desktop\n(Tauri backend)"]
+    A[AI Agent] -->|stdio JSON-RPC| B[MCP Server]
+    B -->|TCP :4000| C[Cortex Desktop]
 ```
 
 - **Transport**: stdio — the server reads JSON-RPC from stdin and writes responses to stdout
