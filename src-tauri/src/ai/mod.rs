@@ -167,10 +167,15 @@ pub async fn ai_complete(
         .map_err(|e| e.to_string())
 }
 
-/// Stream a conversation response
+/// Stream a conversation response.
 ///
-/// Emits "ai:stream_chunk" events with StreamChunk payloads.
-/// Event payload includes thread_id for routing to correct UI component.
+/// **Tauri Event:** `"ai:stream_chunk"`
+/// **Payload:** `{ threadId: string, content: string, done: bool }`
+/// **Direction:** Backend → Frontend
+/// **Listeners:** `AIContext.tsx`, `AIStreamContext.tsx`, `InlineAssistant.tsx`
+///
+/// When `chunk.tool_calls` is present, also emits `"ai:tool_call"` events
+/// with payload `{ threadId, callId, name, arguments }`.
 #[tauri::command]
 pub async fn ai_stream(
     app: AppHandle,
@@ -189,9 +194,27 @@ pub async fn ai_stream(
     let app_clone = app.clone();
     tauri::async_runtime::spawn(async move {
         while let Some(chunk) = rx.recv().await {
+            // Emit tool_call events if tool calls are present in this chunk
+            if let Some(ref tool_calls) = chunk.tool_calls {
+                for tc in tool_calls {
+                    if let Some(ref id) = tc.id {
+                        let tool_payload = ToolCallPayload {
+                            thread_id: thread_id_clone.clone(),
+                            call_id: id.clone(),
+                            name: tc.function.name.clone(),
+                            arguments: tc.function.arguments.clone(),
+                        };
+                        if let Err(e) = app_clone.emit("ai:tool_call", &tool_payload) {
+                            error!("Failed to emit tool_call event: {}", e);
+                        }
+                    }
+                }
+            }
+
             let event_payload = StreamEventPayload {
                 thread_id: thread_id_clone.clone(),
-                chunk,
+                content: chunk.content,
+                done: chunk.done,
             };
             if let Err(e) = app_clone.emit("ai:stream_chunk", &event_payload) {
                 error!("Failed to emit stream event: {}", e);
@@ -208,12 +231,25 @@ pub async fn ai_stream(
     Ok(())
 }
 
-/// Payload for stream events
+/// Flattened payload for `"ai:stream_chunk"` events.
+/// Matches the frontend `StreamChunkEvent` interface: `{ threadId, content, done }`.
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct StreamEventPayload {
     thread_id: String,
-    chunk: StreamChunk,
+    content: String,
+    done: bool,
+}
+
+/// Payload for `"ai:tool_call"` events.
+/// Matches the frontend `ToolCallEvent` interface.
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ToolCallPayload {
+    thread_id: String,
+    call_id: String,
+    name: String,
+    arguments: String,
 }
 
 // =============================================================================

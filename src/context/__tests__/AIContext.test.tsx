@@ -357,36 +357,36 @@ describe("AIContext", () => {
   });
 
   describe("Streaming Events", () => {
-    it("should listen for stream start event", async () => {
-      vi.mocked(listen).mockResolvedValueOnce(() => {});
-
-      await listen("ai:stream-start", () => {});
-
-      expect(listen).toHaveBeenCalledWith("ai:stream-start", expect.any(Function));
-    });
-
     it("should listen for stream chunk event", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("ai:stream-chunk", () => {});
+      await listen("ai:stream_chunk", () => {});
 
-      expect(listen).toHaveBeenCalledWith("ai:stream-chunk", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("ai:stream_chunk", expect.any(Function));
     });
 
-    it("should listen for stream end event", async () => {
+    it("should listen for tool call event", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("ai:stream-end", () => {});
+      await listen("ai:tool_call", () => {});
 
-      expect(listen).toHaveBeenCalledWith("ai:stream-end", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("ai:tool_call", expect.any(Function));
+    });
+
+    it("should listen for tool result event", async () => {
+      vi.mocked(listen).mockResolvedValueOnce(() => {});
+
+      await listen("ai:tool_result", () => {});
+
+      expect(listen).toHaveBeenCalledWith("ai:tool_result", expect.any(Function));
     });
 
     it("should listen for stream error event", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("ai:stream-error", () => {});
+      await listen("ai:error", () => {});
 
-      expect(listen).toHaveBeenCalledWith("ai:stream-error", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("ai:error", expect.any(Function));
     });
   });
 

@@ -3,14 +3,37 @@
  *
  * Centralized type definitions for event payloads used across the application
  * for Tauri IPC events and custom DOM events.
+ *
+ * ## AI Event Pipelines
+ *
+ * There are two separate AI event pipelines:
+ *
+ * ### Pipeline 1: Cortex Protocol (Primary)
+ * - **Tauri Event:** `"cortex-event"`
+ * - **Payload:** `WsMessage` (see `src-tauri/src/ai/protocol.rs`)
+ * - **Emitter:** `session.rs` via `convert_event_to_ws()`
+ * - **Listeners:** `SDKContext.tsx`, `AgentFollowContext.tsx`
+ * - Handles: streaming, tool calls, approvals, task lifecycle, terminals
+ *
+ * ### Pipeline 2: Legacy AI Module
+ * - **Tauri Events:** `"ai:stream_chunk"`, `"ai:tool_call"`, `"ai:tool_result"`, `"ai:error"`
+ * - **Emitter:** `ai/mod.rs` (`ai_stream` command)
+ * - **Listeners:** `AIContext.tsx`, `AIStreamContext.tsx`, `InlineAssistant.tsx`
+ * - Handles: direct model streaming, inline completions
+ *
+ * See `docs/AI_EVENT_CONTRACTS.md` for the full event contract reference.
  */
 
 // ============================================================================
-// AI Event Payloads
+// AI Event Payloads (Legacy Pipeline: "ai:*" events)
 // ============================================================================
 
 /**
  * Stream chunk event from AI streaming.
+ *
+ * **Tauri Event:** `"ai:stream_chunk"`
+ * **Emitter:** `ai/mod.rs` → `ai_stream` command
+ * **Pipeline:** Legacy AI Module
  */
 export interface StreamChunkEvent {
   /** Thread ID receiving the chunk */
@@ -23,6 +46,10 @@ export interface StreamChunkEvent {
 
 /**
  * Tool call event from AI.
+ *
+ * **Tauri Event:** `"ai:tool_call"`
+ * **Emitter:** `ai/mod.rs` → `ai_stream` command (when model returns tool calls)
+ * **Pipeline:** Legacy AI Module
  */
 export interface ToolCallEvent {
   /** Thread ID where tool was called */
@@ -37,6 +64,12 @@ export interface ToolCallEvent {
 
 /**
  * Tool result event.
+ *
+ * **Tauri Event:** `"ai:tool_result"`
+ * **Pipeline:** Legacy AI Module
+ * **Note:** Currently only consumed by `CortexAIModificationsPanel.tsx`.
+ * Tool results in the primary pipeline flow through `"cortex-event"` as
+ * `tool_call_end` messages instead.
  */
 export interface ToolResultEvent {
   /** Thread ID */
@@ -53,6 +86,10 @@ export interface ToolResultEvent {
 
 /**
  * Agent status change event.
+ *
+ * **Tauri Event:** `"ai:agent_status"`
+ * **Emitter:** `ai/agents/commands.rs`
+ * **Pipeline:** Legacy AI Module
  */
 export interface AgentStatusEvent {
   /** Agent identifier */
@@ -63,6 +100,11 @@ export interface AgentStatusEvent {
 
 /**
  * AI error event.
+ *
+ * **Tauri Event:** `"ai:error"`
+ * **Pipeline:** Legacy AI Module
+ * **Note:** Errors in the primary pipeline flow through `"cortex-event"` as
+ * `error` messages with `{ code, message }` payload.
  */
 export interface AIErrorEvent {
   /** Error code */

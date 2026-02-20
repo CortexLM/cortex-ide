@@ -800,7 +800,11 @@ export function SDKProvider(props: ParentProps) {
     }
   });
 
-  // Listen for Tauri cortex events
+  // Listen for Tauri cortex events (Primary AI Pipeline)
+  // Event: "cortex-event" — emitted by session.rs via convert_event_to_ws()
+  // Payload: WsMessage (see src-tauri/src/ai/protocol.rs) with { type: "...", ...fields }
+  // Handles: stream_chunk, agent_message, tool_call_begin/end, task_started/complete,
+  //          approval_request, token_usage, error, reasoning_delta, terminal events, etc.
   useTauriListen<CortexEvent>("cortex-event", (payload) => {
     processMessage(payload);
   });

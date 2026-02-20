@@ -8,8 +8,17 @@ pub struct TokenUsageInfo {
     pub total_tokens: u32,
 }
 
-/// Server-to-client WebSocket messages.
-/// Adapted for Tauri event emitting.
+/// Server-to-client messages emitted via the `"cortex-event"` Tauri event channel.
+///
+/// This is the **primary AI pipeline** used by `SDKContext.tsx` and `AgentPanel.tsx`.
+/// Events are serialized with `#[serde(tag = "type", rename_all = "snake_case")]`,
+/// so each variant becomes a `{ type: "variant_name", ...fields }` JSON object.
+///
+/// **Tauri Event:** `"cortex-event"`
+/// **Direction:** Backend (`session.rs`) → Frontend (`SDKContext.tsx`)
+/// **Emitter:** `convert_event_to_ws()` in `session.rs`
+///
+/// See also: `docs/AI_EVENT_CONTRACTS.md` for the full event contract reference.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum WsMessage {
