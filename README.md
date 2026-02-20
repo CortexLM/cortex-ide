@@ -31,6 +31,8 @@
 > The alpha version is designed so that miners can test and report all bugs through our [Bug Bounty Program](https://github.com/PlatformNetwork/bounty-challenge).
 >
 > Commits will be **very frequent** during the alpha phase. Expect rapid updates and breaking changes as we iterate quickly toward a stable release.
+>
+> **No pre-built binaries will be published during the alpha.** Developers must build the project themselves from source.
 
 ---
 
