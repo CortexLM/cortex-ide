@@ -10,6 +10,7 @@ use std::sync::Arc;
 
 use futures::stream::SplitSink;
 use futures::{SinkExt, StreamExt};
+use tauri::{AppHandle, Emitter};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::{Mutex as TokioMutex, RwLock, broadcast};
 use tokio_tungstenite::WebSocketStream;
@@ -53,7 +54,7 @@ impl CollabServer {
     }
 
     /// Start the WebSocket server
-    pub async fn start(&mut self) -> Result<u16, String> {
+    pub async fn start(&mut self, app: AppHandle) -> Result<u16, String> {
         if self.is_running {
             return Ok(self.port);
         }
@@ -90,8 +91,9 @@ impl CollabServer {
                             Ok((stream, addr)) => {
                                 let peers = peers.clone();
                                 let rooms = rooms.clone();
+                                let app = app.clone();
                                 tokio::spawn(async move {
-                                    if let Err(e) = handle_connection(stream, addr, peers, rooms).await {
+                                    if let Err(e) = handle_connection(stream, addr, peers, rooms, app).await {
                                         warn!("WebSocket connection error from {}: {}", addr, e);
                                     }
                                 });
@@ -179,6 +181,7 @@ async fn handle_connection(
     addr: SocketAddr,
     peers: Arc<RwLock<HashMap<SocketAddr, PeerConnection>>>,
     rooms: Arc<RwLock<HashMap<String, RoomBroadcast>>>,
+    app: AppHandle,
 ) -> Result<(), String> {
     let ws_stream = tokio_tungstenite::accept_async(stream)
         .await
@@ -258,6 +261,14 @@ async fn handle_connection(
                     user_id: peer.user_id.clone(),
                 };
                 broadcast_to_peers(&peers_guard, session_id, &leave_msg, Some(addr));
+
+                let _ = app.emit(
+                    "collab:user_left",
+                    serde_json::json!({
+                        "sessionId": session_id,
+                        "userId": peer.user_id,
+                    }),
+                );
             }
         }
     }

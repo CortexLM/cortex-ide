@@ -1,6 +1,7 @@
-import { createContext, useContext, ParentProps, onMount, createEffect, on } from "solid-js";
+import { createContext, useContext, ParentProps, onMount, onCleanup, createEffect, on } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { invoke } from "@tauri-apps/api/core";
+import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 
 // ============================================================================
 // Rules Types
@@ -377,8 +378,24 @@ export function RulesLibraryProvider(props: ParentProps) {
     filterSource: "all",
   });
 
+  let unlistenRulesFileChanged: UnlistenFn | undefined;
+
   onMount(() => {
     loadRules();
+
+    listen<{ event_type: string; path: string }>("rules:file-changed", (event) => {
+      const { event_type, path } = event.payload;
+      console.debug(`[RulesLibrary] Rules file ${event_type}: ${path}`);
+      if (state.projectRoot) {
+        scanProjectRules(state.projectRoot);
+      }
+    }).then((fn) => {
+      unlistenRulesFileChanged = fn;
+    });
+  });
+
+  onCleanup(() => {
+    unlistenRulesFileChanged?.();
   });
 
   const loadRules = async (): Promise<void> => {

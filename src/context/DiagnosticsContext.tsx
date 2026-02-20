@@ -401,6 +401,9 @@ export function DiagnosticsProvider(props: ParentProps) {
     currentFileUri: null,
   });
 
+  let unlistenDiagRefreshed: UnlistenFn | undefined;
+  let unlistenDiagSummary: UnlistenFn | undefined;
+  let unlistenDiagUpdated: UnlistenFn | undefined;
   let unlistenBuildOutput: UnlistenFn | undefined;
   let unlistenTaskOutput: UnlistenFn | undefined;
   let unlistenFileChange: UnlistenFn | undefined;
@@ -499,6 +502,9 @@ export function DiagnosticsProvider(props: ParentProps) {
 
   // Register cleanup synchronously
   onCleanup(() => {
+    unlistenDiagRefreshed?.();
+    unlistenDiagSummary?.();
+    unlistenDiagUpdated?.();
     unlistenBuildOutput?.();
     unlistenTaskOutput?.();
     unlistenFileChange?.();
@@ -578,6 +584,67 @@ export function DiagnosticsProvider(props: ParentProps) {
       if (state.autoRefresh) {
         debouncedRefresh();
       }
+    });
+
+    // Listen for backend diagnostics events
+    unlistenDiagRefreshed = await listen<{
+      error_count: number;
+      warning_count: number;
+      information_count: number;
+      hint_count: number;
+      total_count: number;
+    }>("diagnostics:refreshed", (_event) => {
+      setState("isRefreshing", false);
+      setState("lastRefresh", Date.now());
+    });
+
+    unlistenDiagSummary = await listen<{
+      error_count: number;
+      warning_count: number;
+      info_count: number;
+      hint_count: number;
+    }>("diagnostics:summary", (event) => {
+      diagnosticsLogger.debug("Diagnostics summary from backend:", event.payload);
+    });
+
+    unlistenDiagUpdated = await listen<
+      Array<{
+        file_path: string;
+        diagnostics: Array<{
+          range: {
+            start: { line: number; character: number };
+            end: { line: number; character: number };
+          };
+          severity: string;
+          message: string;
+          source?: string;
+          code?: string;
+        }>;
+      }>
+    >("diagnostics:updated", (event) => {
+      const fileDiagnostics = event.payload;
+      setState(
+        produce((s) => {
+          for (const fd of fileDiagnostics) {
+            const uri = `file://${fd.file_path.replace(/\\/g, "/")}`;
+            const mapped: UnifiedDiagnostic[] = fd.diagnostics.map((d) => ({
+              id: `backend-${uri}-${d.range.start.line}-${d.range.start.character}-${Date.now()}`,
+              uri,
+              range: d.range,
+              severity: d.severity as UnifiedDiagnostic["severity"],
+              message: d.message,
+              source: (d.source || "backend") as UnifiedDiagnostic["source"],
+              code: d.code,
+              timestamp: Date.now(),
+            }));
+            s.diagnostics[uri] = {
+              uri,
+              diagnostics: mapped,
+              lastUpdated: Date.now(),
+            };
+          }
+        })
+      );
     });
 
     // Register window event listeners

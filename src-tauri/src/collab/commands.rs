@@ -20,7 +20,7 @@ pub async fn collab_create_session(
     let mut manager = state.0.lock().await;
 
     // Start the WebSocket server if not already running
-    let port = manager.ensure_server_running().await?;
+    let port = manager.ensure_server_running(app.clone()).await?;
 
     let session_id = uuid::Uuid::new_v4().to_string();
     let user_id = uuid::Uuid::new_v4().to_string();
@@ -52,7 +52,7 @@ pub async fn collab_join_session(
     let mut manager = state.0.lock().await;
 
     // Ensure server is running
-    manager.ensure_server_running().await?;
+    manager.ensure_server_running(app.clone()).await?;
 
     let user_id = uuid::Uuid::new_v4().to_string();
 

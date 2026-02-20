@@ -1228,6 +1228,7 @@ export function CollabProvider(props: ParentProps) {
   onMount(() => {
     let unlistenJoined: (() => void) | undefined;
     let unlistenLeft: (() => void) | undefined;
+    let unlistenSessionCreated: (() => void) | undefined;
 
     listen<{ roomId: string; userId: string; userName: string }>("collab:user_joined", (event) => {
       collabLogger.debug("User joined via backend event:", event.payload);
@@ -1237,10 +1238,15 @@ export function CollabProvider(props: ParentProps) {
       collabLogger.debug("User left via backend event:", event.payload);
     }).then(u => { unlistenLeft = u; });
 
+    listen<{ id: string; name: string; hostId: string; createdAt: number; participants: unknown[]; documentIds: string[]; serverPort: number }>("collab:session_created", (event) => {
+      collabLogger.debug("Session created via backend event:", event.payload);
+    }).then(u => { unlistenSessionCreated = u; });
+
     onCleanup(() => {
       disconnect();
       unlistenJoined?.();
       unlistenLeft?.();
+      unlistenSessionCreated?.();
     });
   });
 

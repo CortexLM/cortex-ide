@@ -27,6 +27,7 @@ pub mod types;
 
 use std::sync::Arc;
 
+use tauri::AppHandle;
 use tokio::sync::Mutex as TokioMutex;
 use tracing::info;
 
@@ -51,12 +52,12 @@ impl CollabManager {
     }
 
     /// Ensure the WebSocket server is running, starting it if needed
-    pub async fn ensure_server_running(&mut self) -> Result<u16, String> {
+    pub async fn ensure_server_running(&mut self, app: AppHandle) -> Result<u16, String> {
         if self.server.is_running() {
             return Ok(self.server.port());
         }
 
-        let port = self.server.start().await?;
+        let port = self.server.start(app).await?;
         info!("Collaboration server started on port {}", port);
         Ok(port)
     }
