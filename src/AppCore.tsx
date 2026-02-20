@@ -15,7 +15,7 @@
 const CORE_LOAD_TIME = performance.now();
 if (import.meta.env.DEV) console.log(`[STARTUP] AppCore.tsx module loading @ ${CORE_LOAD_TIME.toFixed(1)}ms`);
 
-import { ParentProps, createSignal, onMount, onCleanup, createEffect, Show, lazy, Suspense } from "solid-js";
+import { ParentProps, createSignal, onMount, onCleanup, createEffect, Show, lazy, Suspense, batch } from "solid-js";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { invoke } from "@tauri-apps/api/core";
 import { getWindowLabel } from "@/utils/windowStorage";
@@ -290,18 +290,22 @@ function AppContent(props: ParentProps) {
 
   // Event handlers
   const handleFeedbackOpen = (e: CustomEvent<{ type?: FeedbackType }>) => {
-    if (e.detail?.type) setFeedbackType(e.detail.type);
-    setShowFeedback(true);
+    batch(() => {
+      if (e.detail?.type) setFeedbackType(e.detail.type);
+      setShowFeedback(true);
+    });
   };
 
   const [settingsInitialSection, setSettingsInitialSection] = createSignal<string | undefined>(undefined);
   
   const handleSettingsOpen = (e: Event) => {
     const custom = e as CustomEvent<{ jsonView?: boolean; showDefaults?: boolean; section?: string }>;
-    setSettingsInitialJsonView(custom.detail?.jsonView ?? false);
-    setSettingsInitialShowDefaults(custom.detail?.showDefaults ?? false);
-    setSettingsInitialSection(custom.detail?.section);
-    setShowSettings(true);
+    batch(() => {
+      setSettingsInitialJsonView(custom.detail?.jsonView ?? false);
+      setSettingsInitialShowDefaults(custom.detail?.showDefaults ?? false);
+      setSettingsInitialSection(custom.detail?.section);
+      setShowSettings(true);
+    });
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -560,7 +564,7 @@ function AppContent(props: ParentProps) {
             <DialogErrorBoundary name="SettingsDialog">
               <SettingsDialog
                 isOpen={showSettings()}
-                onClose={() => { setShowSettings(false); setSettingsInitialJsonView(false); setSettingsInitialShowDefaults(false); setSettingsInitialSection(undefined); }}
+                onClose={() => { batch(() => { setShowSettings(false); setSettingsInitialJsonView(false); setSettingsInitialShowDefaults(false); setSettingsInitialSection(undefined); }); }}
                 initialJsonView={settingsInitialJsonView()}
                 initialShowDefaults={settingsInitialShowDefaults()}
                 initialSection={settingsInitialSection()}

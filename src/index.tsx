@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Router, Route } from "@solidjs/router";
 import { lazy, Suspense } from "solid-js";
-import { initializeWindowStorage } from "@/utils/windowStorage";
+import { initializeWindowStorage, getWindowLabel } from "@/utils/windowStorage";
 
 // CRITICAL: Use AppShell instead of App for instant first paint
 // AppShell is minimal (~1KB) and lazy-loads AppCore (with 68 providers) after render
@@ -38,6 +38,28 @@ STARTUP_METRICS.windowStorageInit = performance.now();
 logStartup("Window storage init done");
 
 // ============================================================================
+// STARTUP OPTIMIZATION: Resolve Initial Route Before Render
+// ============================================================================
+// Determine the correct route BEFORE the router initializes, avoiding the
+// Home page redirect render cycle (mount → spinner → navigate → re-render).
+// The SolidJS Router reads window.location.pathname at init time, so setting
+// it here means the correct page component mounts directly.
+
+{
+  const pathname = window.location.pathname;
+  if (pathname === "/" || pathname === "/index.html") {
+    const label = getWindowLabel();
+    const currentProject =
+      localStorage.getItem(`cortex_current_project_${label}`) ||
+      localStorage.getItem("cortex_current_project");
+
+    const targetRoute = currentProject ? "/session" : "/welcome";
+    window.history.replaceState(null, "", targetRoute + window.location.search);
+    logStartup(`Route resolved: ${pathname} → ${targetRoute}`);
+  }
+}
+
+// ============================================================================
 // DEFERRED PRELOADING: Non-critical resources loaded during idle time
 // ============================================================================
 // These resources are not needed for initial render but improve UX when accessed.
@@ -54,7 +76,7 @@ logStartup("Window storage init done");
 // Pages are lazy-loaded to reduce initial bundle size.
 // Each page chunk is loaded on-demand when the route is accessed.
 
-// Home page - routing hub that redirects to /welcome
+// Home page - fallback redirect (route is normally resolved before render)
 const Home = lazy(() => import("./pages/Home"));
 
 // Welcome page - full welcome screen with branding, recent projects, quick actions
