@@ -79,7 +79,7 @@ enum RawScope {
 /// Concurrent theme state backed by DashMap
 #[derive(Clone)]
 pub struct ThemeState {
-    themes: DashMap<String, ThemeData>,
+    pub(crate) themes: DashMap<String, ThemeData>,
 }
 
 impl ThemeState {
@@ -113,7 +113,7 @@ fn generate_theme_id(name: &str) -> String {
 }
 
 /// Create built-in theme stubs for default population
-fn create_builtin_stubs() -> Vec<ThemeData> {
+pub(crate) fn create_builtin_stubs() -> Vec<ThemeData> {
     vec![
         ThemeData {
             id: "dark-plus".to_string(),

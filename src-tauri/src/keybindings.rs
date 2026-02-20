@@ -75,10 +75,9 @@ fn get_keybindings_path() -> Result<std::path::PathBuf, String> {
 // Tauri Commands
 // ============================================================================
 
-/// Load keybindings from the app data directory.
-/// Returns an empty vec if the file does not exist.
-#[tauri::command]
-pub async fn load_keybindings_file(_app: tauri::AppHandle) -> Result<Vec<KeybindingEntry>, String> {
+/// Inner implementation for loading keybindings (no Tauri AppHandle required).
+/// Used by both the Tauri command and the batch IPC dispatcher.
+pub async fn load_keybindings_file_inner() -> Result<Vec<KeybindingEntry>, String> {
     let path = get_keybindings_path()?;
 
     tokio::task::spawn_blocking(move || {
@@ -98,6 +97,13 @@ pub async fn load_keybindings_file(_app: tauri::AppHandle) -> Result<Vec<Keybind
     })
     .await
     .map_err(|e| e.to_string())?
+}
+
+/// Load keybindings from the app data directory.
+/// Returns an empty vec if the file does not exist.
+#[tauri::command]
+pub async fn load_keybindings_file(_app: tauri::AppHandle) -> Result<Vec<KeybindingEntry>, String> {
+    load_keybindings_file_inner().await
 }
 
 /// Save keybindings to the app data directory.

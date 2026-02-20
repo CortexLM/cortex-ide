@@ -11,6 +11,7 @@ mod ai;
 mod app;
 mod auto_update;
 mod batch;
+mod batch_ipc;
 mod browser;
 mod collab;
 mod context_server;

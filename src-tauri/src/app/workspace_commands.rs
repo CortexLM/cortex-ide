@@ -136,6 +136,7 @@ macro_rules! workspace_commands {
             // Workspace edit support
             $crate::fs::apply_workspace_edit,
             // Batch command system for IPC optimization
+            $crate::batch_ipc::batch_invoke,
             $crate::batch::batch_commands,
             $crate::batch::batch_commands_msgpack,
             $crate::batch::batch_cache_invalidate,
