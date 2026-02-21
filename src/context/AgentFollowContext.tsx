@@ -199,7 +199,7 @@ export const AgentFollowProvider: ParentComponent = (props) => {
     
     // Emit event to show agent is controlling ALL editors (orange border on all splits)
     window.dispatchEvent(
-      new CustomEvent("editor:agentActive", {
+      new CustomEvent("editor:agent-active", {
         detail: {
           paths: filesToOpen.map(f => f.path).filter(Boolean),
           action: "read",
@@ -231,7 +231,7 @@ export const AgentFollowProvider: ParentComponent = (props) => {
     }
     
     // Clear orange border
-    window.dispatchEvent(new CustomEvent("editor:agentInactive"));
+    window.dispatchEvent(new CustomEvent("editor:agent-inactive"));
     
     // Reset state
     batch(() => {
@@ -248,7 +248,7 @@ export const AgentFollowProvider: ParentComponent = (props) => {
     if (!state.agentSplitActive || state.userInteractedWithSplit) {
       agentFollowLogger.debug("Skipping close - user interacted or no splits active");
       // Still clear orange border even if user interacted
-      window.dispatchEvent(new CustomEvent("editor:agentInactive"));
+      window.dispatchEvent(new CustomEvent("editor:agent-inactive"));
       return;
     }
     
@@ -274,7 +274,7 @@ export const AgentFollowProvider: ParentComponent = (props) => {
     }
     
     // Clear orange border
-    window.dispatchEvent(new CustomEvent("editor:agentInactive"));
+    window.dispatchEvent(new CustomEvent("editor:agent-inactive"));
     
     // Reset state
     batch(() => {
@@ -336,7 +336,7 @@ export const AgentFollowProvider: ParentComponent = (props) => {
     // Emit event to show agent is controlling the editor (orange border)
     // Keep until task_complete (duration = -1)
     window.dispatchEvent(
-      new CustomEvent("editor:agentActive", {
+      new CustomEvent("editor:agent-active", {
         detail: {
           path: location.path,
           action: location.action,
@@ -348,7 +348,7 @@ export const AgentFollowProvider: ParentComponent = (props) => {
     // Dispatch event for editor to scroll to line
     if (location.line) {
       window.dispatchEvent(
-        new CustomEvent("editor:scrollToLine", {
+        new CustomEvent("editor:scroll-to-line", {
           detail: {
             line: location.line,
             column: location.column || 1,
@@ -450,7 +450,7 @@ export const AgentFollowProvider: ParentComponent = (props) => {
     
     // Emit event for UI feedback
     window.dispatchEvent(
-      new CustomEvent("agentFollow:statusChanged", {
+      new CustomEvent("agent-follow:status-changed", {
         detail: { isFollowing: enabled },
       })
     );
@@ -511,7 +511,7 @@ export const AgentFollowProvider: ParentComponent = (props) => {
 
     // Emit event for other components
     window.dispatchEvent(
-      new CustomEvent("agentFollow:locationRecorded", {
+      new CustomEvent("agent-follow:location-recorded", {
         detail: location,
       })
     );
@@ -586,13 +586,13 @@ export const AgentFollowProvider: ParentComponent = (props) => {
       recordLocation(e.detail);
     };
 
-    window.addEventListener("agentFollow:record", handleRecordLocation as EventListener);
+    window.addEventListener("agent-follow:record", handleRecordLocation as EventListener);
 
     // Listen for user navigation events from editor
     const handleUserNav = () => {
       markUserNavigation();
     };
-    window.addEventListener("editor:userNavigation", handleUserNav);
+    window.addEventListener("editor:user-navigation", handleUserNav);
 
     // Listen for agent-action events from Tauri backend
     // This is the main connection that auto-opens files when agent reads them
@@ -615,9 +615,9 @@ export const AgentFollowProvider: ParentComponent = (props) => {
       sessionId: string;  // camelCase from ActionLogEntry
       description: string;
       category: string;
-    }>("agent-action", (event) => {
+    }>("agent:action", (event) => {
       const { action } = event.payload;
-      agentFollowLogger.debug("Received agent-action:", event.payload);
+      agentFollowLogger.debug("Received agent:action:", event.payload);
       
       // Map agent action types to locations
       if (action.type === "file_read") {
@@ -666,12 +666,12 @@ export const AgentFollowProvider: ParentComponent = (props) => {
     }).then((unlisten) => {
       unlistenAgentAction = unlisten;
     }).catch((e) => {
-      console.error("[AgentFollow] Failed to listen to agent-action:", e);
+      console.error("[AgentFollow] Failed to listen to agent:action:", e);
     });
 
     // Listen for agent response end (task_complete) to close splits and files
     let unlistenAgentEnd: UnlistenFn | null = null;
-    listen<AgentFollowCortexPayload>("cortex-event", (event) => {
+    listen<AgentFollowCortexPayload>("cortex:event", (event) => {
       const payload = event.payload;
       
       // Check for task_complete event - this signals agent finished
@@ -685,7 +685,7 @@ export const AgentFollowProvider: ParentComponent = (props) => {
     }).then((unlisten) => {
       unlistenAgentEnd = unlisten;
     }).catch((e) => {
-      console.error("[AgentFollow] Failed to listen to cortex-event:", e);
+      console.error("[AgentFollow] Failed to listen to cortex:event:", e);
     });
 
     // Listen for user interaction with editor (click, selection)
@@ -696,8 +696,8 @@ export const AgentFollowProvider: ParentComponent = (props) => {
       markUserSplitInteraction();
     };
     
-    window.addEventListener("editor:userClick", handleEditorClick);
-    window.addEventListener("editor:userSelection", handleEditorSelection);
+    window.addEventListener("editor:user-click", handleEditorClick);
+    window.addEventListener("editor:user-selection", handleEditorSelection);
     // Also listen for mousedown on editor containers as fallback
     const handleMouseDown = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -712,10 +712,10 @@ export const AgentFollowProvider: ParentComponent = (props) => {
 
     onCleanup(() => {
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("agentFollow:record", handleRecordLocation as EventListener);
-      window.removeEventListener("editor:userNavigation", handleUserNav);
-      window.removeEventListener("editor:userClick", handleEditorClick);
-      window.removeEventListener("editor:userSelection", handleEditorSelection);
+      window.removeEventListener("agent-follow:record", handleRecordLocation as EventListener);
+      window.removeEventListener("editor:user-navigation", handleUserNav);
+      window.removeEventListener("editor:user-click", handleEditorClick);
+      window.removeEventListener("editor:user-selection", handleEditorSelection);
       window.removeEventListener("mousedown", handleMouseDown);
 
       if (userNavTimer) clearTimeout(userNavTimer);

@@ -276,7 +276,7 @@ function setupLinkedEditing(
       } else {
         updateLinkedEditDecorations();
       }
-      window.dispatchEvent(new CustomEvent("editor-linked-editing-changed", { detail: { enabled: newEnabled } }));
+      window.dispatchEvent(new CustomEvent("editor:linked-editing-changed", { detail: { enabled: newEnabled } }));
     },
   });
 
@@ -663,11 +663,11 @@ export function CodeEditor(props: CodeEditorProps) {
     }
   };
   const handleAgentInactive = () => { setAgentActive(false); if (agentActiveTimer) { clearTimeout(agentActiveTimer); agentActiveTimer = null; } };
-  window.addEventListener("editor:agentActive", handleAgentActive as EventListener);
-  window.addEventListener("editor:agentInactive", handleAgentInactive);
+  window.addEventListener("editor:agent-active", handleAgentActive as EventListener);
+  window.addEventListener("editor:agent-inactive", handleAgentInactive);
   onCleanup(() => {
-    window.removeEventListener("editor:agentActive", handleAgentActive as EventListener);
-    window.removeEventListener("editor:agentInactive", handleAgentInactive);
+    window.removeEventListener("editor:agent-active", handleAgentActive as EventListener);
+    window.removeEventListener("editor:agent-inactive", handleAgentInactive);
     if (agentActiveTimer) clearTimeout(agentActiveTimer);
   });
 
@@ -794,7 +794,7 @@ export function CodeEditor(props: CodeEditorProps) {
         monaco={instance.monaco()}
         onNavigate={(location) => {
           const filePath = location.uri.replace(/^file:\/\//, "").replace(/\//g, "\\");
-          window.dispatchEvent(new CustomEvent("editor:openFile", { detail: { path: filePath, line: location.range.startLineNumber, column: location.range.startColumn } }));
+          window.dispatchEvent(new CustomEvent("editor:open-file", { detail: { path: filePath, line: location.range.startLineNumber, column: location.range.startColumn } }));
         }}
       />
       <PeekReferences
@@ -802,7 +802,7 @@ export function CodeEditor(props: CodeEditorProps) {
         monaco={instance.monaco()}
         onNavigate={(uri, line, column) => {
           const filePath = uri.replace(/^file:\/\//, "").replace(/\//g, "\\");
-          window.dispatchEvent(new CustomEvent("editor:openFile", { detail: { path: filePath, line, column } }));
+          window.dispatchEvent(new CustomEvent("editor:open-file", { detail: { path: filePath, line, column } }));
         }}
       />
       <RenameWidget

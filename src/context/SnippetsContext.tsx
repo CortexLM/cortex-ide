@@ -704,7 +704,7 @@ export function SnippetsProvider(props: ParentProps) {
     
     // Dispatch event for editor to handle
     window.dispatchEvent(
-      new CustomEvent("snippet-session-start", {
+      new CustomEvent("snippet:session-start", {
         detail: {
           session,
           placeholder: session.parsedSnippet.placeholders[0] || null,
@@ -733,7 +733,7 @@ export function SnippetsProvider(props: ParentProps) {
     const placeholder = placeholders[nextIndex];
 
     window.dispatchEvent(
-      new CustomEvent("snippet-placeholder-change", {
+      new CustomEvent("snippet:placeholder-change", {
         detail: { session: state.activeSession, placeholder },
       })
     );
@@ -752,7 +752,7 @@ export function SnippetsProvider(props: ParentProps) {
     const placeholder = placeholders[prevIndex];
 
     window.dispatchEvent(
-      new CustomEvent("snippet-placeholder-change", {
+      new CustomEvent("snippet:placeholder-change", {
         detail: { session: state.activeSession, placeholder },
       })
     );
@@ -769,7 +769,7 @@ export function SnippetsProvider(props: ParentProps) {
 
   const endSession = () => {
     if (state.activeSession) {
-      window.dispatchEvent(new CustomEvent("snippet-session-end"));
+      window.dispatchEvent(new CustomEvent("snippet:session-end"));
     }
     setState("activeSession", null);
   };
@@ -788,7 +788,7 @@ export function SnippetsProvider(props: ParentProps) {
     const mirrors = session.parsedSnippet.placeholderMirrors.get(index);
     if (mirrors && mirrors.length > 1) {
       window.dispatchEvent(
-        new CustomEvent("snippet-mirror-update", {
+        new CustomEvent("snippet:mirror-update", {
           detail: {
             session,
             placeholderIndex: index,

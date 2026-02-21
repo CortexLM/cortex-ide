@@ -113,17 +113,17 @@ describe("BracketPairColorization Component Logic", () => {
       const toggleHandler = vi.fn();
       const guidesHandler = vi.fn();
 
-      window.addEventListener("editor-toggle-bracket-colorization", toggleHandler);
-      window.addEventListener("editor-toggle-bracket-guides", guidesHandler);
+      window.addEventListener("editor:toggle-bracket-colorization", toggleHandler);
+      window.addEventListener("editor:toggle-bracket-guides", guidesHandler);
 
-      window.dispatchEvent(new Event("editor-toggle-bracket-colorization"));
-      window.dispatchEvent(new Event("editor-toggle-bracket-guides"));
+      window.dispatchEvent(new Event("editor:toggle-bracket-colorization"));
+      window.dispatchEvent(new Event("editor:toggle-bracket-guides"));
 
       expect(toggleHandler).toHaveBeenCalledOnce();
       expect(guidesHandler).toHaveBeenCalledOnce();
 
-      window.removeEventListener("editor-toggle-bracket-colorization", toggleHandler);
-      window.removeEventListener("editor-toggle-bracket-guides", guidesHandler);
+      window.removeEventListener("editor:toggle-bracket-colorization", toggleHandler);
+      window.removeEventListener("editor:toggle-bracket-guides", guidesHandler);
     });
   });
 });

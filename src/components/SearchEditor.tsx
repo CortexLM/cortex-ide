@@ -548,7 +548,7 @@ export function SearchEditor(props: SearchEditorProps) {
 
     setTimeout(() => {
       window.dispatchEvent(
-        new CustomEvent("goto-line", {
+        new CustomEvent("editor:goto-line", {
           detail: { line, column },
         })
       );

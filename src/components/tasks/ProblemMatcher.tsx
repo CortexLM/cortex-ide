@@ -261,7 +261,7 @@ function DiagnosticItem(props: DiagnosticItemProps) {
     } else {
       // Navigate to file location
       window.dispatchEvent(
-        new CustomEvent("navigate-to-location", {
+        new CustomEvent("editor:navigate-to-location", {
           detail: {
             uri: `file://${props.diagnostic.file.replace(/\\/g, "/")}`,
             line: props.diagnostic.line,

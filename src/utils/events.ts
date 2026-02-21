@@ -47,33 +47,33 @@ export const EVENTS = {
     GOTO: 'editor:goto',
     REQUEST_FIND_REFERENCES: 'editor:request-find-references',
     NAVIGATE_TO: 'editor:navigate-to',
-    SCROLL_TO_LINE: 'editor:scrollToLine',
+    SCROLL_TO_LINE: 'editor:scroll-to-line',
     HIGHLIGHT: 'editor:highlight',
-    AGENT_ACTIVE: 'editor:agentActive',
-    AGENT_INACTIVE: 'editor:agentInactive',
+    AGENT_ACTIVE: 'editor:agent-active',
+    AGENT_INACTIVE: 'editor:agent-inactive',
     ACTION: 'editor:action',
     NEXT_TAB: 'editor:next-tab',
     PREV_TAB: 'editor:prev-tab',
     APPLY_EDIT: 'editor:apply-edit',
     CLOSE_READONLY_DEBUG_TABS: 'editor:close-readonly-debug-tabs',
     // Legacy non-namespaced events (for backward compatibility)
-    CURSOR_CHANGE: 'editor-cursor-change',
-    COMMAND: 'editor-command',
-    FORMAT_DOCUMENT: 'editor-format-document',
-    FORMAT_ON_PASTE_CHANGED: 'editor-format-on-paste-changed',
-    LINKED_EDITING_CHANGED: 'editor-linked-editing-changed',
-    SAVE_REQUESTED: 'editor-save-requested',
-    SPLIT: 'editor-split',
-    CLOSE_GROUP: 'editor-close-group',
-    PIN_TAB: 'editor-pin-tab',
-    UNPIN_TAB: 'editor-unpin-tab',
-    TOGGLE_PIN_TAB: 'editor-toggle-pin-tab',
-    FOCUS_NEXT_GROUP: 'editor-focus-next-group',
-    FOCUS_PREVIOUS_GROUP: 'editor-focus-previous-group',
-    UNSPLIT: 'editor-unsplit',
-    TOGGLE_WORD_WRAP: 'editor-toggle-word-wrap',
-    TOGGLE_MINIMAP: 'editor-toggle-minimap',
-    TOGGLE_STICKY_SCROLL: 'editor-toggle-sticky-scroll',
+    CURSOR_CHANGE: 'editor:cursor-change',
+    COMMAND: 'editor:command',
+    FORMAT_DOCUMENT: 'editor:format-document',
+    FORMAT_ON_PASTE_CHANGED: 'editor:format-on-paste-changed',
+    LINKED_EDITING_CHANGED: 'editor:linked-editing-changed',
+    SAVE_REQUESTED: 'editor:save-requested',
+    SPLIT: 'editor:split',
+    CLOSE_GROUP: 'editor:close-group',
+    PIN_TAB: 'editor:pin-tab',
+    UNPIN_TAB: 'editor:unpin-tab',
+    TOGGLE_PIN_TAB: 'editor:toggle-pin-tab',
+    FOCUS_NEXT_GROUP: 'editor:focus-next-group',
+    FOCUS_PREVIOUS_GROUP: 'editor:focus-previous-group',
+    UNSPLIT: 'editor:unsplit',
+    TOGGLE_WORD_WRAP: 'editor:toggle-word-wrap',
+    TOGGLE_MINIMAP: 'editor:toggle-minimap',
+    TOGGLE_STICKY_SCROLL: 'editor:toggle-sticky-scroll',
   },
 
   // -------------------------------------------------------------------------
@@ -124,9 +124,9 @@ export const EVENTS = {
     BACK: 'navigation:back',
     FORWARD: 'navigation:forward',
     SIGNIFICANT: 'navigation:significant',
-    GOTO_LINE: 'goto-line',
-    NAVIGATE_TO_LINE: 'navigate-to-line',
-    NAVIGATE_TO_LOCATION: 'navigate-to-location',
+    GOTO_LINE: 'editor:goto-line',
+    NAVIGATE_TO_LINE: 'editor:navigate-to-line',
+    NAVIGATE_TO_LOCATION: 'editor:navigate-to-location',
   },
 
   // -------------------------------------------------------------------------
@@ -183,8 +183,8 @@ export const EVENTS = {
     KILL: 'terminal:kill',
     RUN: 'terminal:run',
     SELECT_ALL: 'terminal:select-all',
-    GO_TO_PREV_COMMAND: 'terminal:goToPrevCommand',
-    GO_TO_NEXT_COMMAND: 'terminal:goToNextCommand',
+    GO_TO_PREV_COMMAND: 'terminal:go-to-prev-command',
+    GO_TO_NEXT_COMMAND: 'terminal:go-to-next-command',
     CREATED: 'terminal:created',
     OUTPUT: 'terminal:output',
     STATUS: 'terminal:status',
@@ -219,7 +219,7 @@ export const EVENTS = {
     TOGGLE_PANEL: 'layout:toggle-panel',
     FOCUS_EXPLORER: 'layout:focus-explorer',
     FOCUS_DEBUG: 'layout:focus-debug',
-    RESET: 'reset-layout',
+    RESET: 'layout:reset',
   },
 
   // -------------------------------------------------------------------------
@@ -231,8 +231,8 @@ export const EVENTS = {
     BUFFER_SHOW_REPLACE: 'buffer-search:show-replace',
     BUFFER_GET_SELECTION: 'buffer-search:get-selection',
     BUFFER_SELECTION_RESPONSE: 'buffer-search:selection-response',
-    BUFFER_HIGHLIGHTS: 'buffer-search-highlights',
-    BUFFER_GOTO: 'buffer-search-goto',
+    BUFFER_HIGHLIGHTS: 'buffer-search:highlights',
+    BUFFER_GOTO: 'buffer-search:goto',
   },
 
   // -------------------------------------------------------------------------
@@ -304,11 +304,11 @@ export const EVENTS = {
   CORTEX: {
     CLEAR_ERROR: 'cortex:clear-error',
     NAVIGATE: 'cortex:navigate',
-    FILE_SAVED: 'cortex:file_saved',
-    TERMINAL_CREATED: 'cortex:terminal_created',
-    TERMINAL_OUTPUT: 'cortex:terminal_output',
-    TERMINAL_STATUS: 'cortex:terminal_status',
-    TERMINAL_LIST: 'cortex:terminal_list',
+    FILE_SAVED: 'cortex:file-saved',
+    TERMINAL_CREATED: 'cortex:terminal-created',
+    TERMINAL_OUTPUT: 'cortex:terminal-output',
+    TERMINAL_STATUS: 'cortex:terminal-status',
+    TERMINAL_LIST: 'cortex:terminal-list',
     WINDOW_OPEN_REQUEST: 'cortex:window-open-request',
     WINDOW_CLOSE_REQUEST: 'cortex:window-close-request',
     WINDOW_MERGE_REQUEST: 'cortex:window-merge-request',
@@ -362,8 +362,8 @@ export const EVENTS = {
   DEBUG: {
     CLEARED: 'debug:cleared',
     REQUEST_SETTINGS: 'debug:request-settings',
-    HOT_RELOAD: 'debug:hotReload',
-    INLINE_VALUES_UPDATED: 'debug:inlineValuesUpdated',
+    HOT_RELOAD: 'debug:hot-reload',
+    INLINE_VALUES_UPDATED: 'debug:inline-values-updated',
     EVENT: 'debug:event',
   },
 
@@ -574,18 +574,18 @@ COMMAND: {
   // Snippet Events
   // -------------------------------------------------------------------------
   SNIPPET: {
-    SESSION_START: 'snippet-session-start',
-    SESSION_END: 'snippet-session-end',
-    PLACEHOLDER_CHANGE: 'snippet-placeholder-change',
-    MIRROR_UPDATE: 'snippet-mirror-update',
+    SESSION_START: 'snippet:session-start',
+    SESSION_END: 'snippet:session-end',
+    PLACEHOLDER_CHANGE: 'snippet:placeholder-change',
+    MIRROR_UPDATE: 'snippet:mirror-update',
   },
 
   // -------------------------------------------------------------------------
   // Vim Events
   // -------------------------------------------------------------------------
   VIM: {
-    MODE_CHANGE: 'vim-mode-change',
-    COMMAND_EXECUTE: 'vim-command-execute',
+    MODE_CHANGE: 'vim:mode-change',
+    COMMAND_EXECUTE: 'vim:command-execute',
   },
 
   // -------------------------------------------------------------------------
@@ -647,16 +647,16 @@ COMMAND: {
   // Supermaven Events
   // -------------------------------------------------------------------------
   SUPERMAVEN: {
-    GHOST_TEXT: 'supermaven-ghost-text',
-    ACCEPT: 'supermaven-accept',
-    ACCEPT_PARTIAL: 'supermaven-accept-partial',
+    GHOST_TEXT: 'supermaven:ghost-text',
+    ACCEPT: 'supermaven:accept',
+    ACCEPT_PARTIAL: 'supermaven:accept-partial',
   },
 
   // -------------------------------------------------------------------------
   // Copilot Events
   // -------------------------------------------------------------------------
   COPILOT: {
-    INSERT_COMPLETION: 'insert-copilot-completion',
+    INSERT_COMPLETION: 'copilot:insert-completion',
   },
 
   // -------------------------------------------------------------------------
@@ -756,7 +756,7 @@ COMMAND: {
   // Diagnostics Events
   // -------------------------------------------------------------------------
   DIAGNOSTICS: {
-    NAVIGATE_TO_LINE: 'navigate-to-line',
+    NAVIGATE_TO_LINE: 'editor:navigate-to-line',
   },
 
   // -------------------------------------------------------------------------
@@ -766,7 +766,7 @@ COMMAND: {
     COPY_PATH: 'breadcrumbs:copy-path',
     COPY_RELATIVE_PATH: 'breadcrumbs:copy-relative-path',
     REVEAL_IN_EXPLORER: 'breadcrumbs:reveal-in-explorer',
-    GOTO_SYMBOL: 'breadcrumbs-goto-symbol',
+    GOTO_SYMBOL: 'breadcrumbs:goto-symbol',
   },
 
   // -------------------------------------------------------------------------
@@ -790,8 +790,8 @@ COMMAND: {
   // Agent Follow Events
   // -------------------------------------------------------------------------
   AGENT_FOLLOW: {
-    STATUS_CHANGED: 'agentFollow:statusChanged',
-    LOCATION_RECORDED: 'agentFollow:locationRecorded',
+    STATUS_CHANGED: 'agent-follow:status-changed',
+    LOCATION_RECORDED: 'agent-follow:location-recorded',
   },
 
   // -------------------------------------------------------------------------
@@ -821,7 +821,7 @@ COMMAND: {
   // Collab Events
   // -------------------------------------------------------------------------
   COLLAB: {
-    TERMINAL_OUTPUT: 'collab:terminal_output',
+    TERMINAL_OUTPUT: 'collab:terminal-output',
   },
 
   // -------------------------------------------------------------------------
@@ -850,22 +850,22 @@ COMMAND: {
   // Tab Bar Events
   // -------------------------------------------------------------------------
   TAB_BAR: {
-    REVEAL_IN_EXPLORER: 'reveal-in-explorer',
-    CREATE_NEW_FILE: 'create-new-file',
+    REVEAL_IN_EXPLORER: 'explorer:reveal',
+    CREATE_NEW_FILE: 'editor:create-new-file',
   },
 
   // -------------------------------------------------------------------------
   // Streaming Events
   // -------------------------------------------------------------------------
   STREAMING: {
-    SCROLL_TO_LINE: 'streaming-scroll-to-line',
+    SCROLL_TO_LINE: 'streaming:scroll-to-line',
   },
 
   // -------------------------------------------------------------------------
   // Insert Events
   // -------------------------------------------------------------------------
   INSERT: {
-    PREDICTION: 'insert-prediction',
+    PREDICTION: 'prediction:insert',
   },
 
   // -------------------------------------------------------------------------

@@ -1,19 +1,17 @@
 /**
- * CortexStatusBar - Pixel-perfect IDE status bar matching Figma design
+ * CortexStatusBar - Pixel-perfect IDE footer matching Figma design
  *
  * Figma specs (node 443:7673 "Footer"):
- * - Container: flex row, space-between, gap 40px, height 28px, padding 8px 24px
- * - Background: var(--cortex-bg-primary), border-top: 1px solid var(--cortex-border-subtle)
- * - Left section: git branch name, sync status
- * - Right section: cursor position, indentation, encoding, EOL, language, notifications
- * - Font: var(--cortex-font-sans), 12px, weight 500
- * - Text: var(--cortex-text-on-surface) primary, var(--cortex-text-secondary) muted
- *
- * Wires to StatusBarContext when available for real editor info.
+ * - Container: flex row, space-between, gap 40px, padding 8px 24px, no fixed height (hug)
+ * - No background, no border-top (transparent)
+ * - Left section (gap 20px): icon buttons for panel toggle, terminal, git branch, notifications
+ * - Right section: Code Navigation Help link
+ * - Icons: 20×20 containers, 16×16 content, stroke #8C8D8F (default), #FCFCFC (active)
+ * - Text: Figtree 14px weight 500, #8C8D8F color
  */
 
 import { Component, JSX, splitProps, Show, createSignal } from "solid-js";
-import { CortexIcon } from "./primitives";
+import { CortexSvgIcon, type CortexIconName } from "./icons";
 
 export type CortexStatusBarVariant = "default" | "active";
 
@@ -29,25 +27,15 @@ export interface CortexStatusBarProps {
   branchName?: string | null;
   isSyncing?: boolean;
   hasChanges?: boolean;
-  cursorLine?: number;
-  cursorColumn?: number;
-  selectionCount?: number;
-  languageName?: string;
-  encoding?: string;
-  lineEnding?: "LF" | "CRLF" | "CR";
-  indentType?: "spaces" | "tabs";
-  indentSize?: number;
+  hasNotificationDot?: boolean;
   notificationCount?: number;
+  languageName?: string;
   onBranchClick?: () => void;
-  onCursorClick?: () => void;
-  onLanguageClick?: () => void;
-  onEncodingClick?: () => void;
-  onLineEndingClick?: () => void;
-  onIndentationClick?: () => void;
   onNotificationClick?: () => void;
   onTogglePanel?: () => void;
   onToggleTerminal?: () => void;
   onSourceControl?: () => void;
+  onCodeNavHelp?: () => void;
   leftItems?: StatusBarItem[];
   rightItems?: StatusBarItem[];
   class?: string;
@@ -60,219 +48,167 @@ export const CortexStatusBar: Component<CortexStatusBarProps> = (props) => {
     "branchName",
     "isSyncing",
     "hasChanges",
-    "cursorLine",
-    "cursorColumn",
-    "selectionCount",
-    "languageName",
-    "encoding",
-    "lineEnding",
-    "indentType",
-    "indentSize",
+    "hasNotificationDot",
     "notificationCount",
+    "languageName",
     "onBranchClick",
-    "onCursorClick",
-    "onLanguageClick",
-    "onEncodingClick",
-    "onLineEndingClick",
-    "onIndentationClick",
     "onNotificationClick",
     "onTogglePanel",
     "onToggleTerminal",
     "onSourceControl",
+    "onCodeNavHelp",
     "leftItems",
     "rightItems",
     "class",
     "style",
   ]);
 
+  const isActive = () => local.variant === "active";
+
   const containerStyle = (): JSX.CSSProperties => ({
     display: "flex",
     "align-items": "center",
     "justify-content": "space-between",
     gap: "40px",
-    height: "28px",
     padding: "8px 24px",
-    background: "var(--cortex-bg-primary)",
-    "border-top": "1px solid var(--cortex-border-subtle)",
     "flex-shrink": "0",
     "font-family": "var(--cortex-font-sans)",
-    "font-size": "12px",
+    "font-size": "14px",
     "font-weight": "500",
-    color: "var(--cortex-text-secondary)",
-    transition: "background var(--cortex-transition-fast, 100ms ease)",
+    color: "var(--cortex-text-secondary, #8C8D8F)",
     ...local.style,
   });
 
   const sectionStyle: JSX.CSSProperties = {
     display: "flex",
     "align-items": "center",
-    gap: "12px",
+    gap: "20px",
   };
 
-  const indentationLabel = () => {
-    const type = local.indentType || "spaces";
-    const size = local.indentSize || 2;
-    return `${type === "spaces" ? "Spaces" : "Tabs"}: ${size}`;
-  };
+  const showNotificationDot = () =>
+    local.hasNotificationDot || (local.notificationCount ?? 0) > 0;
 
   return (
-    <footer class={local.class} style={containerStyle()}>
-      {/* Left Section: Git branch + panel toggles */}
+    <footer class={local.class} style={containerStyle()} data-testid="cortex-status-bar">
+      {/* Left Section: Icon buttons */}
       <div style={sectionStyle}>
-        <Show when={local.branchName}>
-          <StatusBarButton
-            onClick={local.onBranchClick ?? local.onSourceControl}
-            title="Source Control"
-          >
-            <CortexIcon name="git" size={16} color="currentColor" />
-            <span>{local.branchName}</span>
-            <Show when={local.isSyncing}>
-              <CortexIcon name="sync" size={16} color="currentColor" />
-            </Show>
-            <Show when={local.hasChanges}>
-              <span style={{ "font-size": "10px" }}>●</span>
-            </Show>
-          </StatusBarButton>
-        </Show>
+        <StatusBarIconButton
+          iconName={"status-bar/layout-alt-04" as CortexIconName}
+          onClick={local.onTogglePanel}
+          title="Toggle Panel"
+          active={isActive()}
+        />
 
-        <Show when={local.onTogglePanel}>
-          <StatusBarButton onClick={local.onTogglePanel} title="Toggle Panel">
-            <CortexIcon name="layout" size={16} color="currentColor" />
-          </StatusBarButton>
-        </Show>
+        <StatusBarIconButton
+          iconName={"status-bar/terminal-square" as CortexIconName}
+          onClick={local.onToggleTerminal}
+          title="Toggle Terminal"
+        />
 
-        <Show when={local.onToggleTerminal}>
-          <StatusBarButton onClick={local.onToggleTerminal} title="Toggle Terminal">
-            <CortexIcon name="terminal" size={16} color="currentColor" />
-          </StatusBarButton>
-        </Show>
+        <StatusBarIconButton
+          iconName={"status-bar/git-branch-02" as CortexIconName}
+          onClick={local.onBranchClick ?? local.onSourceControl}
+          title="Source Control"
+        />
+
+        <StatusBarIconButton
+          iconName={"status-bar/info-circle" as CortexIconName}
+          onClick={local.onNotificationClick}
+          title="Notifications"
+          showDot={showNotificationDot()}
+        />
 
         <Show when={local.leftItems}>
           {(items) => (
             <>
               {items().map((item) => (
-                <StatusBarButton
+                <StatusBarIconButton
+                  iconName={item.icon as CortexIconName}
                   onClick={item.onClick}
                   title={item.label}
-                >
-                  <CortexIcon name={item.icon} size={16} color="currentColor" />
-                </StatusBarButton>
+                />
               ))}
             </>
           )}
         </Show>
       </div>
 
-      {/* Right Section: Editor info + notifications */}
-      <div style={{ ...sectionStyle, gap: "12px" }}>
-        <StatusBarButton
-          onClick={local.onCursorClick}
-          title="Go to Line/Column"
-        >
-          <span>Ln {local.cursorLine || 1}, Col {local.cursorColumn || 1}</span>
-          <Show when={(local.selectionCount ?? 0) > 0}>
-            <span>({local.selectionCount} selected)</span>
-          </Show>
-        </StatusBarButton>
-
-        <StatusBarButton
-          onClick={local.onIndentationClick}
-          title="Select Indentation"
-        >
-          <span>{indentationLabel()}</span>
-        </StatusBarButton>
-
-        <StatusBarButton
-          onClick={local.onEncodingClick}
-          title="Select Encoding"
-        >
-          <span>{local.encoding || "UTF-8"}</span>
-        </StatusBarButton>
-
-        <StatusBarButton
-          onClick={local.onLineEndingClick}
-          title="Select End of Line Sequence"
-        >
-          <span>{local.lineEnding || "LF"}</span>
-        </StatusBarButton>
-
-        <StatusBarButton
-          onClick={local.onLanguageClick}
-          title="Select Language Mode"
-        >
-          <span>{local.languageName || "Plain Text"}</span>
-        </StatusBarButton>
-
-        <Show when={local.onNotificationClick}>
-          <StatusBarButton
-            onClick={local.onNotificationClick}
-            title="Notifications"
-          >
-            <CortexIcon name="bell" size={16} color="currentColor" />
-            <Show when={(local.notificationCount ?? 0) > 0}>
-              <span style={{
-                "min-width": "14px",
-                height: "14px",
-                "border-radius": "7px",
-                background: "var(--cortex-accent-primary, #B2FF22)",
-                color: "var(--cortex-accent-text, #000)",
-                "font-size": "10px",
-                "font-weight": "600",
-                display: "flex",
-                "align-items": "center",
-                "justify-content": "center",
-                padding: "0 3px",
-              }}>
-                {local.notificationCount}
-              </span>
-            </Show>
-          </StatusBarButton>
-        </Show>
-
+      {/* Right Section: Code Navigation Help */}
+      <div style={{ ...sectionStyle, gap: "4px" }}>
         <Show when={local.rightItems}>
           {(items) => (
             <>
               {items().map((item) => (
-                <StatusBarButton
+                <StatusBarIconButton
+                  iconName={item.icon as CortexIconName}
                   onClick={item.onClick}
                   title={item.label}
-                >
-                  <CortexIcon name={item.icon} size={16} color="currentColor" />
-                </StatusBarButton>
+                />
               ))}
             </>
           )}
         </Show>
+
+        <button
+          style={{
+            display: "flex",
+            "align-items": "center",
+            gap: "4px",
+            padding: "0",
+            border: "none",
+            background: "transparent",
+            color: "var(--cortex-text-on-surface, #FCFCFC)",
+            "font-family": "inherit",
+            "font-size": "inherit",
+            "font-weight": "inherit",
+            cursor: "pointer",
+            height: "26px",
+          }}
+          onClick={() => local.onCodeNavHelp?.()}
+          title="Code Navigation Help"
+          aria-label="Code Navigation Help"
+        >
+          <CortexSvgIcon
+            name={"navigation/chevron-left" as CortexIconName}
+            size={16}
+            color="var(--cortex-text-secondary, #8C8D8F)"
+          />
+          <span style={{ color: "var(--cortex-text-on-surface, #FCFCFC)" }}>Code Navigation Help</span>
+        </button>
       </div>
     </footer>
   );
 };
 
-interface StatusBarButtonProps {
+interface StatusBarIconButtonProps {
+  iconName: CortexIconName;
   onClick?: (() => void) | undefined;
   title?: string;
-  children: JSX.Element;
+  active?: boolean;
+  showDot?: boolean;
 }
 
-const StatusBarButton: Component<StatusBarButtonProps> = (props) => {
+const StatusBarIconButton: Component<StatusBarIconButtonProps> = (props) => {
   const [isHovered, setIsHovered] = createSignal(false);
+
+  const iconColor = () => {
+    if (props.active || isHovered()) return "var(--cortex-text-on-surface, #FCFCFC)";
+    return "var(--cortex-text-secondary, #8C8D8F)";
+  };
 
   return (
     <button
       style={{
         display: "flex",
         "align-items": "center",
-        gap: "4px",
-        padding: "2px 6px",
-        "border-radius": "var(--cortex-radius-sm, 4px)",
+        "justify-content": "center",
+        width: "20px",
+        height: "20px",
+        padding: "2px",
         cursor: props.onClick ? "pointer" : "default",
-        background: isHovered() ? "var(--cortex-bg-hover)" : "transparent",
+        background: "transparent",
         border: "none",
-        color: "inherit",
-        "font-family": "inherit",
-        "font-size": "inherit",
-        "white-space": "nowrap",
-        transition: "background var(--cortex-transition-fast, 100ms ease), color var(--cortex-transition-fast, 100ms ease)",
+        position: "relative",
       }}
       title={props.title}
       aria-label={props.title}
@@ -280,7 +216,25 @@ const StatusBarButton: Component<StatusBarButtonProps> = (props) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {props.children}
+      <CortexSvgIcon
+        name={props.iconName}
+        size={16}
+        color={iconColor()}
+      />
+      <Show when={props.showDot}>
+        <span
+          data-testid="notification-dot"
+          style={{
+            position: "absolute",
+            top: "1px",
+            right: "1px",
+            width: "6px",
+            height: "6px",
+            "border-radius": "50%",
+            background: "var(--cortex-accent-primary, #0288D1)",
+          }}
+        />
+      </Show>
     </button>
   );
 };

@@ -193,10 +193,11 @@ fn get_gpu_info() -> Option<String> {
 
 /// Get list of installed extensions from the extensions manager
 fn get_installed_extensions(app: &AppHandle) -> Vec<ExtensionInfo> {
+    use crate::LazyState;
     use crate::extensions::ExtensionsState;
 
-    if let Some(state) = app.try_state::<ExtensionsState>() {
-        let guard = state.0.lock();
+    if let Some(state) = app.try_state::<LazyState<ExtensionsState>>() {
+        let guard = state.get().0.lock();
         return guard
             .extensions
             .values()
@@ -357,7 +358,7 @@ pub async fn start_live_metrics(app: AppHandle) -> Result<(), String> {
             };
 
             if app_clone
-                .emit("system_specs:live_metrics", &metrics)
+                .emit("system-specs:live-metrics", &metrics)
                 .is_err()
             {
                 break;

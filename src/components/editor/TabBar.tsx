@@ -810,15 +810,15 @@ export function TabBar(props: TabBarProps) {
       }
     };
     
-    window.addEventListener("editor-pin-tab", handlePinTabEvent);
-    window.addEventListener("editor-unpin-tab", handleUnpinTabEvent);
-    window.addEventListener("editor-toggle-pin-tab", handleTogglePinTabEvent);
+    window.addEventListener("editor:pin-tab", handlePinTabEvent);
+    window.addEventListener("editor:unpin-tab", handleUnpinTabEvent);
+    window.addEventListener("editor:toggle-pin-tab", handleTogglePinTabEvent);
     
     onCleanup(() => {
       resizeObserver.disconnect();
-      window.removeEventListener("editor-pin-tab", handlePinTabEvent);
-      window.removeEventListener("editor-unpin-tab", handleUnpinTabEvent);
-      window.removeEventListener("editor-toggle-pin-tab", handleTogglePinTabEvent);
+      window.removeEventListener("editor:pin-tab", handlePinTabEvent);
+      window.removeEventListener("editor:unpin-tab", handleUnpinTabEvent);
+      window.removeEventListener("editor:toggle-pin-tab", handleTogglePinTabEvent);
     });
   });
   
@@ -929,7 +929,7 @@ export function TabBar(props: TabBarProps) {
   
   const handleRevealInExplorer = async (path: string) => {
     // Dispatch event for file explorer to handle
-    window.dispatchEvent(new CustomEvent("reveal-in-explorer", { detail: { path } }));
+    window.dispatchEvent(new CustomEvent("explorer:reveal", { detail: { path } }));
   };
   
   // Double-click on empty area to create new file
@@ -938,7 +938,7 @@ export function TabBar(props: TabBarProps) {
       props.onNewFile();
     } else {
       // Dispatch event for new file creation
-      window.dispatchEvent(new CustomEvent("create-new-file"));
+      window.dispatchEvent(new CustomEvent("editor:create-new-file"));
     }
   };
   
@@ -1149,7 +1149,7 @@ export function TabBar(props: TabBarProps) {
             if (props.onNewFile) {
               props.onNewFile();
             } else {
-              window.dispatchEvent(new CustomEvent("create-new-file", {
+              window.dispatchEvent(new CustomEvent("editor:create-new-file", {
                 detail: { groupId: props.groupId }
               }));
             }

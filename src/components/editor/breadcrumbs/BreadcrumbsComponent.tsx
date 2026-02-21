@@ -95,8 +95,8 @@ export function Breadcrumbs(props: BreadcrumbsProps) {
 
   createEffect(() => {
     const h = (e: CustomEvent<{ line: number; column: number }>) => { if (e.detail) setCursorPosition({ line: e.detail.line ?? 1, column: e.detail.column ?? 1 }); };
-    window.addEventListener("editor-cursor-change", h as EventListener);
-    onCleanup(() => window.removeEventListener("editor-cursor-change", h as EventListener));
+    window.addEventListener("editor:cursor-change", h as EventListener);
+    onCleanup(() => window.removeEventListener("editor:cursor-change", h as EventListener));
   });
   createEffect(() => {
     const h = (e: MouseEvent) => { if (dropdownRef && !dropdownRef.contains(e.target as Node) && breadcrumbsRef && !breadcrumbsRef.contains(e.target as Node)) setDropdownOpen(null); };

@@ -9,6 +9,7 @@ pub enum RemoteError {
     ConnectionFailed(String),
     #[error("Authentication failed: {0}")]
     AuthenticationFailed(String),
+    #[cfg(feature = "remote-ssh")]
     #[error("SSH error: {0}")]
     SshError(#[from] ssh2::Error),
     #[error("IO error: {0}")]

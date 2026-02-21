@@ -129,7 +129,7 @@ export function CallStackView() {
       await editor.openFile(frame.source.path);
       // Dispatch goto-line event to navigate to the frame's line and column
       window.dispatchEvent(
-        new CustomEvent("goto-line", {
+        new CustomEvent("editor:goto-line", {
           detail: {
             line: frame.line,
             column: frame.column > 0 ? frame.column : 1,

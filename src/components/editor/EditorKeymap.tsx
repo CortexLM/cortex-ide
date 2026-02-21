@@ -718,7 +718,7 @@ export function EditorKeymap(props: EditorKeymapProps): null {
           updateFormatOnPasteEnabled(newEnabled);
           props.updateEditorSetting("formatOnPaste", newEnabled);
           window.dispatchEvent(
-            new CustomEvent("editor-format-on-paste-changed", {
+            new CustomEvent("editor:format-on-paste-changed", {
               detail: { enabled: newEnabled },
             }),
           );
@@ -1258,7 +1258,7 @@ export function EditorKeymap(props: EditorKeymapProps): null {
         const position = e.position;
         const currentFile = props.activeFile();
         window.dispatchEvent(
-          new CustomEvent("editor-cursor-change", {
+          new CustomEvent("editor:cursor-change", {
             detail: {
               line: position.lineNumber,
               column: position.column,

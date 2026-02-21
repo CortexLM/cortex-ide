@@ -32,7 +32,7 @@ serde_json = "1"
 rmp-serde = "1"
 
 # Async runtime
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "time", "io-util", "net", "fs", "process", "macros"] }
 async-channel = "2"
 futures = "0.3"
 
@@ -46,7 +46,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Utilities
 open = "5"
-ssh2 = "0.9"
+ssh2 = { version = "0.9", optional = true }
 uuid = { version = "1", features = ["v4"] }
 once_cell = "1"
 dirs = "5"
@@ -87,7 +87,7 @@ git2 = "0.19"
 zip = "0.6"
 
 # WASM extension runtime
-wasmtime = { version = "29", features = ["cranelift"] }
+wasmtime = { version = "29", features = ["cranelift"], optional = true }
 
 # File encoding
 encoding_rs = "0.8"
@@ -101,7 +101,7 @@ libc = "0.2"
 # MCP support
 interprocess = { version = "2.2", features = ["tokio"] }
 enigo = "0.3"
-image = "0.24"
+image = { version = "0.24", optional = true }
 
 # Note: plist and wry are provided by tauri and don't need direct dependencies
 
@@ -141,8 +141,18 @@ tauri-plugin-deep-link = "2.4"
 tempfile = "3"
 
 [features]
-default = ["custom-protocol"]
+default = ["custom-protocol", "wasm-extensions", "remote-ssh", "image-processing"]
 custom-protocol = ["tauri/custom-protocol"]
+wasm-extensions = ["dep:wasmtime"]
+remote-ssh = ["dep:ssh2"]
+image-processing = ["dep:image"]
+
+[profile.dev]
+opt-level = 0
+debug = 2
+
+[profile.dev.package."*"]
+opt-level = 2
 
 [profile.release]
 lto = true

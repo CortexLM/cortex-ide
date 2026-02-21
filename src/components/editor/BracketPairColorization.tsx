@@ -34,8 +34,8 @@ export interface BracketPairColorizationProps {
  * colorization and bracket pair guides via editor options.
  *
  * Event contract:
- * - "editor-toggle-bracket-colorization" → toggles bracket pair colorization
- * - "editor-toggle-bracket-guides"       → toggles bracket pair guides
+ * - "editor:toggle-bracket-colorization" → toggles bracket pair colorization
+ * - "editor:toggle-bracket-guides"       → toggles bracket pair guides
  */
 export const BracketPairColorization: Component<BracketPairColorizationProps> = (props) => {
   const { effectiveSettings, updateEditorSetting } = useSettings();
@@ -75,12 +75,12 @@ export const BracketPairColorization: Component<BracketPairColorizationProps> = 
       updateEditorSetting("guidesBracketPairs", newEnabled);
     };
 
-    window.addEventListener("editor-toggle-bracket-colorization", handleToggle);
-    window.addEventListener("editor-toggle-bracket-guides", handleToggleGuides);
+    window.addEventListener("editor:toggle-bracket-colorization", handleToggle);
+    window.addEventListener("editor:toggle-bracket-guides", handleToggleGuides);
 
     onCleanup(() => {
-      window.removeEventListener("editor-toggle-bracket-colorization", handleToggle);
-      window.removeEventListener("editor-toggle-bracket-guides", handleToggleGuides);
+      window.removeEventListener("editor:toggle-bracket-colorization", handleToggle);
+      window.removeEventListener("editor:toggle-bracket-guides", handleToggleGuides);
     });
   });
 

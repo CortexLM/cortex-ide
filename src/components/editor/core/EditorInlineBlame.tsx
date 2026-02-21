@@ -121,7 +121,7 @@ export function EditorInlineBlame(props: EditorInlineBlameProps) {
 
     window.addEventListener("inline-blame:mode-changed", handleInlineBlameModeChange as EventListener);
     window.addEventListener("inline-blame:toggle", handleToggleInlineBlame);
-    window.addEventListener("debug:inlineValuesUpdated", handleDebugInlineValuesUpdated as EventListener);
+    window.addEventListener("debug:inline-values-updated", handleDebugInlineValuesUpdated as EventListener);
     window.addEventListener("debug:cleared", handleDebugCleared);
     window.addEventListener("debug:toggle-breakpoint", handleDebugToggleBreakpoint as EventListener);
     window.addEventListener("debug:jump-to-cursor-request", handleDebugJumpToCursorRequest as EventListener);
@@ -129,7 +129,7 @@ export function EditorInlineBlame(props: EditorInlineBlameProps) {
     onCleanup(() => {
       window.removeEventListener("inline-blame:mode-changed", handleInlineBlameModeChange as EventListener);
       window.removeEventListener("inline-blame:toggle", handleToggleInlineBlame);
-      window.removeEventListener("debug:inlineValuesUpdated", handleDebugInlineValuesUpdated as EventListener);
+      window.removeEventListener("debug:inline-values-updated", handleDebugInlineValuesUpdated as EventListener);
       window.removeEventListener("debug:cleared", handleDebugCleared);
       window.removeEventListener("debug:toggle-breakpoint", handleDebugToggleBreakpoint as EventListener);
       window.removeEventListener("debug:jump-to-cursor-request", handleDebugJumpToCursorRequest as EventListener);

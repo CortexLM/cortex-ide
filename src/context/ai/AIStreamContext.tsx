@@ -5,12 +5,12 @@
  * emitted by the `ai_stream` Tauri command in `src-tauri/src/ai/mod.rs`.
  *
  * **Events consumed:**
- * - `"ai:stream_chunk"` → `{ threadId, content, done }` — streaming content deltas
- * - `"ai:tool_call"` → `{ threadId, callId, name, arguments }` — tool call notifications
- * - `"ai:tool_result"` → `{ threadId, callId, output, success, durationMs? }` — tool results
+ * - `"ai:stream-chunk"` → `{ threadId, content, done }` — streaming content deltas
+ * - `"ai:tool-call"` → `{ threadId, callId, name, arguments }` — tool call notifications
+ * - `"ai:tool-result"` → `{ threadId, callId, output, success, durationMs? }` — tool results
  * - `"ai:error"` → `{ code, message }` — error notifications
  *
- * **Note:** The primary AI pipeline uses `"cortex-event"` via `SDKContext.tsx` instead.
+ * **Note:** The primary AI pipeline uses `"cortex:event"` via `SDKContext.tsx` instead.
  * This context is used by `InlineAssistant.tsx` and direct model streaming features.
  *
  * Handles:

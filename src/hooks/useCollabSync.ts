@@ -44,18 +44,22 @@ export function useCollabSync(options: UseCollabSyncOptions) {
   let isApplyingRemote = false;
 
   const startServer = async (): Promise<CollabServerInfo> => {
-    const info = await invoke<CollabServerInfo>("start_collab_server");
+    const info = await invoke<CollabServerInfo>("start_collab_server").catch(() => ({
+      port: 0,
+      running: false,
+      session_count: 0,
+    }));
     setServerRunning(info.running);
     return info;
   };
 
   const stopServer = async (): Promise<void> => {
-    await invoke("stop_collab_server");
+    await invoke("stop_collab_server").catch(() => {});
     setServerRunning(false);
   };
 
   const createSession = async (name: string, userName: string): Promise<CollabSessionInfo> => {
-    const session = await invoke<CollabSessionInfo>("create_collab_session", {
+    const session = await invoke<CollabSessionInfo>("collab_create_session", {
       name,
       userName,
     });
@@ -64,8 +68,8 @@ export function useCollabSync(options: UseCollabSyncOptions) {
   };
 
   const joinSession = async (code: string, userName: string): Promise<CollabSessionInfo> => {
-    const session = await invoke<CollabSessionInfo>("join_collab_session", {
-      sessionCode: code,
+    const session = await invoke<CollabSessionInfo>("collab_join_session", {
+      sessionId: code,
       userName,
     });
     setSessionCode(session.session_code);

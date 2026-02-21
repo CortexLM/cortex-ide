@@ -577,7 +577,7 @@ export function useHighFrequencyUpdates(
     if (line >= 0 && line < lineInfos.length) {
       // Dispatch custom event for scroll
       window.dispatchEvent(
-        new CustomEvent("streaming-scroll-to-line", {
+        new CustomEvent("streaming:scroll-to-line", {
           detail: { line, lineInfo: lineInfos[line] },
         })
       );

@@ -2802,8 +2802,8 @@ export const TerminalsProvider: ParentComponent = (props) => {
     }));
   });
 
-  // ssh_terminal:output event
-  useTauriListen<SSHTerminalOutput>("ssh_terminal:output", (output) => {
+  // ssh-terminal:output event
+  useTauriListen<SSHTerminalOutput>("ssh-terminal:output", (output) => {
     // Find the corresponding local terminal ID
     const terminalId = sshSessionToTerminal.get(output.session_id);
     
@@ -2833,8 +2833,8 @@ export const TerminalsProvider: ParentComponent = (props) => {
     }
   });
 
-  // ssh_terminal:status event
-  useTauriListen<SSHTerminalStatus>("ssh_terminal:status", (payload) => {
+  // ssh-terminal:status event
+  useTauriListen<SSHTerminalStatus>("ssh-terminal:status", (payload) => {
     const { session_id, status } = payload;
     const terminalId = sshSessionToTerminal.get(session_id);
     
@@ -2855,8 +2855,8 @@ export const TerminalsProvider: ParentComponent = (props) => {
     }
   });
 
-  // ssh_terminal:connected event
-  useTauriListen<SSHTerminalInfo>("ssh_terminal:connected", (payload) => {
+  // ssh-terminal:connected event
+  useTauriListen<SSHTerminalInfo>("ssh-terminal:connected", (payload) => {
     terminalLogger.debug("SSH terminal connected:", payload.id);
   });
 

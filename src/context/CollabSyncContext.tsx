@@ -383,7 +383,7 @@ export function CollabSyncProvider(props: ParentProps) {
   };
 
   onMount(() => {
-    const unlisten = listen("collab:user_left", (event) => {
+    const unlisten = listen("collab:user-left", (event) => {
       const payload = event.payload as {
         sessionId: string;
         userId: string;

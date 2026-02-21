@@ -74,7 +74,7 @@ export function EditorDiffView(props: EditorDiffViewProps) {
     window.addEventListener("testing:coverage-updated", handleCoverageUpdated);
     window.addEventListener("testing:coverage-visibility-changed", handleCoverageVisibilityChanged as EventListener);
     window.addEventListener("testing:coverage-cleared", handleCoverageCleared);
-    window.addEventListener("editor-toggle-coverage-decorations", handleToggleCoverageDecorations);
+    window.addEventListener("editor:toggle-coverage-decorations", handleToggleCoverageDecorations);
 
     onCleanup(() => {
       window.removeEventListener("git:go-to-next-change", handleGoToNextChange);
@@ -82,7 +82,7 @@ export function EditorDiffView(props: EditorDiffViewProps) {
       window.removeEventListener("testing:coverage-updated", handleCoverageUpdated);
       window.removeEventListener("testing:coverage-visibility-changed", handleCoverageVisibilityChanged as EventListener);
       window.removeEventListener("testing:coverage-cleared", handleCoverageCleared);
-      window.removeEventListener("editor-toggle-coverage-decorations", handleToggleCoverageDecorations);
+      window.removeEventListener("editor:toggle-coverage-decorations", handleToggleCoverageDecorations);
       clearCoverageDecorations(editor);
     });
   });

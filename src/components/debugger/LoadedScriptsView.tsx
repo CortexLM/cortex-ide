@@ -470,7 +470,7 @@ export function LoadedScriptsView() {
 
     const setupListener = async () => {
       unlistenLoadedSource = await listen<{ source: Source }>(
-        "debug:loadedSource",
+        "debug:loaded-source",
         (event) => {
           handleScriptLoaded(event.payload.source);
         }

@@ -267,7 +267,7 @@ export function EditorFilesProvider(props: ParentProps) {
       setState("openFiles", (f) => f.id === fileId, "modified", false);
 
       window.dispatchEvent(
-        new CustomEvent("cortex:file_saved", {
+        new CustomEvent("cortex:file-saved", {
           detail: { path: file.path, fileId: file.id },
         })
       );

@@ -1,20 +1,29 @@
 //! Remote connection manager - thread-safe connection pool.
 
+#[cfg(feature = "remote-ssh")]
 use ssh2::{Session, Sftp};
 use std::collections::HashMap;
+#[cfg(feature = "remote-ssh")]
 use std::io::{Read, Write};
+#[cfg(feature = "remote-ssh")]
 use std::net::TcpStream;
 use std::path::PathBuf;
+#[cfg(feature = "remote-ssh")]
 use std::sync::{Arc, Mutex};
 use tokio::sync::RwLock;
 use tracing::info;
 
-use super::connection::{SshConnection, set_file_permissions};
-use super::credentials::{SecureAuthCredentials, SecureSshCredentials};
+#[cfg(feature = "remote-ssh")]
+use super::connection::SshConnection;
+use super::connection::set_file_permissions;
+#[cfg(feature = "remote-ssh")]
+use super::credentials::SecureAuthCredentials;
+use super::credentials::SecureSshCredentials;
 use super::error::RemoteError;
+#[cfg(feature = "remote-ssh")]
+use super::types::ConnectionStatus;
 use super::types::{
-    AuthMethod, CommandResult, ConnectionInfo, ConnectionProfile, ConnectionStatus,
-    RemoteFileEntry, RemoteFileNode,
+    AuthMethod, CommandResult, ConnectionInfo, ConnectionProfile, RemoteFileEntry, RemoteFileNode,
 };
 
 /// Remote connection manager - thread-safe connection pool
@@ -23,7 +32,10 @@ use super::types::{
 /// ssh2::Session is not Send. All SSH operations must be wrapped in spawn_blocking
 /// and the mutex is locked inside the blocking task to keep Session on a single thread.
 pub struct RemoteManager {
+    #[cfg(feature = "remote-ssh")]
     pub(crate) connections: RwLock<HashMap<String, Arc<Mutex<SshConnection>>>>,
+    #[cfg(not(feature = "remote-ssh"))]
+    pub(crate) connections: RwLock<HashMap<String, ()>>,
     profiles: RwLock<Vec<ConnectionProfile>>,
 }
 
@@ -139,7 +151,7 @@ impl RemoteManager {
         self.save_profiles().await
     }
 
-    /// Connect to a remote host with secure credential handling
+    #[cfg(feature = "remote-ssh")]
     pub async fn connect(&self, profile: ConnectionProfile) -> Result<ConnectionInfo, RemoteError> {
         let connection_id = profile.id.clone();
 
@@ -318,7 +330,7 @@ impl RemoteManager {
         })
     }
 
-    /// Connect with explicit credentials (for first-time setup)
+    #[cfg(feature = "remote-ssh")]
     pub async fn connect_with_credentials(
         &self,
         mut profile: ConnectionProfile,
@@ -351,7 +363,7 @@ impl RemoteManager {
         self.connect(profile).await
     }
 
-    /// Disconnect from a remote host
+    #[cfg(feature = "remote-ssh")]
     pub async fn disconnect(&self, connection_id: &str) -> Result<(), RemoteError> {
         let mut connections = self.connections.write().await;
         if connections.remove(connection_id).is_some() {
@@ -362,7 +374,7 @@ impl RemoteManager {
         }
     }
 
-    /// Get connection status
+    #[cfg(feature = "remote-ssh")]
     pub async fn get_connection_status(
         &self,
         connection_id: &str,
@@ -384,7 +396,7 @@ impl RemoteManager {
         }
     }
 
-    /// Get all active connections
+    #[cfg(feature = "remote-ssh")]
     pub async fn get_active_connections(&self) -> Vec<ConnectionInfo> {
         let connections = self.connections.read().await;
         let mut result = Vec::new();
@@ -402,7 +414,7 @@ impl RemoteManager {
         result
     }
 
-    /// List directory contents
+    #[cfg(feature = "remote-ssh")]
     pub async fn list_directory(
         &self,
         connection_id: &str,
@@ -486,7 +498,7 @@ impl RemoteManager {
         .map_err(|e| RemoteError::ConnectionFailed(format!("Task join error: {}", e)))?
     }
 
-    /// Get file tree for a directory
+    #[cfg(feature = "remote-ssh")]
     pub async fn get_file_tree(
         &self,
         connection_id: &str,
@@ -524,7 +536,7 @@ impl RemoteManager {
         .map_err(|e| RemoteError::ConnectionFailed(format!("Task join error: {}", e)))?
     }
 
-    /// Read file contents
+    #[cfg(feature = "remote-ssh")]
     pub async fn read_file(&self, connection_id: &str, path: &str) -> Result<String, RemoteError> {
         let conn = {
             let connections = self.connections.read().await;
@@ -567,7 +579,7 @@ impl RemoteManager {
         .map_err(|e| RemoteError::ConnectionFailed(format!("Task join error: {}", e)))?
     }
 
-    /// Read file as bytes
+    #[cfg(feature = "remote-ssh")]
     pub async fn read_file_bytes(
         &self,
         connection_id: &str,
@@ -614,7 +626,7 @@ impl RemoteManager {
         .map_err(|e| RemoteError::ConnectionFailed(format!("Task join error: {}", e)))?
     }
 
-    /// Write file contents
+    #[cfg(feature = "remote-ssh")]
     pub async fn write_file(
         &self,
         connection_id: &str,
@@ -656,7 +668,7 @@ impl RemoteManager {
         .map_err(|e| RemoteError::ConnectionFailed(format!("Task join error: {}", e)))?
     }
 
-    /// Write file as bytes
+    #[cfg(feature = "remote-ssh")]
     pub async fn write_file_bytes(
         &self,
         connection_id: &str,
@@ -698,7 +710,7 @@ impl RemoteManager {
         .map_err(|e| RemoteError::ConnectionFailed(format!("Task join error: {}", e)))?
     }
 
-    /// Delete a file or directory
+    #[cfg(feature = "remote-ssh")]
     pub async fn delete(
         &self,
         connection_id: &str,
@@ -749,7 +761,7 @@ impl RemoteManager {
         .map_err(|e| RemoteError::ConnectionFailed(format!("Task join error: {}", e)))?
     }
 
-    /// Create a directory
+    #[cfg(feature = "remote-ssh")]
     pub async fn create_directory(
         &self,
         connection_id: &str,
@@ -791,7 +803,7 @@ impl RemoteManager {
         .map_err(|e| RemoteError::ConnectionFailed(format!("Task join error: {}", e)))?
     }
 
-    /// Rename/move a file or directory
+    #[cfg(feature = "remote-ssh")]
     pub async fn rename(
         &self,
         connection_id: &str,
@@ -840,7 +852,7 @@ impl RemoteManager {
         .map_err(|e| RemoteError::ConnectionFailed(format!("Task join error: {}", e)))?
     }
 
-    /// Execute a command on the remote host
+    #[cfg(feature = "remote-ssh")]
     pub async fn execute_command(
         &self,
         connection_id: &str,
@@ -883,7 +895,7 @@ impl RemoteManager {
         .map_err(|e| RemoteError::ConnectionFailed(format!("Task join error: {}", e)))?
     }
 
-    /// Get file/directory stats
+    #[cfg(feature = "remote-ssh")]
     pub async fn stat(
         &self,
         connection_id: &str,
@@ -936,9 +948,153 @@ impl RemoteManager {
         .await
         .map_err(|e| RemoteError::ConnectionFailed(format!("Task join error: {}", e)))?
     }
+
+    // --- Stub implementations when remote-ssh feature is disabled ---
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn connect(
+        &self,
+        _profile: ConnectionProfile,
+    ) -> Result<ConnectionInfo, RemoteError> {
+        Err(RemoteError::ConnectionFailed(
+            "SSH support is not enabled. Rebuild with the 'remote-ssh' feature.".to_string(),
+        ))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn connect_with_credentials(
+        &self,
+        _profile: ConnectionProfile,
+        _password: Option<&str>,
+        _passphrase: Option<&str>,
+    ) -> Result<ConnectionInfo, RemoteError> {
+        Err(RemoteError::ConnectionFailed(
+            "SSH support is not enabled".to_string(),
+        ))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn disconnect(&self, connection_id: &str) -> Result<(), RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn get_connection_status(
+        &self,
+        connection_id: &str,
+    ) -> Result<ConnectionInfo, RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn get_active_connections(&self) -> Vec<ConnectionInfo> {
+        Vec::new()
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn list_directory(
+        &self,
+        connection_id: &str,
+        _path: &str,
+    ) -> Result<Vec<RemoteFileEntry>, RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn get_file_tree(
+        &self,
+        connection_id: &str,
+        _path: &str,
+        _depth: u32,
+    ) -> Result<RemoteFileNode, RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn read_file(&self, connection_id: &str, _path: &str) -> Result<String, RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn read_file_bytes(
+        &self,
+        connection_id: &str,
+        _path: &str,
+    ) -> Result<Vec<u8>, RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn write_file(
+        &self,
+        connection_id: &str,
+        _path: &str,
+        _content: &str,
+    ) -> Result<(), RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn write_file_bytes(
+        &self,
+        connection_id: &str,
+        _path: &str,
+        _content: &[u8],
+    ) -> Result<(), RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn delete(
+        &self,
+        connection_id: &str,
+        _path: &str,
+        _recursive: bool,
+    ) -> Result<(), RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn create_directory(
+        &self,
+        connection_id: &str,
+        _path: &str,
+        _recursive: bool,
+    ) -> Result<(), RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn rename(
+        &self,
+        connection_id: &str,
+        _old_path: &str,
+        _new_path: &str,
+    ) -> Result<(), RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn execute_command(
+        &self,
+        connection_id: &str,
+        _command: &str,
+        _working_dir: Option<&str>,
+    ) -> Result<CommandResult, RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
+
+    #[cfg(not(feature = "remote-ssh"))]
+    pub async fn stat(
+        &self,
+        connection_id: &str,
+        _path: &str,
+    ) -> Result<RemoteFileEntry, RemoteError> {
+        Err(RemoteError::ConnectionNotFound(connection_id.to_string()))
+    }
 }
 
-/// Build file tree recursively (synchronous helper for spawn_blocking)
+#[cfg(feature = "remote-ssh")]
 fn build_file_tree_recursive_sync(
     sftp: &Sftp,
     path: &str,

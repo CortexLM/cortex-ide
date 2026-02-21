@@ -10,6 +10,7 @@ use super::types::{
     AgentRuntimeState, AuditEntry, AuditFilter, DecisionAction, ExecutionState, PendingApproval,
     SupervisorDecision, Workflow, WorkflowExport,
 };
+use crate::LazyState;
 
 // =============================================================================
 // Workflow Management Commands
@@ -19,10 +20,10 @@ use super::types::{
 #[tauri::command]
 pub async fn factory_create_workflow(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     workflow: Workflow,
 ) -> Result<Workflow, String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
     let id = manager.create_workflow(workflow.clone());
 
     let created = manager
@@ -52,10 +53,10 @@ pub async fn factory_create_workflow(
 #[tauri::command]
 pub async fn factory_update_workflow(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     workflow: Workflow,
 ) -> Result<Workflow, String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
     let id = workflow.id.clone();
 
     manager.update_workflow(workflow)?;
@@ -87,10 +88,10 @@ pub async fn factory_update_workflow(
 #[tauri::command]
 pub async fn factory_delete_workflow(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     workflow_id: String,
 ) -> Result<(), String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
     let workflow = manager.delete_workflow(&workflow_id)?;
 
     // Log audit entry
@@ -111,29 +112,29 @@ pub async fn factory_delete_workflow(
 /// List all workflows
 #[tauri::command]
 pub async fn factory_list_workflows(
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
 ) -> Result<Vec<Workflow>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     Ok(manager.list_workflows().into_iter().cloned().collect())
 }
 
 /// Get a specific workflow by ID
 #[tauri::command]
 pub async fn factory_get_workflow(
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     workflow_id: String,
 ) -> Result<Option<Workflow>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     Ok(manager.get_workflow(&workflow_id).cloned())
 }
 
 /// Export a workflow to JSON
 #[tauri::command]
 pub async fn factory_export_workflow(
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     workflow_id: String,
 ) -> Result<WorkflowExport, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     let workflow = manager
         .get_workflow(&workflow_id)
         .cloned()
@@ -147,10 +148,10 @@ pub async fn factory_export_workflow(
 #[tauri::command]
 pub async fn factory_import_workflow(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     export: WorkflowExport,
 ) -> Result<Workflow, String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     // Create a new workflow from the export
     let mut workflow = export.workflow;
@@ -188,11 +189,11 @@ pub async fn factory_import_workflow(
 #[tauri::command]
 pub async fn factory_start_workflow(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     workflow_id: String,
     variables: Option<std::collections::HashMap<String, serde_json::Value>>,
 ) -> Result<ExecutionState, String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     // Get the workflow
     let workflow = manager
@@ -243,10 +244,10 @@ pub async fn factory_start_workflow(
 #[tauri::command]
 pub async fn factory_stop_workflow(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     execution_id: String,
 ) -> Result<(), String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     let execution_arc = manager
         .get_execution(&execution_id)
@@ -280,10 +281,10 @@ pub async fn factory_stop_workflow(
 #[tauri::command]
 pub async fn factory_pause_workflow(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     execution_id: String,
 ) -> Result<(), String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     let execution_arc = manager
         .get_execution(&execution_id)
@@ -319,10 +320,10 @@ pub async fn factory_pause_workflow(
 #[tauri::command]
 pub async fn factory_resume_workflow(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     execution_id: String,
 ) -> Result<(), String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     let execution_arc = manager
         .get_execution(&execution_id)
@@ -357,10 +358,10 @@ pub async fn factory_resume_workflow(
 /// Get the current state of an execution
 #[tauri::command]
 pub async fn factory_get_execution_state(
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     execution_id: String,
 ) -> Result<Option<ExecutionState>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
 
     if let Some(execution_arc) = manager.get_execution(&execution_id) {
         let execution = execution_arc.read().await;
@@ -377,9 +378,9 @@ pub async fn factory_get_execution_state(
 /// List all agents
 #[tauri::command]
 pub async fn factory_list_agents(
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
 ) -> Result<Vec<AgentRuntimeState>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     Ok(manager.list_agents().into_iter().cloned().collect())
 }
 
@@ -387,10 +388,10 @@ pub async fn factory_list_agents(
 #[tauri::command]
 pub async fn factory_create_agent(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     agent: AgentRuntimeState,
 ) -> Result<AgentRuntimeState, String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
     let id = manager.create_agent(agent);
 
     let created = manager
@@ -420,10 +421,10 @@ pub async fn factory_create_agent(
 #[tauri::command]
 pub async fn factory_update_agent(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     agent: AgentRuntimeState,
 ) -> Result<AgentRuntimeState, String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
     let id = agent.id.clone();
 
     manager.update_agent(agent)?;
@@ -446,10 +447,10 @@ pub async fn factory_update_agent(
 #[tauri::command]
 pub async fn factory_delete_agent(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     agent_id: String,
 ) -> Result<(), String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
     let agent = manager.delete_agent(&agent_id)?;
 
     // Log audit entry
@@ -470,10 +471,10 @@ pub async fn factory_delete_agent(
 /// Get the current state of an agent
 #[tauri::command]
 pub async fn factory_get_agent_state(
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     agent_id: String,
 ) -> Result<Option<AgentRuntimeState>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     Ok(manager.get_agent(&agent_id).cloned())
 }
 
@@ -484,9 +485,9 @@ pub async fn factory_get_agent_state(
 /// List all pending approvals
 #[tauri::command]
 pub async fn factory_list_pending_approvals(
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
 ) -> Result<Vec<PendingApproval>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     Ok(manager
         .list_pending_approvals()
         .into_iter()
@@ -498,11 +499,11 @@ pub async fn factory_list_pending_approvals(
 #[tauri::command]
 pub async fn factory_approve_action(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     approval_id: String,
     reason: Option<String>,
 ) -> Result<(), String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     let approval = manager
         .get_pending_approval(&approval_id)
@@ -545,11 +546,11 @@ pub async fn factory_approve_action(
 #[tauri::command]
 pub async fn factory_deny_action(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     approval_id: String,
     reason: Option<String>,
 ) -> Result<(), String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     let approval = manager
         .get_pending_approval(&approval_id)
@@ -592,12 +593,12 @@ pub async fn factory_deny_action(
 #[tauri::command]
 pub async fn factory_modify_action(
     app: AppHandle,
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     approval_id: String,
     modified_params: serde_json::Value,
     reason: Option<String>,
 ) -> Result<(), String> {
-    let mut manager = state.0.lock().await;
+    let mut manager = state.get().0.lock().await;
 
     let approval = manager
         .get_pending_approval(&approval_id)
@@ -643,31 +644,31 @@ pub async fn factory_modify_action(
 /// Get audit log entries with optional filtering
 #[tauri::command]
 pub async fn factory_get_audit_log(
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     filter: Option<AuditFilter>,
 ) -> Result<Vec<AuditEntry>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     Ok(manager.audit().query(filter.unwrap_or_default()))
 }
 
 /// Export audit log to a file
 #[tauri::command]
 pub async fn factory_export_audit_log(
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     path: String,
     filter: Option<AuditFilter>,
 ) -> Result<usize, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     manager.audit().export_to_file(&path, filter)
 }
 
 /// Get a specific audit entry by ID
 #[tauri::command]
 pub async fn factory_get_audit_entry(
-    state: State<'_, FactoryState>,
+    state: State<'_, LazyState<FactoryState>>,
     entry_id: String,
 ) -> Result<Option<AuditEntry>, String> {
-    let manager = state.0.lock().await;
+    let manager = state.get().0.lock().await;
     Ok(manager.audit().get_entry(&entry_id).cloned())
 }
 

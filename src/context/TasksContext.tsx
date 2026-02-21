@@ -2388,7 +2388,7 @@ export const TasksProvider: ParentComponent = (props) => {
   const emitTaskStart = (execution: TaskExecution) => {
     const event: TaskStartEvent = { execution };
     taskStartListeners.forEach(listener => listener(event));
-    window.dispatchEvent(new CustomEvent("tasks:onDidStartTask", { detail: event }));
+    window.dispatchEvent(new CustomEvent("tasks:on-did-start-task", { detail: event }));
   };
 
   /**
@@ -2397,7 +2397,7 @@ export const TasksProvider: ParentComponent = (props) => {
   const emitTaskEnd = (execution: TaskExecution, exitCode?: number) => {
     const event: TaskEndEvent = { execution, exitCode };
     taskEndListeners.forEach(listener => listener(event));
-    window.dispatchEvent(new CustomEvent("tasks:onDidEndTask", { detail: event }));
+    window.dispatchEvent(new CustomEvent("tasks:on-did-end-task", { detail: event }));
   };
 
   /**
@@ -2406,7 +2406,7 @@ export const TasksProvider: ParentComponent = (props) => {
   const emitTaskProcessStart = (execution: TaskExecution, processId: number) => {
     const event: TaskProcessStartEvent = { execution, processId };
     taskProcessStartListeners.forEach(listener => listener(event));
-    window.dispatchEvent(new CustomEvent("tasks:onDidStartTaskProcess", { detail: event }));
+    window.dispatchEvent(new CustomEvent("tasks:on-did-start-task-process", { detail: event }));
   };
 
   /**
@@ -2415,7 +2415,7 @@ export const TasksProvider: ParentComponent = (props) => {
   const emitTaskProcessEnd = (execution: TaskExecution, exitCode: number) => {
     const event: TaskProcessEndEvent = { execution, exitCode };
     taskProcessEndListeners.forEach(listener => listener(event));
-    window.dispatchEvent(new CustomEvent("tasks:onDidEndTaskProcess", { detail: event }));
+    window.dispatchEvent(new CustomEvent("tasks:on-did-end-task-process", { detail: event }));
   };
 
   /**
@@ -4061,11 +4061,11 @@ export const TasksProvider: ParentComponent = (props) => {
 
     onCleanup(() => {
       if (listenersRegistered) {
-        window.removeEventListener("cortex:project_opened", handleProjectOpen);
-        window.removeEventListener("cortex:terminal_status", handleTerminalStatus);
-        window.removeEventListener("cortex:terminal_output", handleTerminalOutput);
-        window.removeEventListener("cortex:file_saved", handleFileSavedEvent);
-        window.removeEventListener("cortex:file_changed", handleFileChangedEvent);
+        window.removeEventListener("cortex:project-opened", handleProjectOpen);
+        window.removeEventListener("cortex:terminal-status", handleTerminalStatus);
+        window.removeEventListener("cortex:terminal-output", handleTerminalOutput);
+        window.removeEventListener("cortex:file-saved", handleFileSavedEvent);
+        window.removeEventListener("cortex:file-changed", handleFileChangedEvent);
         window.removeEventListener("tasks:open-run-dialog", handleOpenRunDialog);
         window.removeEventListener("tasks:open-panel", handleOpenPanel);
         window.removeEventListener("tasks:open-config-editor", handleOpenConfigEditor);
@@ -4093,11 +4093,11 @@ export const TasksProvider: ParentComponent = (props) => {
     });
 
     queueMicrotask(() => {
-      window.addEventListener("cortex:project_opened", handleProjectOpen);
-      window.addEventListener("cortex:terminal_status", handleTerminalStatus);
-      window.addEventListener("cortex:terminal_output", handleTerminalOutput);
-      window.addEventListener("cortex:file_saved", handleFileSavedEvent);
-      window.addEventListener("cortex:file_changed", handleFileChangedEvent);
+      window.addEventListener("cortex:project-opened", handleProjectOpen);
+      window.addEventListener("cortex:terminal-status", handleTerminalStatus);
+      window.addEventListener("cortex:terminal-output", handleTerminalOutput);
+      window.addEventListener("cortex:file-saved", handleFileSavedEvent);
+      window.addEventListener("cortex:file-changed", handleFileChangedEvent);
       window.addEventListener("tasks:open-run-dialog", handleOpenRunDialog);
       window.addEventListener("tasks:open-panel", handleOpenPanel);
       window.addEventListener("tasks:open-config-editor", handleOpenConfigEditor);

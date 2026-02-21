@@ -46,7 +46,7 @@ export const PluginDetail: Component<PluginDetailProps> = (props) => {
   const handleInstall = async () => {
     setInstalling(true);
     try {
-      await invoke("registry_install_plugin", { name: props.pluginName });
+      await invoke("registry_install", { name: props.pluginName });
       setPlugin((prev) => (prev ? { ...prev, isInstalled: true } : prev));
       props.onInstall?.(props.pluginName);
     } catch (err) {
@@ -59,7 +59,7 @@ export const PluginDetail: Component<PluginDetailProps> = (props) => {
   const handleUninstall = async () => {
     setInstalling(true);
     try {
-      await invoke("registry_uninstall_plugin", { name: props.pluginName });
+      await invoke("uninstall_extension", { name: props.pluginName });
       setPlugin((prev) => (prev ? { ...prev, isInstalled: false } : prev));
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));

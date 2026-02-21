@@ -13,6 +13,7 @@ use tracing::{info, warn};
 use super::state::ExtensionsState;
 use super::types::ExtensionSource;
 use super::utils::{extract_zip_package, find_extension_root};
+use crate::LazyState;
 
 // ============================================================================
 // Types
@@ -510,8 +511,8 @@ pub async fn registry_install(
     let ext_root = find_extension_root(&extract_dir)?;
 
     let extension = {
-        let state = app.state::<ExtensionsState>();
-        let mut manager = state.0.lock();
+        let state = app.state::<LazyState<ExtensionsState>>();
+        let mut manager = state.get().0.lock();
         let mut ext = manager.install_extension(&ext_root)?;
         ext.source = ExtensionSource::Marketplace;
         ext
@@ -530,8 +531,8 @@ pub async fn registry_install(
 #[tauri::command]
 pub async fn registry_check_updates(app: AppHandle) -> Result<Vec<RegistryUpdateInfo>, String> {
     let installed = {
-        let state = app.state::<ExtensionsState>();
-        let manager = state.0.lock();
+        let state = app.state::<LazyState<ExtensionsState>>();
+        let manager = state.get().0.lock();
         manager
             .get_extensions()
             .into_iter()

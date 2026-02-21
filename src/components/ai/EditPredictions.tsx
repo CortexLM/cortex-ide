@@ -50,9 +50,9 @@ export function useEditPredictions() {
       }, 500);
     };
 
-    window.addEventListener("editor-cursor-change", handleCursorChange as EventListener);
+    window.addEventListener("editor:cursor-change", handleCursorChange as EventListener);
     onCleanup(() => {
-      window.removeEventListener("editor-cursor-change", handleCursorChange as EventListener);
+      window.removeEventListener("editor:cursor-change", handleCursorChange as EventListener);
       clearTimeout(debounceTimer);
     });
   });
@@ -108,7 +108,7 @@ export function useEditPredictions() {
 
     // Emit event to insert prediction in editor
     // VS Code specs: ghost text uses italic + opacity 0.7
-    window.dispatchEvent(new CustomEvent("insert-prediction", {
+    window.dispatchEvent(new CustomEvent("prediction:insert", {
       detail: {
         ...pred,
         styles: GHOST_TEXT_STYLES,

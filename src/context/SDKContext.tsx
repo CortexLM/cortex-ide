@@ -460,19 +460,19 @@ export function SDKProvider(props: ParentProps) {
 
       // Terminal events - handled by TerminalsContext via custom events
       case "terminal_created":
-        window.dispatchEvent(new CustomEvent("cortex:terminal_created", { detail: data }));
+        window.dispatchEvent(new CustomEvent("cortex:terminal-created", { detail: data }));
         break;
 
       case "terminal_output":
-        window.dispatchEvent(new CustomEvent("cortex:terminal_output", { detail: data }));
+        window.dispatchEvent(new CustomEvent("cortex:terminal-output", { detail: data }));
         break;
 
       case "terminal_status":
-        window.dispatchEvent(new CustomEvent("cortex:terminal_status", { detail: data }));
+        window.dispatchEvent(new CustomEvent("cortex:terminal-status", { detail: data }));
         break;
 
       case "terminal_list":
-        window.dispatchEvent(new CustomEvent("cortex:terminal_list", { detail: data }));
+        window.dispatchEvent(new CustomEvent("cortex:terminal-list", { detail: data }));
         break;
     }
   };
@@ -801,11 +801,11 @@ export function SDKProvider(props: ParentProps) {
   });
 
   // Listen for Tauri cortex events (Primary AI Pipeline)
-  // Event: "cortex-event" — emitted by session.rs via convert_event_to_ws()
+  // Event: "cortex:event" — emitted by session.rs via convert_event_to_ws()
   // Payload: WsMessage (see src-tauri/src/ai/protocol.rs) with { type: "...", ...fields }
   // Handles: stream_chunk, agent_message, tool_call_begin/end, task_started/complete,
   //          approval_request, token_usage, error, reasoning_delta, terminal events, etc.
-  useTauriListen<CortexEvent>("cortex-event", (payload) => {
+  useTauriListen<CortexEvent>("cortex:event", (payload) => {
     processMessage(payload);
   });
 

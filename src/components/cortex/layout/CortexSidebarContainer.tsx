@@ -3,7 +3,6 @@ import type { SidebarTab } from "./types";
 import { SidebarSkeleton, SIDEBAR_MIN_WIDTH, SIDEBAR_MAX_WIDTH } from "./types";
 
 const CortexAgentsPanel = lazy(() => import("@/components/cortex/CortexAgentsPanel").then(m => ({ default: m.CortexAgentsPanel })));
-const CortexFactoryPanel = lazy(() => import("@/components/cortex/CortexFactoryPanel").then(m => ({ default: m.CortexFactoryPanel })));
 const RealFileExplorer = lazy(() => import("@/components/FileExplorer").then(m => ({ default: m.FileExplorer })));
 const CortexGitPanel = lazy(() => import("@/components/cortex/CortexGitPanel").then(m => ({ default: m.CortexGitPanel })));
 const CortexSearchPanel = lazy(() => import("@/components/cortex/CortexSearchPanel").then(m => ({ default: m.CortexSearchPanel })));
@@ -29,7 +28,7 @@ function EmptyExplorer(props: { onOpenFolder: () => void }) {
         <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
       </svg>
       <p style={{
-        "font-family": "'Inter', sans-serif",
+        "font-family": "var(--cortex-font-sans)",
         "font-size": "14px",
         "text-align": "center",
         margin: "0",
@@ -43,7 +42,7 @@ function EmptyExplorer(props: { onOpenFolder: () => void }) {
           background: "var(--cortex-accent-primary)",
           border: "none",
           "border-radius": "var(--cortex-radius-md)",
-          "font-family": "'Inter', sans-serif",
+          "font-family": "var(--cortex-font-sans)",
           "font-size": "13px",
           "font-weight": "500",
           color: "var(--cortex-text-primary)",
@@ -73,90 +72,90 @@ export function CortexSidebarContainer(props: CortexSidebarContainerProps) {
     height: "calc(100% - 16px)",
     "margin-top": "var(--cortex-space-2)",
     "margin-bottom": "var(--cortex-space-2)",
-    "margin-left": "var(--cortex-space-2)",
     "flex-shrink": "0",
     overflow: "hidden",
     transition: props.isResizing ? "none" : "width 150ms ease, opacity 150ms ease",
-    background: "var(--cortex-sidebar-bg)",
-    "border-radius": "var(--cortex-sidebar-radius)",
-    border: "1px solid var(--cortex-sidebar-border)",
+    background: "#1C1C1D",
+    "border-radius": "12px",
+    border: "1px solid #2E2F31",
     opacity: props.sidebarCollapsed ? "0" : "1",
     display: "flex",
     "flex-direction": "column",
-    gap: "8px",
     position: "relative",
   });
 
   return (
     <Show when={!props.sidebarCollapsed}>
       <aside style={sidebarStyle()}>
-        <Show when={props.sidebarTab === "files"}>
-          <Show
-            when={props.projectPath && props.projectPath !== "."}
-            fallback={<EmptyExplorer onOpenFolder={() => window.dispatchEvent(new CustomEvent("folder:open"))} />}
-          >
+        <div style={{
+          flex: "1",
+          display: "flex",
+          "flex-direction": "column",
+          overflow: "hidden",
+          "min-height": "0",
+        }}>
+          <Show when={props.sidebarTab === "files"}>
+            <Show
+              when={props.projectPath && props.projectPath !== "."}
+              fallback={<EmptyExplorer onOpenFolder={() => window.dispatchEvent(new CustomEvent("folder:open"))} />}
+            >
+              <Suspense fallback={<SidebarSkeleton />}>
+                <RealFileExplorer
+                  rootPath={props.projectPath}
+                  onFileSelect={props.onFileSelect}
+                />
+              </Suspense>
+            </Show>
+          </Show>
+
+          <Show when={props.sidebarTab === "search"}>
             <Suspense fallback={<SidebarSkeleton />}>
-              <RealFileExplorer
-                rootPath={props.projectPath}
-                onFileSelect={props.onFileSelect}
-              />
+              <CortexSearchPanel />
             </Suspense>
           </Show>
-        </Show>
 
-        <Show when={props.sidebarTab === "search"}>
-          <Suspense fallback={<SidebarSkeleton />}>
-            <CortexSearchPanel />
-          </Suspense>
-        </Show>
+          <Show when={props.sidebarTab === "git"}>
+            <Suspense fallback={<SidebarSkeleton />}>
+              <CortexGitPanel />
+            </Suspense>
+          </Show>
 
-        <Show when={props.sidebarTab === "git"}>
-          <Suspense fallback={<SidebarSkeleton />}>
-            <CortexGitPanel />
-          </Suspense>
-        </Show>
+          <Show when={props.sidebarTab === "debug"}>
+            <Suspense fallback={<SidebarSkeleton />}>
+              <CortexDebugPanel />
+            </Suspense>
+          </Show>
 
-        <Show when={props.sidebarTab === "debug"}>
-          <Suspense fallback={<SidebarSkeleton />}>
-            <CortexDebugPanel />
-          </Suspense>
-        </Show>
+          <Show when={props.sidebarTab === "extensions"}>
+            <Suspense fallback={<SidebarSkeleton />}>
+              <CortexExtensionsPanel />
+            </Suspense>
+          </Show>
 
-        <Show when={props.sidebarTab === "extensions"}>
-          <Suspense fallback={<SidebarSkeleton />}>
-            <CortexExtensionsPanel />
-          </Suspense>
-        </Show>
+          <Show when={props.sidebarTab === "agents"}>
+            <Suspense fallback={<SidebarSkeleton />}>
+              <CortexAgentsPanel />
+            </Suspense>
+          </Show>
 
-        <Show when={props.sidebarTab === "agents"}>
-          <Suspense fallback={<SidebarSkeleton />}>
-            <CortexAgentsPanel />
-          </Suspense>
-        </Show>
+          <Show when={props.sidebarTab === "themes"}>
+            <Suspense fallback={<SidebarSkeleton />}>
+              <CortexThemePicker />
+            </Suspense>
+          </Show>
 
-        <Show when={props.sidebarTab === "factory"}>
-          <Suspense fallback={<SidebarSkeleton />}>
-            <CortexFactoryPanel />
-          </Suspense>
-        </Show>
+          <Show when={props.sidebarTab === "plugins"}>
+            <Suspense fallback={<SidebarSkeleton />}>
+              <CortexPluginsPanel />
+            </Suspense>
+          </Show>
 
-        <Show when={props.sidebarTab === "themes"}>
-          <Suspense fallback={<SidebarSkeleton />}>
-            <CortexThemePicker />
-          </Suspense>
-        </Show>
-
-        <Show when={props.sidebarTab === "plugins"}>
-          <Suspense fallback={<SidebarSkeleton />}>
-            <CortexPluginsPanel />
-          </Suspense>
-        </Show>
-
-        <Show when={props.sidebarTab === "account"}>
-          <Suspense fallback={<SidebarSkeleton />}>
-            <CortexAccountPanel />
-          </Suspense>
-        </Show>
+          <Show when={props.sidebarTab === "account"}>
+            <Suspense fallback={<SidebarSkeleton />}>
+              <CortexAccountPanel />
+            </Suspense>
+          </Show>
+        </div>
       </aside>
 
       <div

@@ -1,6 +1,12 @@
 /**
  * CortexHeaderItem - Pixel-perfect header menu item for Cortex UI Design System
- * Figma "Header item": menu bar items with hover/active states
+ * Figma "Header item" (20:2695): menu bar items with Default, Hover, Dropdown open states
+ *
+ * Figma specs:
+ *   Layout: row, justify center, align center, gap 10px, padding 8px 10px
+ *   Font: Figtree 16px weight 500, line-height 1em
+ *   Default: text #8C8D8F, bg transparent, no border-radius
+ *   Hover/Active: text #FCFCFC, bg #1C1C1D, border-radius 8px
  */
 
 import { Component, JSX, splitProps, createSignal } from "solid-js";
@@ -35,15 +41,15 @@ export const CortexHeaderItem: Component<CortexHeaderItemProps> = (props) => {
     padding: "8px 10px",
     gap: "10px",
     border: "none",
-    background: isHighlighted() ? "var(--cortex-bg-secondary)" : "transparent",
-    "border-radius": isHighlighted() ? "var(--cortex-radius-md)" : "0",
-    color: isHighlighted() ? "var(--cortex-text-primary)" : "var(--cortex-text-secondary)",
-    "font-family": "var(--cortex-font-sans)",
+    background: isHighlighted() ? "#1C1C1D" : "transparent",
+    "border-radius": isHighlighted() ? "8px" : "0",
+    color: isHighlighted() ? "#FCFCFC" : "#8C8D8F",
+    "font-family": "'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     "font-size": "16px",
     "font-weight": "500",
     "line-height": "1em",
     cursor: "pointer",
-    transition: "all var(--cortex-transition-normal, 150ms ease)",
+    transition: "all 150ms ease",
     "white-space": "nowrap",
     "user-select": "none",
     ...local.style,

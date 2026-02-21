@@ -263,7 +263,7 @@ async fn handle_connection(
                 broadcast_to_peers(&peers_guard, session_id, &leave_msg, Some(addr));
 
                 let _ = app.emit(
-                    "collab:user_left",
+                    "collab:user-left",
                     serde_json::json!({
                         "sessionId": session_id,
                         "userId": peer.user_id,

@@ -239,7 +239,7 @@ export function createFileOperations(
       );
       
       window.dispatchEvent(
-        new CustomEvent("cortex:file_saved", {
+        new CustomEvent("cortex:file-saved", {
           detail: { path: file.path, fileId: file.id },
         })
       );

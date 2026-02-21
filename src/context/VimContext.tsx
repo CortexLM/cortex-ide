@@ -156,7 +156,7 @@ export function VimProvider(props: ParentProps) {
   // Dispatch custom event when mode changes for other components to listen
   createEffect(() => {
     const currentMode = mode();
-    const event = new CustomEvent("vim-mode-change", { detail: { mode: currentMode, enabled: enabled() } });
+    const event = new CustomEvent("vim:mode-change", { detail: { mode: currentMode, enabled: enabled() } });
     window.dispatchEvent(event);
   });
 
@@ -262,7 +262,7 @@ export function VimProvider(props: ParentProps) {
     setLastCommand(command);
     
     // Dispatch command execution event
-    const event = new CustomEvent("vim-command-execute", { detail: { command } });
+    const event = new CustomEvent("vim:command-execute", { detail: { command } });
     window.dispatchEvent(event);
     
     // Return to normal mode after command execution

@@ -23,6 +23,8 @@ pub mod tunnel;
 pub mod types;
 
 // Re-export main types for backwards compatibility
+#[cfg(feature = "remote-ssh")]
 pub use credentials::SecureAuthCredentials;
 pub use manager::RemoteManager;
+#[cfg(feature = "remote-ssh")]
 pub use types::AuthMethod;

@@ -386,7 +386,7 @@ export const ActivityIndicatorProvider: ParentComponent = (props) => {
 
   const handleActivityUpdate = (payload: ActivityUpdate) => {
     switch (payload.eventType) {
-      case "task_created": {
+      case "task-created": {
         if (payload.task) {
           setState(
             produce((s) => {
@@ -398,9 +398,9 @@ export const ActivityIndicatorProvider: ParentComponent = (props) => {
         }
         break;
       }
-      case "task_updated":
-      case "task_progress":
-      case "task_message": {
+      case "task-updated":
+      case "task-progress":
+      case "task-message": {
         if (payload.task) {
           setState(
             produce((s) => {
@@ -415,8 +415,8 @@ export const ActivityIndicatorProvider: ParentComponent = (props) => {
         }
         break;
       }
-      case "task_completed":
-      case "task_cancelled": {
+      case "task-completed":
+      case "task-cancelled": {
         setState(
           produce((s) => {
             if (payload.taskId) {
@@ -442,7 +442,7 @@ export const ActivityIndicatorProvider: ParentComponent = (props) => {
         );
         break;
       }
-      case "history_cleared": {
+      case "history-cleared": {
         setState("history", []);
         break;
       }

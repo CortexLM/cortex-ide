@@ -133,7 +133,11 @@ export const CortexExtensionsPanel: Component = () => {
       name={ext.manifest.name} version={ext.manifest.version}
       author={ext.manifest.author ?? "Unknown"} description={ext.manifest.description ?? ""}
       isInstalled={true} enabled={ext.enabled} updateInfo={outdatedMap().get(ext.manifest.name)}
-      onToggle={() => ext.enabled ? ctx?.disableExtension(ext.manifest.name) : ctx?.enableExtension(ext.manifest.name)}
+      onToggle={() => {
+        const current = installedList().find(e => e.manifest.name === ext.manifest.name);
+        if (!current) return;
+        current.enabled ? ctx?.disableExtension(ext.manifest.name) : ctx?.enableExtension(ext.manifest.name);
+      }}
       onUninstall={() => ctx?.uninstallExtension(ext.manifest.name)}
       onUpdate={() => ctx?.updateExtension(ext.manifest.name)}
     />

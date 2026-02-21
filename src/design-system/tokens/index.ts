@@ -109,30 +109,6 @@ export const colors = {
     glow: 'var(--neon-glow)',
   },
   
-  // Factory node category colors
-  node: {
-    trigger: 'var(--node-trigger)',
-    agent: 'var(--node-agent)',
-    supervisor: 'var(--node-supervisor)',
-    action: 'var(--node-action)',
-    logic: 'var(--node-logic)',
-    communication: 'var(--node-communication)',
-    utility: 'var(--node-utility)',
-  },
-  
-  // Factory port data type colors
-  port: {
-    any: 'var(--port-any)',
-    string: 'var(--port-string)',
-    number: 'var(--port-number)',
-    boolean: 'var(--port-boolean)',
-    object: 'var(--port-object)',
-    array: 'var(--port-array)',
-    agent: 'var(--port-agent)',
-    message: 'var(--port-message)',
-    event: 'var(--port-event)',
-    error: 'var(--port-error)',
-  },
 } as const;
 
 // =============================================================================
@@ -434,20 +410,6 @@ export const rawValues = {
     error: '#ef4444',
     white: '#f8f9fa',
     neonCyan: '#00D9FF',
-    // Factory node colors (raw values for JS calculations)
-    nodeTrigger: '#E9AA46',
-    nodeAgent: '#3574F0',
-    nodeSupervisor: '#9D5BD2',
-    nodeAction: '#59A869',
-    nodeLogic: '#CC7832',
-    nodeCommunication: '#C75450',
-    nodeUtility: '#8B8B8B',
-    // Factory port colors (raw values for JS calculations)
-    portObject: '#9B59B6',
-    portArray: '#1ABC9C',
-    portAgent: '#3498DB',
-    portMessage: '#00BCD4',
-    portEvent: '#E91E63',
   },
   spacing: {
     1: 4,

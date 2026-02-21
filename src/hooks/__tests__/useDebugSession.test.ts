@@ -157,9 +157,9 @@ describe("useDebugSession", () => {
     it("should call stepOver via invoke", async () => {
       vi.mocked(invoke).mockResolvedValueOnce(undefined);
 
-      await invoke("dap_step_over", { sessionId: "session-1", threadId: 1 });
+      await invoke("debug_step_over", { sessionId: "session-1", threadId: 1 });
 
-      expect(invoke).toHaveBeenCalledWith("dap_step_over", {
+      expect(invoke).toHaveBeenCalledWith("debug_step_over", {
         sessionId: "session-1",
         threadId: 1,
       });
@@ -168,9 +168,9 @@ describe("useDebugSession", () => {
     it("should call stepInto via invoke", async () => {
       vi.mocked(invoke).mockResolvedValueOnce(undefined);
 
-      await invoke("dap_step_into", { sessionId: "session-1", threadId: 1 });
+      await invoke("debug_step_into", { sessionId: "session-1", threadId: 1 });
 
-      expect(invoke).toHaveBeenCalledWith("dap_step_into", {
+      expect(invoke).toHaveBeenCalledWith("debug_step_into", {
         sessionId: "session-1",
         threadId: 1,
       });
@@ -179,9 +179,9 @@ describe("useDebugSession", () => {
     it("should call stepOut via invoke", async () => {
       vi.mocked(invoke).mockResolvedValueOnce(undefined);
 
-      await invoke("dap_step_out", { sessionId: "session-1", threadId: 1 });
+      await invoke("debug_step_out", { sessionId: "session-1", threadId: 1 });
 
-      expect(invoke).toHaveBeenCalledWith("dap_step_out", {
+      expect(invoke).toHaveBeenCalledWith("debug_step_out", {
         sessionId: "session-1",
         threadId: 1,
       });
@@ -189,7 +189,7 @@ describe("useDebugSession", () => {
   });
 
   describe("Start Session", () => {
-    it("should call dap_start_session via invoke", async () => {
+    it("should call debug_start_session via invoke", async () => {
       vi.mocked(invoke).mockResolvedValueOnce({
         id: "session-1",
         name: "Debug App",
@@ -197,7 +197,7 @@ describe("useDebugSession", () => {
         state: { type: "initializing" },
       });
 
-      const result = await invoke("dap_start_session", {
+      const result = await invoke("debug_start_session", {
         config: {
           id: "config-1",
           name: "Debug App",
@@ -207,7 +207,7 @@ describe("useDebugSession", () => {
         },
       });
 
-      expect(invoke).toHaveBeenCalledWith("dap_start_session", {
+      expect(invoke).toHaveBeenCalledWith("debug_start_session", {
         config: expect.objectContaining({ type: "node" }),
       });
       expect(result).toHaveProperty("id", "session-1");
@@ -215,25 +215,25 @@ describe("useDebugSession", () => {
   });
 
   describe("Stop Session", () => {
-    it("should call dap_stop_session via invoke", async () => {
+    it("should call debug_stop_session via invoke", async () => {
       vi.mocked(invoke).mockResolvedValueOnce(undefined);
 
-      await invoke("dap_stop_session", { sessionId: "session-1", terminate: true });
+      await invoke("debug_stop_session", { sessionId: "session-1", terminateDebuggee: true });
 
-      expect(invoke).toHaveBeenCalledWith("dap_stop_session", {
+      expect(invoke).toHaveBeenCalledWith("debug_stop_session", {
         sessionId: "session-1",
-        terminate: true,
+        terminateDebuggee: true,
       });
     });
 
-    it("should call dap_stop_session with disconnect", async () => {
+    it("should call debug_stop_session with disconnect", async () => {
       vi.mocked(invoke).mockResolvedValueOnce(undefined);
 
-      await invoke("dap_stop_session", { sessionId: "session-1", terminate: false });
+      await invoke("debug_stop_session", { sessionId: "session-1", terminateDebuggee: false });
 
-      expect(invoke).toHaveBeenCalledWith("dap_stop_session", {
+      expect(invoke).toHaveBeenCalledWith("debug_stop_session", {
         sessionId: "session-1",
-        terminate: false,
+        terminateDebuggee: false,
       });
     });
   });
@@ -243,7 +243,7 @@ describe("useDebugSession", () => {
       vi.mocked(invoke).mockRejectedValueOnce(new Error("Adapter not found"));
 
       await expect(
-        invoke("dap_start_session", { config: { type: "unknown" } })
+        invoke("debug_start_session", { config: { type: "unknown" } })
       ).rejects.toThrow("Adapter not found");
     });
 
@@ -251,7 +251,7 @@ describe("useDebugSession", () => {
       vi.mocked(invoke).mockRejectedValueOnce(new Error("No active session"));
 
       await expect(
-        invoke("dap_step_over", { sessionId: "invalid", threadId: 1 })
+        invoke("debug_step_over", { sessionId: "invalid", threadId: 1 })
       ).rejects.toThrow("No active session");
     });
 
@@ -259,7 +259,7 @@ describe("useDebugSession", () => {
       vi.mocked(invoke).mockRejectedValueOnce(new Error("Session already terminated"));
 
       await expect(
-        invoke("dap_stop_session", { sessionId: "session-1" })
+        invoke("debug_stop_session", { sessionId: "session-1" })
       ).rejects.toThrow("Session already terminated");
     });
   });
@@ -268,17 +268,17 @@ describe("useDebugSession", () => {
     it("should listen for session started event", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("debug:session_started", () => {});
+      await listen("debug:session-started", () => {});
 
-      expect(listen).toHaveBeenCalledWith("debug:session_started", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("debug:session-started", expect.any(Function));
     });
 
     it("should listen for session stopped event", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("debug:session_stopped", () => {});
+      await listen("debug:session-stopped", () => {});
 
-      expect(listen).toHaveBeenCalledWith("debug:session_stopped", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("debug:session-stopped", expect.any(Function));
     });
 
     it("should listen for session paused event", async () => {

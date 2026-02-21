@@ -59,10 +59,13 @@ export const CortexPluginsPanel: Component = () => {
     setInstalling(null);
   };
 
-  const handleToggle = async (name: string, enabled: boolean) => {
+  const handleToggle = async (name: string) => {
+    const current = installedPlugins().find(p => p.name === name);
+    if (!current) return;
+    const wasEnabled = current.enabled;
     try {
-      await invoke(enabled ? "disable_extension" : "enable_extension", { name });
-      setInstalledPlugins(prev => prev.map(p => p.name === name ? { ...p, enabled: !p.enabled } : p));
+      await invoke(wasEnabled ? "disable_extension" : "enable_extension", { name });
+      setInstalledPlugins(prev => prev.map(p => p.name === name ? { ...p, enabled: !wasEnabled } : p));
     } catch { /* toggle failed */ }
   };
 
@@ -136,7 +139,7 @@ export const CortexPluginsPanel: Component = () => {
             <div style={emptyStyle}>No plugins installed yet</div>
           </Show>
           <For each={installedPlugins()}>{(plugin) => (
-            <InstalledCard plugin={plugin} onToggle={() => handleToggle(plugin.name, plugin.enabled)} onUninstall={() => handleUninstall(plugin.name)} />
+            <InstalledCard plugin={plugin} onToggle={() => handleToggle(plugin.name)} onUninstall={() => handleUninstall(plugin.name)} />
           )}</For>
         </Show>
       </div>

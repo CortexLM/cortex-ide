@@ -47,9 +47,9 @@ export const CortexOpenProjectDropdown: Component<CortexOpenProjectDropdownProps
   const labelStyle = (): JSX.CSSProperties => ({
     "font-family": "var(--cortex-font-sans)",
     "font-size": "16px",
-    "font-weight": "500",
+    "font-weight": "400",
     "line-height": "1em",
-    color: local.isOpen ? "var(--cortex-accent-text)" : "var(--cortex-text-secondary)",
+    color: local.isOpen ? "var(--cortex-open-project-open-text, #1C1C1D)" : "var(--cortex-text-secondary)",
     "white-space": "nowrap",
     "user-select": "none",
   });
@@ -81,7 +81,7 @@ export const CortexOpenProjectDropdown: Component<CortexOpenProjectDropdownProps
         <CortexIcon
           name={local.isOpen ? "chevron-up" : "chevron-down"}
           size={16}
-          color={local.isOpen ? "var(--cortex-accent-text)" : "var(--cortex-text-primary)"}
+          color={local.isOpen ? "var(--cortex-open-project-open-text, #1C1C1D)" : "var(--cortex-text-primary)"}
         />
       </button>
       <Show when={local.isOpen && local.children}>

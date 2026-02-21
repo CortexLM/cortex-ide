@@ -210,7 +210,7 @@ pub async fn activity_create_task(
 
     // Emit event to frontend
     let event = ActivityEvent {
-        event_type: "task_created".to_string(),
+        event_type: "task-created".to_string(),
         task_id: Some(id.clone()),
         task: Some(task),
         history_entry: None,
@@ -256,7 +256,7 @@ pub async fn activity_update_task(
 
     // Emit event to frontend
     let event = ActivityEvent {
-        event_type: "task_updated".to_string(),
+        event_type: "task-updated".to_string(),
         task_id: Some(task_id),
         task: Some(task),
         history_entry: None,
@@ -306,7 +306,7 @@ pub async fn activity_complete_task(
 
     // Emit event to frontend
     let event = ActivityEvent {
-        event_type: "task_completed".to_string(),
+        event_type: "task-completed".to_string(),
         task_id: Some(task_id),
         task: None,
         history_entry: Some(history_entry),
@@ -359,7 +359,7 @@ pub async fn activity_cancel_task(
 
     // Emit event to frontend
     let event = ActivityEvent {
-        event_type: "task_cancelled".to_string(),
+        event_type: "task-cancelled".to_string(),
         task_id: Some(task_id),
         task: None,
         history_entry: Some(history_entry),
@@ -402,7 +402,7 @@ pub async fn activity_clear_history(
 
     // Emit event to frontend
     let event = ActivityEvent {
-        event_type: "history_cleared".to_string(),
+        event_type: "history-cleared".to_string(),
         task_id: None,
         task: None,
         history_entry: None,
@@ -439,7 +439,7 @@ pub async fn activity_set_progress(
 
     // Emit event to frontend
     let event = ActivityEvent {
-        event_type: "task_progress".to_string(),
+        event_type: "task-progress".to_string(),
         task_id: Some(task_id),
         task: Some(task),
         history_entry: None,
@@ -466,7 +466,7 @@ pub async fn activity_set_message(
 
     // Emit event to frontend
     let event = ActivityEvent {
-        event_type: "task_message".to_string(),
+        event_type: "task-message".to_string(),
         task_id: Some(task_id),
         task: Some(task),
         history_entry: None,

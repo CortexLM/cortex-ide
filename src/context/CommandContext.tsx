@@ -517,7 +517,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Alt+F12",
         category: "Navigation",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "peek-definition" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "peek-definition" } }));
         },
       },
       {
@@ -526,7 +526,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Shift+F12",
         category: "Navigation",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "peek-references" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "peek-references" } }));
         },
       },
       {
@@ -535,7 +535,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+F12",
         category: "Navigation",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "peek-implementation" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "peek-implementation" } }));
         },
       },
       {
@@ -544,7 +544,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+F12",
         category: "Navigation",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "go-to-implementation" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "go-to-implementation" } }));
         },
       },
       // Call Hierarchy commands
@@ -572,7 +572,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Alt+Up",
         category: "Multi-Cursor",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "add-cursor-above" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "add-cursor-above" } }));
         },
       },
       {
@@ -581,7 +581,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Alt+Down",
         category: "Multi-Cursor",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "add-cursor-below" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "add-cursor-below" } }));
         },
       },
       {
@@ -590,7 +590,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+L",
         category: "Multi-Cursor",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "select-all-occurrences" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "select-all-occurrences" } }));
         },
       },
       {
@@ -599,7 +599,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+D",
         category: "Multi-Cursor",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "add-selection-to-next-find-match" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "add-selection-to-next-find-match" } }));
         },
       },
       {
@@ -608,7 +608,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Shift+Alt+I",
         category: "Multi-Cursor",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "add-cursors-to-line-ends" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "add-cursors-to-line-ends" } }));
         },
       },
       {
@@ -617,7 +617,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+U",
         category: "Multi-Cursor",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "undo-cursor" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "undo-cursor" } }));
         },
       },
       {
@@ -626,7 +626,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+\\",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-split", { detail: { direction: "vertical" } }));
+          window.dispatchEvent(new CustomEvent("editor:split", { detail: { direction: "vertical" } }));
         },
       },
       {
@@ -635,7 +635,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+K Ctrl+\\",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-split", { detail: { direction: "horizontal" } }));
+          window.dispatchEvent(new CustomEvent("editor:split", { detail: { direction: "horizontal" } }));
         },
       },
       {
@@ -644,7 +644,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+K W",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-close-group", {}));
+          window.dispatchEvent(new CustomEvent("editor:close-group", {}));
         },
       },
       {
@@ -653,7 +653,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+K Shift+Enter",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-pin-tab", {}));
+          window.dispatchEvent(new CustomEvent("editor:pin-tab", {}));
         },
       },
       {
@@ -662,7 +662,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+K Ctrl+Shift+Enter",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-unpin-tab", {}));
+          window.dispatchEvent(new CustomEvent("editor:unpin-tab", {}));
         },
       },
       {
@@ -670,7 +670,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Toggle Pin Tab",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-toggle-pin-tab", {}));
+          window.dispatchEvent(new CustomEvent("editor:toggle-pin-tab", {}));
         },
       },
       {
@@ -679,7 +679,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+K Ctrl+Right",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-focus-next-group", {}));
+          window.dispatchEvent(new CustomEvent("editor:focus-next-group", {}));
         },
       },
       {
@@ -688,7 +688,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+K Ctrl+Left",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-focus-previous-group", {}));
+          window.dispatchEvent(new CustomEvent("editor:focus-previous-group", {}));
         },
       },
       {
@@ -696,7 +696,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Close All Splits",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-unsplit", {}));
+          window.dispatchEvent(new CustomEvent("editor:unsplit", {}));
         },
       },
       {
@@ -705,7 +705,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Alt+Right",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-move-to-next-group", {}));
+          window.dispatchEvent(new CustomEvent("editor:move-to-next-group", {}));
         },
       },
       {
@@ -713,7 +713,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Toggle Grid Layout Mode",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-toggle-grid-layout", {}));
+          window.dispatchEvent(new CustomEvent("editor:toggle-grid-layout", {}));
         },
       },
       {
@@ -721,7 +721,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Create 2x2 Grid Layout",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-create-2x2-layout", {}));
+          window.dispatchEvent(new CustomEvent("editor:create-2x2-layout", {}));
         },
       },
       {
@@ -729,7 +729,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Create 3 Column Layout",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-create-3-column-layout", {}));
+          window.dispatchEvent(new CustomEvent("editor:create-3-column-layout", {}));
         },
       },
       {
@@ -737,7 +737,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Reset Grid Layout",
         category: "Editor Layout",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-reset-grid-layout", {}));
+          window.dispatchEvent(new CustomEvent("editor:reset-grid-layout", {}));
         },
       },
       {
@@ -746,7 +746,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+D",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "duplicate-selection" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "duplicate-selection" } }));
         },
       },
       {
@@ -755,7 +755,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Alt+Up",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "move-line-up" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "move-line-up" } }));
         },
       },
       {
@@ -764,7 +764,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Alt+Down",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "move-line-down" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "move-line-down" } }));
         },
       },
       {
@@ -773,7 +773,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Shift+Alt+Up",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "copy-line-up" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "copy-line-up" } }));
         },
       },
       {
@@ -782,7 +782,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Shift+Alt+Down",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "copy-line-down" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "copy-line-down" } }));
         },
       },
       {
@@ -791,7 +791,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+L",
         category: "Selection",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "select-line" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "select-line" } }));
         },
       },
       {
@@ -800,7 +800,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Shift+Alt+Right",
         category: "Selection",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "expand-selection" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "expand-selection" } }));
         },
       },
       {
@@ -809,7 +809,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Shift+Alt+Left",
         category: "Selection",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "shrink-selection" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "shrink-selection" } }));
         },
       },
       {
@@ -817,7 +817,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Transform to Uppercase",
         category: "Transform",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "transform-to-uppercase" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "transform-to-uppercase" } }));
         },
       },
       {
@@ -825,7 +825,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Transform to Lowercase",
         category: "Transform",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "transform-to-lowercase" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "transform-to-lowercase" } }));
         },
       },
       {
@@ -833,7 +833,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Transform to Title Case",
         category: "Transform",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "transform-to-titlecase" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "transform-to-titlecase" } }));
         },
       },
       {
@@ -841,7 +841,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Transform to Snake_case",
         category: "Transform",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "transform-to-snakecase" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "transform-to-snakecase" } }));
         },
       },
       {
@@ -849,7 +849,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Transform to camelCase",
         category: "Transform",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "transform-to-camelcase" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "transform-to-camelcase" } }));
         },
       },
       {
@@ -857,7 +857,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Transform to PascalCase",
         category: "Transform",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "transform-to-pascalcase" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "transform-to-pascalcase" } }));
         },
       },
       {
@@ -865,7 +865,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Transform to kebab-case",
         category: "Transform",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "transform-to-kebabcase" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "transform-to-kebabcase" } }));
         },
       },
       {
@@ -873,7 +873,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Transform to CONSTANT_CASE",
         category: "Transform",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "transform-to-constantcase" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "transform-to-constantcase" } }));
         },
       },
       // Comment commands
@@ -883,7 +883,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+/",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "toggle-line-comment" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "toggle-line-comment" } }));
         },
       },
       {
@@ -892,7 +892,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+/",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "toggle-block-comment" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "toggle-block-comment" } }));
         },
       },
       // Chord-based comment commands (Ctrl+K Ctrl+C / Ctrl+K Ctrl+U)
@@ -902,7 +902,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+K Ctrl+C",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "add-line-comment" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "add-line-comment" } }));
         },
       },
       {
@@ -911,7 +911,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+K Ctrl+U",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "remove-line-comment" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "remove-line-comment" } }));
         },
       },
       {
@@ -930,7 +930,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Shift+Alt+F",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-format-document"));
+          window.dispatchEvent(new CustomEvent("editor:format-document"));
         },
       },
       {
@@ -938,7 +938,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Indent Lines",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "indent-lines" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "indent-lines" } }));
         },
       },
       {
@@ -946,7 +946,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Outdent Lines",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "outdent-lines" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "outdent-lines" } }));
         },
       },
       {
@@ -975,7 +975,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Alt+Z",
         category: "View",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-toggle-word-wrap"));
+          window.dispatchEvent(new CustomEvent("editor:toggle-word-wrap"));
         },
       },
       {
@@ -983,7 +983,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Toggle Minimap",
         category: "View",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-toggle-minimap"));
+          window.dispatchEvent(new CustomEvent("editor:toggle-minimap"));
         },
       },
       {
@@ -992,7 +992,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+Y",
         category: "View",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-toggle-sticky-scroll"));
+          window.dispatchEvent(new CustomEvent("editor:toggle-sticky-scroll"));
         },
       },
       {
@@ -1250,7 +1250,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Up (in terminal)",
         category: "Terminal",
         action: () => {
-          window.dispatchEvent(new CustomEvent("terminal:goToPrevCommand"));
+          window.dispatchEvent(new CustomEvent("terminal:go-to-prev-command"));
         },
       },
       {
@@ -1259,7 +1259,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Down (in terminal)",
         category: "Terminal",
         action: () => {
-          window.dispatchEvent(new CustomEvent("terminal:goToNextCommand"));
+          window.dispatchEvent(new CustomEvent("terminal:go-to-next-command"));
         },
       },
       {
@@ -1277,7 +1277,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Sort Lines Ascending",
         category: "Sort",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "sort-lines-ascending" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "sort-lines-ascending" } }));
         },
       },
       {
@@ -1285,7 +1285,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Sort Lines Descending",
         category: "Sort",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "sort-lines-descending" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "sort-lines-descending" } }));
         },
       },
       {
@@ -1293,7 +1293,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Sort Lines Ascending (Case Insensitive)",
         category: "Sort",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "sort-lines-ascending-case-insensitive" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "sort-lines-ascending-case-insensitive" } }));
         },
       },
       {
@@ -1301,7 +1301,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Sort Lines Descending (Case Insensitive)",
         category: "Sort",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "sort-lines-descending-case-insensitive" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "sort-lines-descending-case-insensitive" } }));
         },
       },
       {
@@ -1309,7 +1309,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Sort Lines Ascending (Natural)",
         category: "Sort",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "sort-lines-natural" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "sort-lines-natural" } }));
         },
       },
       {
@@ -1317,7 +1317,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Sort Lines by Length",
         category: "Sort",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "sort-lines-by-length" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "sort-lines-by-length" } }));
         },
       },
       {
@@ -1325,7 +1325,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Reverse Lines",
         category: "Sort",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "reverse-lines" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "reverse-lines" } }));
         },
       },
       {
@@ -1333,7 +1333,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Shuffle Lines",
         category: "Sort",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "shuffle-lines" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "shuffle-lines" } }));
         },
       },
       {
@@ -1341,7 +1341,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Remove Duplicate Lines",
         category: "Sort",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "remove-duplicate-lines" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "remove-duplicate-lines" } }));
         },
       },
       // Emmet commands
@@ -1784,7 +1784,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+\\",
         category: "Navigation",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "jump-to-bracket" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "jump-to-bracket" } }));
         },
       },
       {
@@ -1793,7 +1793,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+Alt+\\",
         category: "Selection",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "select-to-bracket" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "select-to-bracket" } }));
         },
       },
       // File operations
@@ -1814,7 +1814,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+[",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "fold-all" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "fold-all" } }));
         },
       },
       {
@@ -1823,7 +1823,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+]",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "unfold-all" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "unfold-all" } }));
         },
       },
       {
@@ -1832,7 +1832,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+[",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "toggle-fold" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "toggle-fold" } }));
         },
       },
       {
@@ -1841,7 +1841,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+1",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "fold-level-1" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "fold-level-1" } }));
         },
       },
       {
@@ -1850,7 +1850,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+2",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "fold-level-2" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "fold-level-2" } }));
         },
       },
       {
@@ -1859,7 +1859,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+3",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "fold-level-3" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "fold-level-3" } }));
         },
       },
       {
@@ -1868,7 +1868,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+4",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "fold-level-4" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "fold-level-4" } }));
         },
       },
       {
@@ -1877,7 +1877,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+5",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "fold-level-5" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "fold-level-5" } }));
         },
       },
       {
@@ -1886,7 +1886,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+6",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "fold-level-6" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "fold-level-6" } }));
         },
       },
       {
@@ -1895,7 +1895,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+7",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "fold-level-7" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "fold-level-7" } }));
         },
       },
       {
@@ -1903,7 +1903,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Fold All Block Comments",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "fold-all-block-comments" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "fold-all-block-comments" } }));
         },
       },
       {
@@ -1911,7 +1911,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Fold All Regions",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "fold-all-regions" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "fold-all-regions" } }));
         },
       },
       {
@@ -1919,7 +1919,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Unfold All Regions",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "unfold-all-regions" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "unfold-all-regions" } }));
         },
       },
       {
@@ -1927,7 +1927,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Fold Recursively",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "fold-recursively" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "fold-recursively" } }));
         },
       },
       {
@@ -1935,7 +1935,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Unfold Recursively",
         category: "Folding",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "unfold-recursively" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "unfold-recursively" } }));
         },
       },
       // Bookmarks commands
@@ -2416,7 +2416,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+T",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "transpose-characters" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "transpose-characters" } }));
         },
       },
       // =========================================================================
@@ -2428,7 +2428,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+,",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "in-place-replace-up" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "in-place-replace-up" } }));
         },
       },
       {
@@ -2437,7 +2437,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+.",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "in-place-replace-down" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "in-place-replace-down" } }));
         },
       },
       // =========================================================================
@@ -2448,7 +2448,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Delete Word Part Left",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "delete-word-part-left" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "delete-word-part-left" } }));
         },
       },
       {
@@ -2456,7 +2456,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Delete Word Part Right",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "delete-word-part-right" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "delete-word-part-right" } }));
         },
       },
       // =========================================================================
@@ -2467,7 +2467,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Toggle Linked Editing",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "toggle-linked-editing" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "toggle-linked-editing" } }));
         },
       },
       // =========================================================================
@@ -2479,7 +2479,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+K Ctrl+I",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "show-hover" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "show-hover" } }));
         },
       },
       {
@@ -2488,7 +2488,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Space",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "trigger-suggest" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "trigger-suggest" } }));
         },
       },
       {
@@ -2497,7 +2497,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+Space",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "trigger-parameter-hints" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "trigger-parameter-hints" } }));
         },
       },
       // =========================================================================
@@ -2509,7 +2509,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Shift+Alt+Right",
         category: "Selection",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "smart-select-expand" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "smart-select-expand" } }));
         },
       },
       {
@@ -2518,7 +2518,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Shift+Alt+Left",
         category: "Selection",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "smart-select-shrink" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "smart-select-shrink" } }));
         },
       },
       // =========================================================================
@@ -2530,7 +2530,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+.",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "quick-fix" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "quick-fix" } }));
         },
       },
       {
@@ -2539,7 +2539,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+R",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "refactor" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "refactor" } }));
         },
       },
       {
@@ -2547,7 +2547,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Source Action",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "source-action" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "source-action" } }));
         },
       },
       // =========================================================================
@@ -2559,7 +2559,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "F2",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "rename-symbol" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "rename-symbol" } }));
         },
       },
       {
@@ -2567,7 +2567,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Go to Type Definition",
         category: "Navigation",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "go-to-type-definition" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "go-to-type-definition" } }));
         },
       },
       {
@@ -2576,7 +2576,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Alt+F12",
         category: "Navigation",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "find-all-references" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "find-all-references" } }));
         },
       },
       // =========================================================================
@@ -2588,7 +2588,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Shift+Alt+H",
         category: "Navigation",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "show-call-hierarchy" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "show-call-hierarchy" } }));
         },
       },
       {
@@ -2596,7 +2596,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Show Type Hierarchy",
         category: "Navigation",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "show-type-hierarchy" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "show-type-hierarchy" } }));
         },
       },
       // =========================================================================
@@ -2608,7 +2608,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Shift+Alt+O",
         category: "Source",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "organize-imports" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "organize-imports" } }));
         },
       },
       {
@@ -2616,7 +2616,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Sort Imports",
         category: "Source",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "sort-imports" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "sort-imports" } }));
         },
       },
       {
@@ -2624,7 +2624,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Remove Unused Imports",
         category: "Source",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "remove-unused-imports" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "remove-unused-imports" } }));
         },
       },
       {
@@ -2632,7 +2632,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         label: "Add Missing Imports",
         category: "Source",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "add-missing-imports" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "add-missing-imports" } }));
         },
       },
       // =========================================================================
@@ -2644,7 +2644,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+C",
         category: "Selection",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "toggle-column-selection" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "toggle-column-selection" } }));
         },
       },
       // =========================================================================
@@ -2817,7 +2817,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+L",
         category: "Selection",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "select-all-occurrences" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "select-all-occurrences" } }));
         },
       },
       {
@@ -2826,7 +2826,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+D",
         category: "Selection",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "add-selection-to-next-find-match" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "add-selection-to-next-find-match" } }));
         },
       },
       {
@@ -2835,7 +2835,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "F2",
         category: "Refactor",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "rename-symbol" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "rename-symbol" } }));
         },
       },
       {
@@ -2844,7 +2844,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+Shift+Space",
         category: "Edit",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "trigger-parameter-hints" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "trigger-parameter-hints" } }));
         },
       },
       {
@@ -2853,7 +2853,7 @@ export function CommandProvider(props: { children: JSX.Element }) {
         shortcut: "Ctrl+.",
         category: "Refactor",
         action: () => {
-          window.dispatchEvent(new CustomEvent("editor-command", { detail: { command: "quick-fix" } }));
+          window.dispatchEvent(new CustomEvent("editor:command", { detail: { command: "quick-fix" } }));
         },
       },
       // Keybindings command

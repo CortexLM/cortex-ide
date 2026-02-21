@@ -289,7 +289,7 @@ pub fn handle_deep_link(app: &AppHandle, urls: Vec<String>) {
         let action = parse_deep_link(&url);
 
         // Emit the parsed action to the frontend
-        if let Err(e) = app.emit("deep-link", &action) {
+        if let Err(e) = app.emit("deep:link", &action) {
             warn!("Failed to emit deep link event: {}", e);
         }
 

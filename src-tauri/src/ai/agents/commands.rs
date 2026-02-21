@@ -63,11 +63,11 @@ pub async fn agent_run_task(
     let ac = app.clone();
     let recv = tokio::spawn(async move {
         while let Some(c) = rx.recv().await {
-            let _ = ac.emit("agent:task_progress", &c);
+            let _ = ac.emit("agent:task-progress", &c);
         }
     });
     let _ = app.emit(
-        "agent:task_started",
+        "agent:task-started",
         serde_json::json!({ "agentId": agent_id, "prompt": prompt }),
     );
     let r = {
@@ -80,12 +80,12 @@ pub async fn agent_run_task(
         Ok(tid) => {
             let o = state.0.lock().await;
             let t = o.get_task(&tid).cloned().ok_or("Not found")?;
-            let _ = app.emit("agent:task_completed", serde_json::json!({ "task": t }));
+            let _ = app.emit("agent:task-completed", serde_json::json!({ "task": t }));
             Ok(t)
         }
         Err(e) => {
             let _ = app.emit(
-                "agent:task_failed",
+                "agent:task-failed",
                 serde_json::json!({ "agentId": agent_id, "error": e.to_string() }),
             );
             Err(e.to_string())
@@ -102,7 +102,7 @@ pub async fn agent_cancel_task(
     let mut o = state.0.lock().await;
     o.cancel_task(&task_id).map_err(|e| e.to_string())?;
     let _ = app.emit(
-        "agent:task_cancelled",
+        "agent:task-cancelled",
         serde_json::json!({ "taskId": task_id }),
     );
     Ok(())

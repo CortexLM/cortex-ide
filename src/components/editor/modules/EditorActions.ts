@@ -740,7 +740,7 @@ export function setupLinkedEditingActions(
       }
 
       window.dispatchEvent(
-        new CustomEvent("editor-linked-editing-changed", {
+        new CustomEvent("editor:linked-editing-changed", {
           detail: { enabled: newEnabled },
         })
       );

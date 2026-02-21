@@ -72,8 +72,8 @@ export const CortexDropdownItem: Component<CortexDropdownItemProps> = (props) =>
 
   const labelStyle = (): JSX.CSSProperties => ({
     "font-family": "'Figtree', var(--cortex-font-sans, Inter, sans-serif)",
-    "font-size": local.isRecentFile ? "16px" : "14px",
-    "font-weight": "500",
+    "font-size": local.isRecentFile ? "16px" : "12px",
+    "font-weight": local.isRecentFile ? "500" : "400",
     "line-height": "1em",
     color: "var(--cortex-text-primary, #FCFCFC)",
     "white-space": "nowrap",
@@ -83,8 +83,8 @@ export const CortexDropdownItem: Component<CortexDropdownItemProps> = (props) =>
 
   const shortcutStyle = (): JSX.CSSProperties => ({
     "font-family": "'Figtree', var(--cortex-font-sans, Inter, sans-serif)",
-    "font-size": "14px",
-    "font-weight": "500",
+    "font-size": "12px",
+    "font-weight": "400",
     "line-height": "1em",
     color: "#8C8D8F",
     "white-space": "nowrap",
@@ -106,6 +106,8 @@ export const CortexDropdownItem: Component<CortexDropdownItemProps> = (props) =>
   return (
     <button
       type="button"
+      role="menuitem"
+      tabindex="0"
       class={local.class}
       style={baseStyle()}
       onClick={handleClick}

@@ -9,6 +9,7 @@ use super::super::protocol::{ReadMemoryResponse, WriteMemoryResponse};
 use super::state::DebuggerState;
 use super::types::DisassembleResult;
 use super::validation::validate_session_id;
+use crate::LazyState;
 
 const MAX_MEMORY_READ_BYTES: i64 = 1_048_576;
 const MAX_WRITE_DATA_LEN: usize = 10_485_760;
@@ -57,7 +58,7 @@ fn validate_instruction_count(instruction_count: i64) -> Result<(), String> {
 /// Disassemble code at a memory reference
 #[tauri::command]
 pub async fn debug_disassemble(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     memory_reference: String,
     offset: Option<i64>,
@@ -69,7 +70,7 @@ pub async fn debug_disassemble(
     validate_memory_reference(&memory_reference)?;
     validate_instruction_count(instruction_count)?;
 
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -94,7 +95,7 @@ pub async fn debug_disassemble(
 /// Read memory from the debuggee
 #[tauri::command]
 pub async fn debug_read_memory(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     memory_reference: String,
     offset: Option<i64>,
@@ -104,7 +105,7 @@ pub async fn debug_read_memory(
     validate_memory_reference(&memory_reference)?;
     validate_count(count)?;
 
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -119,7 +120,7 @@ pub async fn debug_read_memory(
 /// Write memory to the debuggee
 #[tauri::command]
 pub async fn debug_write_memory(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     memory_reference: String,
     offset: Option<i64>,
@@ -138,7 +139,7 @@ pub async fn debug_write_memory(
         ));
     }
 
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;

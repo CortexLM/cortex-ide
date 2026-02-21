@@ -753,7 +753,7 @@ export function SearchSidebar() {
     
     if (isAlreadyActive) {
       // File is already active, just navigate to line
-      window.dispatchEvent(new CustomEvent("goto-line", { 
+      window.dispatchEvent(new CustomEvent("editor:goto-line", { 
         detail: { line, column }
       }));
       return;
@@ -768,7 +768,7 @@ export function SearchSidebar() {
       if (eventPath === normalizedFullPath) {
         handled = true;
         window.removeEventListener("editor:file-ready", handleEditorReady as EventListener);
-        window.dispatchEvent(new CustomEvent("goto-line", { 
+        window.dispatchEvent(new CustomEvent("editor:goto-line", { 
           detail: { line, column }
         }));
       }
@@ -783,7 +783,7 @@ export function SearchSidebar() {
       if (!handled) {
         handled = true;
         window.removeEventListener("editor:file-ready", handleEditorReady as EventListener);
-        window.dispatchEvent(new CustomEvent("goto-line", { 
+        window.dispatchEvent(new CustomEvent("editor:goto-line", { 
           detail: { line, column }
         }));
       }

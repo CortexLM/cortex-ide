@@ -18,10 +18,10 @@ export async function setupMcpListeners() {
   const currentWindow = getCurrentWebviewWindow();
   
   // Listen for JavaScript execution requests
-  executeJsUnlisten = await currentWindow.listen('mcp-execute-js', handleExecuteJs);
+  executeJsUnlisten = await currentWindow.listen('mcp:execute-js', handleExecuteJs);
   
   // Listen for DOM content requests
-  getDomUnlisten = await currentWindow.listen('mcp-get-dom', handleGetDom);
+  getDomUnlisten = await currentWindow.listen('mcp:get-dom', handleGetDom);
   
   if (import.meta.env.DEV) console.log('[MCP] Event listeners set up for execute-js and get-dom');
 }
@@ -51,7 +51,7 @@ export function cleanupMcpListeners() {
 async function handleExecuteJs(_event: { payload: string }) {
   // SECURITY: JavaScript execution via MCP is completely disabled to prevent RCE
   console.warn('[MCP] JavaScript execution via MCP is disabled for security reasons');
-  await emit('mcp-execute-js-response', {
+  await emit('mcp:execute-js-response', {
     success: false,
     error: 'JavaScript execution via MCP is disabled for security reasons',
     type: 'error'
@@ -76,7 +76,7 @@ async function handleGetDom(event: { payload: { selector?: string } }) {
       html = document.documentElement.outerHTML;
     }
     
-    await emit('mcp-get-dom-response', {
+    await emit('mcp:get-dom-response', {
       success: true,
       html
     });
@@ -84,7 +84,7 @@ async function handleGetDom(event: { payload: { selector?: string } }) {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     
-    await emit('mcp-get-dom-response', {
+    await emit('mcp:get-dom-response', {
       success: false,
       error: errorMessage
     });

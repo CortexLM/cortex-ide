@@ -90,6 +90,7 @@ export const FIGMA_ICON_MAP: FigmaIconEntry[] = [
   { figmaNodeId: "603:12381", name: "pie-chart-01", category: "sidebar", path: "/icons/cortex/sidebar/pie-chart-01.svg" },
   { figmaNodeId: "603:12383", name: "data", category: "sidebar", path: "/icons/cortex/sidebar/data.svg" },
   { figmaNodeId: "603:12384", name: "shield-02", category: "sidebar", path: "/icons/cortex/sidebar/shield-02.svg" },
+  { figmaNodeId: "0:588", name: "magic-wand", category: "sidebar", path: "/icons/cortex/sidebar/magic-wand.svg" },
 
   // Chat Icons (16x16)
   { figmaNodeId: "43:919", name: "code", category: "chat", path: "/icons/cortex/chat/code.svg" },
@@ -112,7 +113,6 @@ export const FIGMA_SECTIONS = {
   sourceControl: "262:5945",
   debug: "262:6855",
   extensions: "262:7065",
-  factory: "262:7668",
   agents: "262:7348",
   vibe: "406:5190",
   account: "600:11484",

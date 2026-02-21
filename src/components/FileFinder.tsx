@@ -756,7 +756,7 @@ export function FileFinder() {
     if (parsed.line) {
       // Small delay to ensure file is loaded and editor is ready
       setTimeout(() => {
-        window.dispatchEvent(new CustomEvent("goto-line", {
+        window.dispatchEvent(new CustomEvent("editor:goto-line", {
           detail: { line: parsed.line, column: parsed.column || 1 }
         }));
       }, 50);
@@ -786,7 +786,7 @@ export function FileFinder() {
     // Only proceed if there's a line to go to and an active file
     if (parsed.line && editorState.activeFileId) {
       setShowFileFinder(false);
-      window.dispatchEvent(new CustomEvent("goto-line", {
+      window.dispatchEvent(new CustomEvent("editor:goto-line", {
         detail: { line: parsed.line, column: parsed.column || 1 }
       }));
     }

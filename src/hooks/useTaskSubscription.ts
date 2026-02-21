@@ -120,19 +120,19 @@ export function useTaskSubscription(
 
   // Handle WebSocket messages
   const handleWebSocketMessage = (message: {
-    type: "task_added" | "task_updated" | "task_removed" | "tasks_sync";
+    type: "task-added" | "task-updated" | "task-removed" | "tasks-sync";
     task?: Task;
     tasks?: Task[];
     taskId?: string;
   }) => {
     switch (message.type) {
-      case "task_added":
+      case "task-added":
         if (message.task) {
           setTasks((prev) => [...prev, message.task!]);
         }
         break;
 
-      case "task_updated":
+      case "task-updated":
         if (message.task) {
           setTasks((prev) =>
             prev.map((t) => (t.id === message.task!.id ? { ...t, ...message.task } : t))
@@ -140,13 +140,13 @@ export function useTaskSubscription(
         }
         break;
 
-      case "task_removed":
+      case "task-removed":
         if (message.taskId) {
           setTasks((prev) => prev.filter((t) => t.id !== message.taskId));
         }
         break;
 
-      case "tasks_sync":
+      case "tasks-sync":
         if (message.tasks) {
           setTasks(message.tasks);
         }

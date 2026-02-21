@@ -160,7 +160,7 @@ describe("BracketPairColorizer", () => {
       ));
 
       expect(addEventSpy).toHaveBeenCalledWith(
-        "editor-toggle-bracket-colorizer",
+        "editor:toggle-bracket-colorizer",
         expect.any(Function)
       );
 
@@ -178,7 +178,7 @@ describe("BracketPairColorizer", () => {
 
       (mockEditor as any).updateOptions.mockClear();
 
-      window.dispatchEvent(new Event("editor-toggle-bracket-colorizer"));
+      window.dispatchEvent(new Event("editor:toggle-bracket-colorizer"));
 
       expect((mockEditor as any).updateOptions).toHaveBeenCalled();
     });

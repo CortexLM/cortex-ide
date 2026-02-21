@@ -489,4 +489,53 @@ describe("CortexDropdown", () => {
       expect(button.style.marginTop).toBe("10px");
     });
   });
+
+  describe("click-outside behavior", () => {
+    it("closes dropdown when clicking outside", async () => {
+      const handleClose = vi.fn();
+      const { container } = render(() => (
+        <div>
+          <button data-testid="outside-btn">Outside</button>
+          <CortexDropdown options={defaultOptions} onClose={handleClose} />
+        </div>
+      ));
+      const trigger = container.querySelector("button:not([data-testid])") as HTMLElement;
+      await fireEvent.click(trigger);
+      const listbox = document.body.querySelector("[role='listbox']");
+      expect(listbox).toBeTruthy();
+
+      const outsideBtn = container.querySelector("[data-testid='outside-btn']") as HTMLElement;
+      await fireEvent.mouseDown(outsideBtn);
+      const listboxAfter = document.body.querySelector("[role='listbox']");
+      expect(listboxAfter).toBeFalsy();
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not close when clicking inside the dropdown", async () => {
+      const handleClose = vi.fn();
+      const { container } = render(() => (
+        <CortexDropdown options={defaultOptions} onClose={handleClose} />
+      ));
+      const trigger = container.querySelector("button") as HTMLElement;
+      await fireEvent.click(trigger);
+      const listbox = document.body.querySelector("[role='listbox']");
+      expect(listbox).toBeTruthy();
+
+      await fireEvent.mouseDown(listbox!);
+      const listboxAfter = document.body.querySelector("[role='listbox']");
+      expect(listboxAfter).toBeTruthy();
+      expect(handleClose).not.toHaveBeenCalled();
+    });
+
+    it("removes event listener on cleanup after close", async () => {
+      const handleClose = vi.fn();
+      const { container } = render(() => (
+        <CortexDropdown options={defaultOptions} onClose={handleClose} />
+      ));
+      const trigger = container.querySelector("button") as HTMLElement;
+      await fireEvent.click(trigger);
+      await fireEvent.keyDown(trigger, { key: "Escape" });
+      expect(handleClose).toHaveBeenCalledTimes(1);
+    });
+  });
 });

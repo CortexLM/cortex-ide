@@ -332,12 +332,12 @@ export const ToolchainProvider: ParentComponent = (props) => {
 
     const handleRefresh = () => refreshToolchains();
 
-    window.addEventListener("cortex:project_opened", handleProjectOpen);
+    window.addEventListener("cortex:project-opened", handleProjectOpen);
     window.addEventListener("toolchain:open-selector", handleOpenSelector);
     window.addEventListener("toolchain:refresh", handleRefresh);
 
     onCleanup(() => {
-      window.removeEventListener("cortex:project_opened", handleProjectOpen);
+      window.removeEventListener("cortex:project-opened", handleProjectOpen);
       window.removeEventListener("toolchain:open-selector", handleOpenSelector);
       window.removeEventListener("toolchain:refresh", handleRefresh);
     });

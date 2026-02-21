@@ -134,11 +134,12 @@ describe("CortexEditorTabs", () => {
       const activeTab = tabElements[0] as HTMLElement;
       const inactiveTab = tabElements[1] as HTMLElement;
 
-      expect(activeTab?.style.background).toContain("var(--cortex-bg-primary");
+      // Figma design: active tab bg #252628 (renders as rgb(37, 38, 40))
+      expect(activeTab?.style.background).toContain("rgb(37, 38, 40)");
       expect(inactiveTab?.style.background).toBe("transparent");
     });
 
-    it("should show lime border on active tab", () => {
+    it("should style active tab with bg and border-radius (no lime border per Figma)", () => {
       const tabs: EditorTab[] = [{ id: "1", name: "active.ts" }];
 
       const { container } = render(() => (
@@ -146,8 +147,10 @@ describe("CortexEditorTabs", () => {
       ));
 
       const activeTab = container.querySelector('[role="tab"]') as HTMLElement;
-      const borderBottom = activeTab?.style.borderBottom || "";
-      expect(borderBottom).toMatch(/cortex-accent-primary|B2FF22|rgb\(178,\s*255,\s*34\)/i);
+      // Figma design: active tab has bg #252628 and top border-radius 8px, no lime bottom border
+      expect(activeTab?.style.background).toContain("rgb(37, 38, 40)");
+      expect(activeTab?.style.borderTopLeftRadius).toBe("8px");
+      expect(activeTab?.style.borderTopRightRadius).toBe("8px");
     });
 
     it("should not highlight any tab when activeTabId is null", () => {
@@ -366,12 +369,12 @@ describe("CortexEditorTabs", () => {
       expect(tabBar?.style.backgroundColor).toBe("red");
     });
 
-    it("should have correct container height of 47px", () => {
+    it("should have correct container height of 36px per Figma", () => {
       const { container } = render(() => (
         <CortexEditorTabs tabs={[]} activeTabId={null} />
       ));
       const tabBar = container.firstChild as HTMLElement;
-      expect(tabBar?.style.height).toBe("47px");
+      expect(tabBar?.style.height).toBe("36px");
     });
   });
 });

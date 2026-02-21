@@ -67,7 +67,7 @@ export interface AgentActivityFeedProps {
   showSummary?: boolean;
   /** Custom class name */
   class?: string;
-  /** Event name to listen for (default: "agent-action") */
+  /** Event name to listen for (default: "agent:action") */
   eventName?: string;
 }
 
@@ -156,7 +156,7 @@ export function AgentActivityFeed(props: AgentActivityFeedProps) {
   let feedRef: HTMLDivElement | undefined;
   let unlisten: UnlistenFn | undefined;
   const maxActions = props.maxActions ?? 500;
-  const eventName = props.eventName ?? "agent-action";
+  const eventName = props.eventName ?? "agent:action";
 
   // Filtered actions
   const filteredActions = createMemo(() => {
@@ -605,7 +605,7 @@ export function AgentActivityFeedCompact(props: AgentActivityFeedCompactProps) {
 
   onMount(async () => {
     try {
-      unlisten = await listen("agent-action", (event) => {
+      unlisten = await listen("agent:action", (event) => {
         const actionData = event.payload as Partial<AgentAction>;
         setActions((prev) => {
           const actionType = actionData.type || "tool_start";
@@ -623,7 +623,7 @@ export function AgentActivityFeedCompact(props: AgentActivityFeedCompactProps) {
         });
       });
     } catch (e) {
-      console.error("[AgentActivityFeedCompact] Failed to listen to agent-action:", e);
+      console.error("[AgentActivityFeedCompact] Failed to listen to agent:action:", e);
     }
   });
 

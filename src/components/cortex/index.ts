@@ -33,6 +33,12 @@ export type { CortexFileExplorerProps } from "./CortexFileExplorer";
 export { CortexCodeEditor, default as CortexCodeEditorDefault } from "./CortexCodeEditor";
 export type { CortexCodeEditorProps, EditorTab } from "./CortexCodeEditor";
 
+export { EditorTabBar, default as EditorTabBarDefault } from "./EditorTabBar";
+export type { EditorTabBarProps } from "./EditorTabBar";
+
+export { EditorBreadcrumbs, default as EditorBreadcrumbsDefault } from "./EditorBreadcrumbs";
+export type { EditorBreadcrumbsProps } from "./EditorBreadcrumbs";
+
 export { CortexEditorTabs, default as CortexEditorTabsDefault } from "./CortexEditorTabs";
 export type { CortexEditorTabsProps, EditorTab as CortexEditorTab } from "./CortexEditorTabs";
 
@@ -175,9 +181,6 @@ export type { CortexUpdateFileViewProps, FileUpdate, DiffLine } from "./CortexUp
 
 // Theme Picker
 export { CortexThemePicker } from "./CortexThemePicker";
-
-// Factory Panel
-export { CortexFactoryPanel } from "./CortexFactoryPanel";
 
 // Agents Panel
 export { CortexAgentsPanel } from "./CortexAgentsPanel";

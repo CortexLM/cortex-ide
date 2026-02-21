@@ -519,9 +519,9 @@ export function Breadcrumbs(props: BreadcrumbsProps) {
       });
     };
 
-    window.addEventListener("editor-cursor-change", handleCursorChange as EventListener);
+    window.addEventListener("editor:cursor-change", handleCursorChange as EventListener);
     onCleanup(() => {
-      window.removeEventListener("editor-cursor-change", handleCursorChange as EventListener);
+      window.removeEventListener("editor:cursor-change", handleCursorChange as EventListener);
     });
   });
 

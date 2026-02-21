@@ -1,21 +1,26 @@
 /**
  * CortexCodeEditor - Pixel-perfect code editor shell matching Figma design
  *
- * Structure:
- * - Tab Bar: CortexEditorTabs (47px)
- * - Editor Content: Monaco wrapper (flex)
- * - Status Bar: CortexStatusBar (28px)
+ * Figma specs (node 5:12544, layout_D1BM8Q):
+ * - Container: bg #1C1C1D, border 1px solid #2E2F31, border-radius 16px
+ * - Structure: EditorTabBar → EditorBreadcrumbs → Monaco container
+ * - Monaco area: bg #141415, flex-1, overflow hidden
+ * - Scrollbar: 8px thumb, color #2E2F31, track transparent
  *
- * Integrates CortexEditorTabs and CortexStatusBar for a complete editor frame.
- * Actual editing uses Monaco Editor passed via children slot.
+ * Sub-components extracted per 300-line rule:
+ * - EditorTabBar: tab bar with file tabs
+ * - EditorBreadcrumbs: path breadcrumb trail
  */
 
-import { Component, JSX, splitProps } from "solid-js";
+import { Component, JSX, Show, splitProps } from "solid-js";
 import { CortexIcon } from "./primitives";
-import { CortexEditorTabs, type EditorTab } from "./CortexEditorTabs";
+import { EditorTabBar } from "./EditorTabBar";
+import { EditorBreadcrumbs, type BreadcrumbSegment } from "./EditorBreadcrumbs";
 import { CortexStatusBar } from "./CortexStatusBar";
+import type { EditorTab } from "./CortexEditorTabs";
 
 export type { EditorTab };
+export type { BreadcrumbSegment } from "./EditorBreadcrumbs";
 
 export interface CortexCodeEditorProps {
   tabs?: EditorTab[];
@@ -26,20 +31,10 @@ export interface CortexCodeEditorProps {
   onTabCloseAll?: () => void;
   onTabReorder?: (sourceId: string, targetId: string) => void;
   onNewTab?: () => void;
-  currentLine?: number;
-  currentColumn?: number;
-  selectionCount?: number;
+  breadcrumbs?: BreadcrumbSegment[];
   language?: string;
-  encoding?: string;
-  lineEnding?: "LF" | "CRLF" | "CR";
-  indentType?: "spaces" | "tabs";
-  indentSize?: number;
   branchName?: string | null;
   notificationCount?: number;
-  onLanguageClick?: () => void;
-  onEncodingClick?: () => void;
-  onLineEndingClick?: () => void;
-  onIndentationClick?: () => void;
   onNotificationClick?: () => void;
   onBranchClick?: () => void;
   onTogglePanel?: () => void;
@@ -55,6 +50,12 @@ const SAMPLE_TABS: EditorTab[] = [
   { id: "3", name: "build.rs" },
 ];
 
+const DEFAULT_BREADCRUMBS: BreadcrumbSegment[] = [
+  { label: "node" },
+  { label: "src" },
+  { label: "main.rs" },
+];
+
 export const CortexCodeEditor: Component<CortexCodeEditorProps> = (props) => {
   const [local, others] = splitProps(props, [
     "tabs",
@@ -65,20 +66,10 @@ export const CortexCodeEditor: Component<CortexCodeEditorProps> = (props) => {
     "onTabCloseAll",
     "onTabReorder",
     "onNewTab",
-    "currentLine",
-    "currentColumn",
-    "selectionCount",
+    "breadcrumbs",
     "language",
-    "encoding",
-    "lineEnding",
-    "indentType",
-    "indentSize",
     "branchName",
     "notificationCount",
-    "onLanguageClick",
-    "onEncodingClick",
-    "onLineEndingClick",
-    "onIndentationClick",
     "onNotificationClick",
     "onBranchClick",
     "onTogglePanel",
@@ -90,13 +81,16 @@ export const CortexCodeEditor: Component<CortexCodeEditorProps> = (props) => {
 
   const tabs = () => local.tabs || SAMPLE_TABS;
   const activeTabId = () => local.activeTabId ?? tabs()[0]?.id ?? null;
+  const breadcrumbs = () => local.breadcrumbs || DEFAULT_BREADCRUMBS;
 
   const containerStyle = (): JSX.CSSProperties => ({
     display: "flex",
     "flex-direction": "column",
     width: "100%",
     height: "100%",
-    background: "var(--cortex-bg-primary, #141415)",
+    background: "#1C1C1D",
+    border: "1px solid #2E2F31",
+    "border-radius": "16px",
     overflow: "hidden",
     ...local.style,
   });
@@ -106,13 +100,12 @@ export const CortexCodeEditor: Component<CortexCodeEditorProps> = (props) => {
     display: "flex",
     "flex-direction": "column",
     overflow: "hidden",
-    background: "var(--cortex-bg-secondary, #1C1C1D)",
+    background: "#141415",
   });
 
   return (
-    <div class={local.class} style={containerStyle()} {...others}>
-      {/* Tab Bar */}
-      <CortexEditorTabs
+    <div class={`cortex-code-editor ${local.class || ""}`} style={containerStyle()} {...others}>
+      <EditorTabBar
         tabs={tabs()}
         activeTabId={activeTabId()}
         onTabSelect={local.onTabClick}
@@ -123,33 +116,50 @@ export const CortexCodeEditor: Component<CortexCodeEditorProps> = (props) => {
         onNewTab={local.onNewTab}
       />
 
-      {/* Editor Content (Monaco slot) */}
+      <Show when={breadcrumbs().length > 0}>
+        <EditorBreadcrumbs segments={breadcrumbs()} />
+      </Show>
+
       <div style={editorContentStyle()}>
         {local.children || <EditorPlaceholder />}
       </div>
 
-      {/* Status Bar */}
       <CortexStatusBar
         variant="active"
         branchName={local.branchName}
-        cursorLine={local.currentLine}
-        cursorColumn={local.currentColumn}
-        selectionCount={local.selectionCount}
         languageName={local.language}
-        encoding={local.encoding}
-        lineEnding={local.lineEnding}
-        indentType={local.indentType}
-        indentSize={local.indentSize}
         notificationCount={local.notificationCount}
-        onLanguageClick={local.onLanguageClick}
-        onEncodingClick={local.onEncodingClick}
-        onLineEndingClick={local.onLineEndingClick}
-        onIndentationClick={local.onIndentationClick}
         onNotificationClick={local.onNotificationClick}
         onBranchClick={local.onBranchClick}
         onTogglePanel={local.onTogglePanel}
         onToggleTerminal={local.onToggleTerminal}
       />
+
+      <style>{`
+        .cortex-code-editor .monaco-editor,
+        .cortex-code-editor .monaco-editor .overflow-guard {
+          border-radius: 0;
+        }
+        .cortex-code-editor .monaco-editor .monaco-scrollable-element > .scrollbar > .slider {
+          background: #2E2F31 !important;
+          border-radius: 4px;
+        }
+        .cortex-code-editor .monaco-editor .monaco-scrollable-element > .scrollbar.vertical {
+          width: 8px !important;
+        }
+        .cortex-code-editor .monaco-editor .monaco-scrollable-element > .scrollbar.vertical > .slider {
+          width: 8px !important;
+        }
+        .cortex-code-editor .monaco-editor .monaco-scrollable-element > .scrollbar.horizontal {
+          height: 8px !important;
+        }
+        .cortex-code-editor .monaco-editor .monaco-scrollable-element > .scrollbar.horizontal > .slider {
+          height: 8px !important;
+        }
+        .cortex-code-editor .monaco-editor .monaco-scrollable-element > .scrollbar {
+          background: transparent !important;
+        }
+      `}</style>
     </div>
   );
 };
@@ -162,15 +172,15 @@ const EditorPlaceholder: Component = () => {
     "flex-direction": "column",
     "align-items": "center",
     "justify-content": "center",
-    background: "var(--cortex-bg-secondary, #1C1C1D)",
-    color: "var(--cortex-text-muted, #8C8D8F)",
+    background: "#141415",
+    color: "#8C8D8F",
     gap: "16px",
   });
 
   return (
     <div style={containerStyle()}>
       <CortexIcon name="file-code" size={48} />
-      <span style={{ "font-size": "14px" }}>No file selected</span>
+      <span style={{ "font-size": "14px", "font-family": "'Figtree', sans-serif" }}>No file selected</span>
     </div>
   );
 };

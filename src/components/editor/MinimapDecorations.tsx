@@ -395,13 +395,13 @@ export function MinimapDecorations(props: MinimapDecorationsProps) {
     };
     
     window.addEventListener(
-      "buffer-search-highlights",
+      "buffer-search:highlights",
       handleSearchHighlights as EventListener
     );
     
     onCleanup(() => {
       window.removeEventListener(
-        "buffer-search-highlights",
+        "buffer-search:highlights",
         handleSearchHighlights as EventListener
       );
     });

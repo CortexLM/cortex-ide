@@ -299,7 +299,7 @@ impl SSHTerminalState {
         };
 
         // Emit connected event
-        let _ = app_handle.emit("ssh_terminal:connected", &info);
+        let _ = app_handle.emit("ssh-terminal:connected", &info);
 
         // Create flow controller
         let flow_controller = Arc::new(FlowController::new());
@@ -426,7 +426,7 @@ impl SSHTerminalState {
             session_id: session_id.clone(),
             status: SSHConnectionStatus::Disconnected,
         };
-        let _ = app_handle.emit("ssh_terminal:status", &status);
+        let _ = app_handle.emit("ssh-terminal:status", &status);
 
         info!("SSH reader loop ended for session {}", session_id);
     }
@@ -442,7 +442,7 @@ impl SSHTerminalState {
             data: data.to_string(),
         };
 
-        if let Err(e) = app_handle.emit("ssh_terminal:output", &output) {
+        if let Err(e) = app_handle.emit("ssh-terminal:output", &output) {
             warn!("Failed to emit SSH output: {}", e);
         } else {
             flow_controller.add_pending(data.len());
@@ -574,7 +574,7 @@ impl SSHTerminalState {
                 session_id: session_id.to_string(),
                 status: SSHConnectionStatus::Disconnected,
             };
-            let _ = app_handle.emit("ssh_terminal:status", &status);
+            let _ = app_handle.emit("ssh-terminal:status", &status);
 
             info!("SSH session {} disconnected", session_id);
             Ok(())

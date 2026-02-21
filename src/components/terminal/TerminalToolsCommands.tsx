@@ -40,7 +40,7 @@ export function openKillPortDialogWithScan() {
   setShowKillPortDialog(true);
   // Dispatch event to trigger scan after dialog opens
   setTimeout(() => {
-    window.dispatchEvent(new CustomEvent("terminal:scanPorts"));
+    window.dispatchEvent(new CustomEvent("terminal:scan-ports"));
   }, 100);
 }
 

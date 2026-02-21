@@ -340,10 +340,10 @@ describe("CodespacesContext", () => {
       });
     });
 
-    it("should listen for codespaces:state_changed events", async () => {
-      await listen("codespaces:state_changed", () => {});
+    it("should listen for codespaces:state-changed events", async () => {
+      await listen("codespaces:state-changed", () => {});
 
-      expect(listen).toHaveBeenCalledWith("codespaces:state_changed", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("codespaces:state-changed", expect.any(Function));
     });
 
     it("should listen for codespaces:created events", async () => {

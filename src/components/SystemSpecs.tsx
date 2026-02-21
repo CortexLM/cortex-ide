@@ -101,7 +101,7 @@ export function SystemSpecsDialog(props: SystemSpecsDialogProps) {
   const startLiveMetrics = async () => {
     try {
       // Listen for live metrics events
-      unlistenFn = await listen<LiveMetrics>("system_specs:live_metrics", (event) => {
+      unlistenFn = await listen<LiveMetrics>("system-specs:live-metrics", (event) => {
         setLiveMetrics(event.payload);
       });
       

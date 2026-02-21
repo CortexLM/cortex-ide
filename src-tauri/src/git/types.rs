@@ -355,10 +355,66 @@ pub struct BranchComparison {
 }
 
 // ============================================================================
+// Commit Details Types (for git-graph SDK)
+// ============================================================================
+
+/// Detailed information about a single commit, including file changes and diff stats.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CommitDetails {
+    pub hash: String,
+    pub short_hash: String,
+    pub message: String,
+    pub body: String,
+    pub author: CommitPerson,
+    pub committer: CommitPerson,
+    pub parents: Vec<String>,
+    pub refs: Vec<CommitDetailRef>,
+    pub stats: Option<CommitDiffStat>,
+    pub files: Vec<CommitDetailFile>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CommitPerson {
+    pub name: String,
+    pub email: String,
+    pub timestamp: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CommitDetailRef {
+    pub name: String,
+    #[serde(rename = "type")]
+    pub ref_type: String,
+    pub is_head: Option<bool>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CommitDiffStat {
+    pub insertions: u32,
+    pub deletions: u32,
+    pub files: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CommitDetailFile {
+    pub path: String,
+    pub old_path: Option<String>,
+    pub status: String,
+    pub insertions: u32,
+    pub deletions: u32,
+}
+
+// ============================================================================
 // Commit Comparison Types
 // ============================================================================
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CommitComparison {
     pub files_changed: u32,
     pub additions: u32,
@@ -698,6 +754,8 @@ pub struct GraphOptions {
     pub branch: Option<String>,
     #[serde(default = "default_true_graph")]
     pub all: bool,
+    #[serde(default)]
+    pub first_parent: bool,
     pub since: Option<String>,
     pub until: Option<String>,
     pub author: Option<String>,

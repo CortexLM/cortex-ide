@@ -2175,21 +2175,21 @@ export function VimMode(props: VimModeProps) {
     // Handle common commands
     switch (trimmed) {
       case "w": // Write (save)
-        const event = new CustomEvent("vim-command-execute", { detail: { command: "w" } });
+        const event = new CustomEvent("vim:command-execute", { detail: { command: "w" } });
         window.dispatchEvent(event);
         break;
         
       case "q": // Quit
-        window.dispatchEvent(new CustomEvent("vim-command-execute", { detail: { command: "q" } }));
+        window.dispatchEvent(new CustomEvent("vim:command-execute", { detail: { command: "q" } }));
         break;
         
       case "wq": // Write and quit
       case "x":
-        window.dispatchEvent(new CustomEvent("vim-command-execute", { detail: { command: "wq" } }));
+        window.dispatchEvent(new CustomEvent("vim:command-execute", { detail: { command: "wq" } }));
         break;
         
       case "q!": // Force quit
-        window.dispatchEvent(new CustomEvent("vim-command-execute", { detail: { command: "q!" } }));
+        window.dispatchEvent(new CustomEvent("vim:command-execute", { detail: { command: "q!" } }));
         break;
         
       case "set number":

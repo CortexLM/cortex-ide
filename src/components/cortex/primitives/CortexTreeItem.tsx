@@ -1,6 +1,13 @@
 /**
  * CortexTreeItem - Tree view item component for FileExplorer
- * Matches Cortex UI specs: 16px row height, proper indentation
+ * Matches Figma Explorer component (590:10817) tree items
+ *
+ * Row: row, center, stretch, gap 8px
+ * Folder icon: 20×20 container
+ * File icon: 16×16
+ * Text: Figtree 16px 500, #E9E9EA (folders), #8C8D8F (files)
+ * Selected: bg rgba(255,255,255,0.05), border-radius 2px
+ * Indent: 24px per level
  */
 
 import { Component, JSX, splitProps, createSignal, Show, For } from "solid-js";
@@ -23,24 +30,15 @@ export interface CortexTreeItemProps {
   onSelect?: (item: TreeItemData) => void;
   onToggle?: (item: TreeItemData) => void;
   onContextMenu?: (item: TreeItemData, e: MouseEvent) => void;
+  selectedId?: string | null;
+  expandedIds?: Set<string>;
   class?: string;
   style?: JSX.CSSProperties;
 }
 
-// Cortex UI specs for file icons
 const FILE_ICON_MAP: Record<string, string> = {
-  // Folders by type
   "folder-default": "folder",
   "folder-open": "folder-open",
-  "folder-yarn": "folder",
-  "folder-syntax": "folder",
-  "folder-sublime": "folder",
-  "folder-storybook": "folder",
-  "folder-taskfile": "folder",
-  "folder-zeabur": "folder",
-  "folder-windows": "folder",
-  
-  // Files by extension
   ".ts": "file-code",
   ".tsx": "file-code",
   ".js": "file-code",
@@ -58,15 +56,15 @@ const FILE_ICON_MAP: Record<string, string> = {
 
 const getFileIcon = (name: string, type: "file" | "folder", customIcon?: string): string => {
   if (customIcon) return customIcon;
-  
+
   if (type === "folder") {
     return "folder";
   }
-  
+
   const ext = name.toLowerCase().includes(".")
     ? "." + name.split(".").pop()?.toLowerCase()
     : name.toLowerCase();
-  
+
   return FILE_ICON_MAP[ext] || "file";
 };
 
@@ -79,6 +77,8 @@ export const CortexTreeItem: Component<CortexTreeItemProps> = (props) => {
     "onSelect",
     "onToggle",
     "onContextMenu",
+    "selectedId",
+    "expandedIds",
     "class",
     "style",
   ]);
@@ -87,74 +87,72 @@ export const CortexTreeItem: Component<CortexTreeItemProps> = (props) => {
   const level = () => local.level || 0;
   const hasChildren = () => local.item.type === "folder" && local.item.children && local.item.children.length > 0;
 
-  // Cortex UI specs: 24px per indent level
   const indentPx = () => level() * 24;
 
   const rowStyle = (): JSX.CSSProperties => ({
     display: "flex",
     "align-items": "center",
-    height: "24px", // 16px content + 4px padding top/bottom
-    padding: "4px 8px",
-    "padding-left": `${8 + indentPx()}px`,
-    gap: "4px",
+    "align-self": "stretch",
+    gap: "8px",
+    height: "24px",
+    padding: "0",
+    "padding-left": `${indentPx()}px`,
     cursor: "pointer",
     background: local.isSelected
-      ? "var(--cortex-accent-muted, rgba(191,255,0,0.1))"
+      ? "rgba(255, 255, 255, 0.05)"
       : isHovered()
-      ? "var(--cortex-bg-hover, rgba(255,255,255,0.05))"
+      ? "rgba(255, 255, 255, 0.03)"
       : "transparent",
-    transition: "background var(--cortex-transition-fast, 100ms ease)",
+    "border-radius": local.isSelected ? "2px" : "0",
+    transition: "background 100ms ease",
     ...local.style,
   });
 
-  const chevronStyle = (): JSX.CSSProperties => ({
+  const folderIconContainerStyle = (): JSX.CSSProperties => ({
+    width: "20px",
+    height: "20px",
+    display: "flex",
+    "align-items": "center",
+    "justify-content": "center",
+    "flex-shrink": "0",
+  });
+
+  const textRowStyle = (): JSX.CSSProperties => ({
+    display: "flex",
+    "align-items": "center",
+    gap: "4px",
+    flex: "1",
+    "min-width": "0",
+  });
+
+  const fileIconStyle = (): JSX.CSSProperties => ({
     width: "16px",
     height: "16px",
     display: "flex",
     "align-items": "center",
     "justify-content": "center",
-    color: "var(--cortex-text-muted, var(--cortex-text-inactive))",
-    transform: local.isExpanded ? "rotate(0deg)" : "rotate(-90deg)",
-    transition: "transform var(--cortex-transition-fast, 100ms ease)",
-    opacity: hasChildren() ? "1" : "0",
-    visibility: hasChildren() ? "visible" : "hidden",
-  });
-
-  const iconStyle = (): JSX.CSSProperties => ({
-    width: "16px",
-    height: "16px",
     "flex-shrink": "0",
-    color: local.item.type === "folder"
-      ? "var(--cortex-accent-primary, var(--cortex-accent-primary))"
-      : "var(--cortex-text-muted, var(--cortex-text-inactive))",
   });
 
   const textStyle = (): JSX.CSSProperties => ({
-    flex: "1",
-    "font-family": "var(--cortex-font-sans, Inter, sans-serif)",
-    "font-size": "14px",
-    color: local.isSelected
-      ? "var(--cortex-text-primary, var(--cortex-text-primary))"
-      : "var(--cortex-text-secondary, var(--cortex-text-secondary))",
+    "font-family": "Figtree, var(--cortex-font-sans, Inter, sans-serif)",
+    "font-size": "16px",
+    "font-weight": "500",
+    "line-height": "1em",
+    color: local.item.type === "folder" ? "#E9E9EA" : "#E9E9EA",
     "white-space": "nowrap",
     overflow: "hidden",
     "text-overflow": "ellipsis",
-    "line-height": "16px",
   });
 
   const handleClick = (e: MouseEvent) => {
     e.stopPropagation();
-    
+
     if (local.item.type === "folder") {
       local.onToggle?.(local.item);
     }
-    
-    local.onSelect?.(local.item);
-  };
 
-  const handleChevronClick = (e: MouseEvent) => {
-    e.stopPropagation();
-    local.onToggle?.(local.item);
+    local.onSelect?.(local.item);
   };
 
   const handleContextMenu = (e: MouseEvent) => {
@@ -162,11 +160,7 @@ export const CortexTreeItem: Component<CortexTreeItemProps> = (props) => {
     local.onContextMenu?.(local.item, e);
   };
 
-  const icon = () => getFileIcon(
-    local.item.name,
-    local.item.type,
-    local.item.icon
-  );
+  const icon = () => getFileIcon(local.item.name, local.item.type, local.item.icon);
 
   return (
     <>
@@ -179,35 +173,37 @@ export const CortexTreeItem: Component<CortexTreeItemProps> = (props) => {
         onMouseLeave={() => setIsHovered(false)}
         {...others}
       >
-        {/* Chevron for folders */}
-        <div style={chevronStyle()} onClick={handleChevronClick}>
-          <CortexIcon name="chevron-down" size={12} />
-        </div>
-
-        {/* File/Folder Icon */}
-        <div style={iconStyle()}>
+        <div style={folderIconContainerStyle()}>
           <CortexIcon
             name={local.isExpanded && local.item.type === "folder" ? "folder-open" : icon()}
-            size={16}
+            size={local.item.type === "folder" ? 20 : 16}
+            color={local.item.type === "folder" ? "#8C8D8F" : "#8C8D8F"}
           />
         </div>
 
-        {/* Name */}
-        <span style={textStyle()}>{local.item.name}</span>
+        <div style={textRowStyle()}>
+          <Show when={local.item.type === "file"}>
+            <div style={fileIconStyle()}>
+              <CortexIcon name={icon()} size={16} color="#8C8D8F" />
+            </div>
+          </Show>
+          <span style={textStyle()}>{local.item.name}</span>
+        </div>
       </div>
 
-      {/* Children (if expanded) */}
       <Show when={local.isExpanded && hasChildren()}>
         <For each={local.item.children}>
           {(child) => (
             <CortexTreeItem
               item={child}
               level={level() + 1}
-              isSelected={false}
-              isExpanded={child.isExpanded}
+              isSelected={local.selectedId === child.id}
+              isExpanded={local.expandedIds?.has(child.id) ?? child.isExpanded}
               onSelect={local.onSelect}
               onToggle={local.onToggle}
               onContextMenu={local.onContextMenu}
+              selectedId={local.selectedId}
+              expandedIds={local.expandedIds}
             />
           )}
         </For>
@@ -228,10 +224,10 @@ export interface IndentGuideProps {
 export const IndentGuide: Component<IndentGuideProps> = (props) => {
   const guideStyle = (): JSX.CSSProperties => ({
     position: "absolute",
-    left: `${8 + props.level * 24 + 8}px`, // 8px padding + level indent + 8px to center in chevron
+    left: `${props.level * 24 + 10}px`,
     width: "1px",
     height: `${props.height}px`,
-    background: "var(--cortex-border-default, rgba(255,255,255,0.1))",
+    background: "rgba(255, 255, 255, 0.1)",
     "pointer-events": "none",
     ...props.style,
   });
@@ -240,5 +236,3 @@ export const IndentGuide: Component<IndentGuideProps> = (props) => {
 };
 
 export default CortexTreeItem;
-
-

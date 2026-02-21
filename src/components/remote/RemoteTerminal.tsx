@@ -446,7 +446,7 @@ export function RemoteTerminal(props: RemoteTerminalProps) {
   onMount(async () => {
     // Listen for SSH output
     unlistenOutput = await listen<SSHTerminalOutput>(
-      "ssh_terminal:output",
+      "ssh-terminal:output",
       (event) => {
         const sid = sessionId();
         if (event.payload.session_id === sid && terminal) {
@@ -459,7 +459,7 @@ export function RemoteTerminal(props: RemoteTerminalProps) {
 
     // Listen for SSH status changes
     unlistenStatus = await listen<SSHTerminalStatus>(
-      "ssh_terminal:status",
+      "ssh-terminal:status",
       (event) => {
         const sid = sessionId();
         if (event.payload.session_id === sid) {

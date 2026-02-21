@@ -223,7 +223,7 @@ function DeepLinkHandler(): null {
   onCleanup(() => unlisten?.());
 
   onMount(async () => {
-    unlisten = await listen<DeepLinkAction>("deep-link", async (event) => {
+    unlisten = await listen<DeepLinkAction>("deep:link", async (event) => {
       const action = event.payload;
       if (import.meta.env.DEV) console.log("[DeepLink] Received:", action);
 

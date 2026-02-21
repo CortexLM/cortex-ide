@@ -1,19 +1,17 @@
 /**
  * CortexEditorTabs - Pixel-perfect editor tab bar matching Figma design
  *
- * Design specs from Figma node 166:2183 (Main Screen):
- * - Tab bar height: 47px
- * - Active tab: bg #141415, lime #B2FF22 bottom border 2px, lime text
- * - Inactive tab: transparent bg, #FCFCFC text
- * - Tab structure: file icon (16×16) + filename (Figtree 12px) + close button (16×16)
- * - Tab padding: 10px 20px, gap 4px, border-radius 8px 8px 0 0
+ * Figma specs (node 5:12544, layout_DL9R7K / layout_FLO741 / layout_GFZOKQ):
+ * - Tab bar height: 36px, bg #141415, border-bottom 1px solid #2E2F31
+ * - Active tab: bg #252628, text #FCFCFC, border-radius 8px 8px 0 0
+ * - Inactive tab: transparent bg, text #8C8D8F
+ * - Tab structure: file icon (16×16) + filename (14px Figtree) + close button (16×16)
+ * - Tab padding: 10px 16px, gap 6px
  * - Close button: visible on hover/active, x-close icon
  * - Modified dot: 8px circle indicator
  * - Horizontal scrolling when tabs overflow
  * - Drag-to-reorder tabs
  * - Right-click context menu (Close, Close Others, Close All, Copy Path)
- *
- * Wires to EditorContext when available for real file operations.
  */
 
 import { Component, JSX, For, Show, createSignal, onCleanup } from "solid-js";
@@ -64,10 +62,11 @@ export const CortexEditorTabs: Component<CortexEditorTabsProps> = (props) => {
 
   const containerStyle = (): JSX.CSSProperties => ({
     display: "flex",
-    "align-items": "flex-end",
-    height: "47px",
-    background: "var(--cortex-bg-secondary, #1C1C1D)",
-    "border-bottom": "1px solid var(--cortex-border-default, rgba(255,255,255,0.1))",
+    "align-items": "center",
+    "align-self": "stretch",
+    height: "36px",
+    background: "#141415",
+    "border-bottom": "1px solid #2E2F31",
     overflow: "hidden",
     "flex-shrink": "0",
     position: "relative",
@@ -76,7 +75,7 @@ export const CortexEditorTabs: Component<CortexEditorTabsProps> = (props) => {
 
   const scrollContainerStyle = (): JSX.CSSProperties => ({
     display: "flex",
-    "align-items": "flex-end",
+    "align-items": "center",
     "overflow-x": "auto",
     "overflow-y": "hidden",
     flex: "1",
@@ -180,8 +179,8 @@ const TabContextMenu: Component<TabContextMenuProps> = (props) => {
     left: `${props.x}px`,
     top: `${props.y}px`,
     "z-index": "9999",
-    background: "var(--cortex-bg-secondary, #1C1C1D)",
-    border: "1px solid var(--cortex-border-default, rgba(255,255,255,0.15))",
+    background: "#1C1C1D",
+    border: "1px solid #2E2F31",
     "border-radius": "8px",
     padding: "4px 0",
     "min-width": "160px",
@@ -197,7 +196,7 @@ const TabContextMenu: Component<TabContextMenuProps> = (props) => {
     background: "transparent",
     border: "none",
     color: "var(--cortex-text-on-surface)",
-    "font-family": "'Figtree', 'Inter', sans-serif",
+    "font-family": "var(--cortex-font-sans)",
     "font-size": "12px",
     cursor: "pointer",
     "text-align": "left",
@@ -265,30 +264,24 @@ const EditorTabItem: Component<EditorTabItemProps> = (props) => {
   const tabStyle = (): JSX.CSSProperties => ({
     display: "flex",
     "align-items": "center",
-    gap: "4px",
-    height: props.isActive ? "47px" : "36px",
-    padding: "10px 20px",
-    background: props.isActive
-      ? "var(--cortex-bg-primary, #141415)"
-      : "transparent",
+    gap: "6px",
+    height: "36px",
+    padding: "10px 16px",
+    background: props.isActive ? "#252628" : "transparent",
     "border-top-left-radius": "8px",
     "border-top-right-radius": "8px",
-    "border-bottom": props.isActive ? "2px solid var(--cortex-accent-primary)" : "2px solid transparent",
     cursor: "pointer",
     transition: "background 100ms ease",
-    position: "relative",
-    "margin-bottom": props.isActive ? "0" : "1px",
     "flex-shrink": "0",
     "user-select": "none",
   });
 
   const nameStyle = (): JSX.CSSProperties => ({
     "font-family": "'Figtree', sans-serif",
-    "font-size": "12px",
+    "font-size": "14px",
     "font-weight": "400",
-    color: props.isActive
-      ? "var(--cortex-accent-primary)"
-      : "var(--cortex-text-on-surface)",
+    "line-height": "1em",
+    color: props.isActive ? "#FCFCFC" : "#8C8D8F",
     "white-space": "nowrap",
     "font-style": props.tab.isPreview ? "italic" : "normal",
   });

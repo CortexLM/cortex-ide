@@ -472,10 +472,10 @@ describe("BookmarksContext", () => {
       const originalAddEventListener = window.addEventListener;
       window.addEventListener = addEventListener;
 
-      window.addEventListener("editor-cursor-change", () => {});
+      window.addEventListener("editor:cursor-change", () => {});
 
       expect(addEventListener).toHaveBeenCalledWith(
-        "editor-cursor-change",
+        "editor:cursor-change",
         expect.any(Function)
       );
 

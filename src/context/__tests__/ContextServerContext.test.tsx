@@ -552,10 +552,10 @@ describe("ContextServerContext", () => {
       expect(listen).toHaveBeenCalledWith("mcp:status", expect.any(Function));
     });
 
-    it("should listen for mcp:resource_updated events", async () => {
-      await listen("mcp:resource_updated", () => {});
+    it("should listen for mcp:resource-updated events", async () => {
+      await listen("mcp:resource-updated", () => {});
 
-      expect(listen).toHaveBeenCalledWith("mcp:resource_updated", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("mcp:resource-updated", expect.any(Function));
     });
   });
 

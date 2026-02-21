@@ -156,6 +156,31 @@ pub async fn git_cherry_pick_status(path: String) -> Result<CherryPickStatus, St
     .map_err(|e| format!("Task join error: {}", e))?
 }
 
+/// Cherry-pick a single commit (simple wrapper for git-graph SDK)
+#[tauri::command]
+pub async fn git_cherry_pick(path: Option<String>, hash: String) -> Result<(), String> {
+    let path = path.unwrap_or_else(|| ".".to_string());
+    tokio::task::spawn_blocking(move || {
+        info!("Cherry-picking commit {}", hash);
+
+        let output = git_command_with_timeout(&["cherry-pick", &hash], Path::new(&path))?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            if stderr.contains("CONFLICT") || stderr.contains("conflict") {
+                info!("Cherry-pick has conflicts, waiting for resolution");
+                return Ok(());
+            }
+            return Err(format!("Cherry-pick failed: {}", stderr));
+        }
+
+        info!("Cherry-pick of {} completed successfully", hash);
+        Ok(())
+    })
+    .await
+    .map_err(|e| format!("Task join error: {}", e))?
+}
+
 /// Start a cherry-pick operation for one or more commits
 #[tauri::command]
 pub async fn git_cherry_pick_start(path: String, commits: Vec<String>) -> Result<(), String> {

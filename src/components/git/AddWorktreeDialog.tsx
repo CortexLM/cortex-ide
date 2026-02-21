@@ -297,7 +297,7 @@ export function AddWorktreeDialog(props: AddWorktreeDialogProps) {
               onClick={() => {
                 // Trigger native folder picker
                 window.dispatchEvent(
-                  new CustomEvent("command:showOpenDialog", {
+                  new CustomEvent("command:show-open-dialog", {
                     detail: {
                       properties: ["openDirectory", "createDirectory"],
                       callback: (paths: string[]) => {

@@ -12,6 +12,31 @@ use super::types::{RebaseAction, RebaseCommit, RebaseStatus, RebaseTodoEntry};
 // Rebase Commands
 // ============================================================================
 
+/// Simple (non-interactive) rebase onto a target
+#[tauri::command]
+pub async fn git_rebase(path: Option<String>, onto: String) -> Result<(), String> {
+    let path = path.unwrap_or_else(|| ".".to_string());
+    tokio::task::spawn_blocking(move || {
+        info!("Rebasing onto {}", onto);
+
+        let output = git_command_with_timeout(&["rebase", &onto], Path::new(&path))?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            if stderr.contains("CONFLICT") || stderr.contains("conflict") {
+                info!("Rebase has conflicts, waiting for resolution");
+                return Ok(());
+            }
+            return Err(format!("Rebase failed: {}", stderr));
+        }
+
+        info!("Rebase onto {} completed successfully", onto);
+        Ok(())
+    })
+    .await
+    .map_err(|e| format!("Task join error: {}", e))?
+}
+
 /// Get commits that would be rebased when rebasing onto a target
 #[tauri::command]
 pub async fn git_rebase_commits(path: String, onto: String) -> Result<Vec<RebaseCommit>, String> {

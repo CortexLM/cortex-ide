@@ -14,17 +14,27 @@ fn state_types_are_send_sync() {
     assert_send_sync::<crate::ai::AgentStoreState>();
     assert_send_sync::<crate::lsp::LspState>();
     assert_send_sync::<crate::dap::DebuggerState>();
+    assert_send_sync::<crate::LazyState<crate::dap::DebuggerState>>();
     assert_send_sync::<crate::terminal::TerminalState>();
     assert_send_sync::<crate::settings::SettingsState>();
     assert_send_sync::<crate::collab::CollabState>();
+    assert_send_sync::<crate::LazyState<crate::collab::CollabState>>();
     assert_send_sync::<crate::context_server::ContextServerState>();
+    assert_send_sync::<crate::LazyState<crate::context_server::ContextServerState>>();
     assert_send_sync::<crate::activity::ActivityState>();
     assert_send_sync::<crate::timeline::TimelineState>();
     assert_send_sync::<crate::toolchain::ToolchainState>();
     assert_send_sync::<crate::factory::FactoryState>();
+    assert_send_sync::<crate::LazyState<crate::factory::FactoryState>>();
+    assert_send_sync::<crate::extensions::ExtensionsState>();
+    assert_send_sync::<crate::LazyState<crate::extensions::ExtensionsState>>();
     assert_send_sync::<crate::extensions::activation::ActivationState>();
     assert_send_sync::<crate::extensions::registry::RegistryState>();
+    assert_send_sync::<crate::sandbox::commands::SandboxState>();
+    assert_send_sync::<crate::LazyState<crate::sandbox::commands::SandboxState>>();
     assert_send_sync::<crate::testing::TestWatcherState>();
+    assert_send_sync::<crate::LazyState<crate::testing::TestWatcherState>>();
+    #[cfg(feature = "remote-ssh")]
     assert_send_sync::<crate::ssh_terminal::SSHTerminalState>();
     assert_send_sync::<crate::wsl::WSLState>();
 }
@@ -55,6 +65,7 @@ fn state_initialization_does_not_panic() {
     let _ = crate::extensions::activation::ActivationState::new();
     let _ = crate::extensions::registry::RegistryState::new();
     let _ = crate::testing::TestWatcherState::new();
+    #[cfg(feature = "remote-ssh")]
     let _ = crate::ssh_terminal::SSHTerminalState::new();
     let _ = crate::wsl::WSLState::new();
 }

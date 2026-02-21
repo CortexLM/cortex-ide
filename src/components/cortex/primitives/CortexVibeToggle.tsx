@@ -64,7 +64,7 @@ export const CortexVibeToggle: Component<CortexVibeToggleProps> = (props) => {
       padding: "0",
       "font-family": "var(--cortex-font-sans)",
       "font-size": "14px",
-      "font-weight": "500",
+      "font-weight": "400",
       "line-height": "1em",
       color: isActive ? "var(--cortex-text-on-surface)" : "var(--cortex-text-secondary)",
       transition: "all 200ms ease",

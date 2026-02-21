@@ -212,7 +212,7 @@ export function EditorToolbar(props: EditorToolbarProps) {
           updateFormatOnPasteEnabled(newEnabled);
           updateEditorSetting("formatOnPaste", newEnabled);
           window.dispatchEvent(
-            new CustomEvent("editor-format-on-paste-changed", {
+            new CustomEvent("editor:format-on-paste-changed", {
               detail: { enabled: newEnabled },
             }),
           );
@@ -416,7 +416,7 @@ export function EditorToolbar(props: EditorToolbarProps) {
         const position = e.position;
         const currentFile = props.activeFile();
         window.dispatchEvent(
-          new CustomEvent("editor-cursor-change", {
+          new CustomEvent("editor:cursor-change", {
             detail: { line: position.lineNumber, column: position.column, cursorCount, selectionCount },
           }),
         );

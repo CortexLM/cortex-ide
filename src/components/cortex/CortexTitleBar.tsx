@@ -2,8 +2,12 @@
  * CortexTitleBar - Pixel-perfect title bar matching Figma Header (443:7609)
  * Layout: Flexbox with justify-content: space-between
  * Left: Logo (40×40) + (Vibe/IDE toggle + Open Project) + Menu items
- * Right: Config badge + Start/Pause + Window controls
- * Gap: 44px, Padding: 0 0 0 8px
+ * Right: Config badge + Start/Pause + vertical separator + Window controls
+ * Gap: 44px, Padding: 0 0 0 8px, Height: 56px
+ *
+ * OS-aware window controls:
+ * - macOS: traffic-light circles on the LEFT
+ * - Windows/Linux: — □ × buttons on the RIGHT
  */
 
 import { Component, JSX, splitProps, Show, For, onMount, onCleanup } from "solid-js";
@@ -15,9 +19,10 @@ import {
 import { CortexVibeToggle } from "./primitives/CortexVibeToggle";
 import { CortexOpenProjectDropdown } from "./primitives/CortexOpenProjectDropdown";
 import { TitleBarDropdownMenu } from "./titlebar/TitleBarDropdownMenu";
-import { MacWindowControls } from "./titlebar/MacWindowControls";
+import { WindowControls } from "./titlebar/WindowControls";
 import { CortexLogo } from "./titlebar/CortexLogo";
 import { MENU_LABELS, DEFAULT_MENUS } from "./titlebar/defaultMenus";
+import { detectPlatform } from "./titlebar/platformDetect";
 import type { MenuItem } from "./titlebar/defaultMenus";
 
 export type { MenuItem };
@@ -61,6 +66,8 @@ export const CortexTitleBar: Component<CortexTitleBarProps> = (props) => {
     "isRunning", "onStartPause", "openProjectLabel", "isProjectDropdownOpen",
     "onProjectDropdownClick", "projectDropdownChildren", "class", "style",
   ]);
+
+  const isMac = detectPlatform() === "macos";
 
   type WindowHandle = {
     minimize: () => Promise<void>;
@@ -161,6 +168,14 @@ export const CortexTitleBar: Component<CortexTitleBarProps> = (props) => {
     });
   });
 
+  const windowControlsEl = () => (
+    <WindowControls
+      onMinimize={handleMinimize}
+      onMaximize={handleMaximize}
+      onClose={handleClose}
+    />
+  );
+
   return (
     <header
       class={local.class}
@@ -169,10 +184,11 @@ export const CortexTitleBar: Component<CortexTitleBarProps> = (props) => {
         display: "flex",
         "justify-content": "space-between",
         "align-items": "center",
-        gap: "var(--cortex-space-11)",
+        gap: "44px",
         width: "100%",
-        "min-height": "var(--cortex-height-titlebar)",
-        padding: "0 0 0 var(--cortex-space-2)",
+        height: "56px",
+        "min-height": "56px",
+        padding: "0 0 0 8px",
         background: "transparent",
         position: "relative",
         "-webkit-app-region": "drag",
@@ -185,33 +201,27 @@ export const CortexTitleBar: Component<CortexTitleBarProps> = (props) => {
       <div style={{
         display: "flex",
         "align-items": "center",
-        gap: "var(--cortex-space-3)",
+        gap: "12px",
         "-webkit-app-region": "no-drag",
         "min-width": "0",
         "flex-shrink": "1",
+        overflow: "hidden",
       }}>
-        <div style={{
-          width: "40px",
-          height: "40px",
-          display: "flex",
-          "align-items": "center",
-          "justify-content": "center",
-          "border-radius": "var(--cortex-radius-lg)",
-          "flex-shrink": "0",
-          cursor: "pointer",
-        }}>
-          <CortexLogo size={40} />
-        </div>
+        <Show when={isMac}>
+          {windowControlsEl()}
+        </Show>
+
+        <CortexLogo size={40} />
 
         <div style={{
           display: "flex",
           "align-items": "center",
-          gap: "var(--cortex-space-1)",
+          gap: "4px",
         }}>
           <div style={{
             display: "flex",
             "align-items": "center",
-            gap: "var(--cortex-space-2)",
+            gap: "8px",
           }}>
             <CortexVibeToggle
               mode={local.mode ?? "ide"}
@@ -226,7 +236,7 @@ export const CortexTitleBar: Component<CortexTitleBarProps> = (props) => {
             </CortexOpenProjectDropdown>
           </div>
 
-          <div ref={menuBarRef} style={{ display: "flex", "align-items": "center", "min-width": "0" }}>
+          <div ref={menuBarRef} style={{ display: "flex", "align-items": "center", "min-width": "0", overflow: "hidden" }}>
             <For each={MENU_LABELS}>
               {(label) => (
                 <div
@@ -254,20 +264,18 @@ export const CortexTitleBar: Component<CortexTitleBarProps> = (props) => {
         </div>
       </div>
 
-
-
       {/* Right Section */}
       <div style={{
         display: "flex",
         "align-items": "center",
-        gap: "var(--cortex-space-5)",
+        gap: "20px",
         "-webkit-app-region": "no-drag",
         "flex-shrink": "0",
       }}>
         <div style={{
           display: "flex",
           "align-items": "center",
-          gap: "var(--cortex-space-2)",
+          gap: "8px",
         }}>
           <CortexConfigBadge
             label={local.configLabel ?? "config"}
@@ -282,11 +290,17 @@ export const CortexTitleBar: Component<CortexTitleBarProps> = (props) => {
           />
         </div>
 
-        <MacWindowControls
-          onMinimize={handleMinimize}
-          onMaximize={handleMaximize}
-          onClose={handleClose}
-        />
+        {/* Vertical Separator */}
+        <div style={{
+          width: "1px",
+          height: "20px",
+          background: "#2E2F31",
+          "flex-shrink": "0",
+        }} />
+
+        <Show when={!isMac}>
+          {windowControlsEl()}
+        </Show>
       </div>
 
     </header>

@@ -62,13 +62,13 @@ export function ViewNavigationHandlers(props: ViewNavigationHandlersProps) {
       // ── Selection events ─────────────────────────────────────────────
       "selection:expand": (() => {
         window.dispatchEvent(
-          new CustomEvent("editor-command", { detail: { command: "expand-selection" } }),
+          new CustomEvent("editor:command", { detail: { command: "expand-selection" } }),
         );
       }) as EventListener,
 
       "selection:shrink": (() => {
         window.dispatchEvent(
-          new CustomEvent("editor-command", { detail: { command: "shrink-selection" } }),
+          new CustomEvent("editor:command", { detail: { command: "shrink-selection" } }),
         );
       }) as EventListener,
 

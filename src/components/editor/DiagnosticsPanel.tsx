@@ -1283,7 +1283,7 @@ export function DiagnosticsPanel(props: DiagnosticsPanelProps) {
       openFile(filePath);
 
       window.dispatchEvent(
-        new CustomEvent("navigate-to-line", {
+        new CustomEvent("editor:navigate-to-line", {
           detail: {
             line: start.line + 1,
             column: start.character + 1,

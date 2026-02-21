@@ -296,14 +296,14 @@ export function LayoutProvider(props: ParentProps) {
 
   const toggleAuxiliaryBar = () => {
     setState("auxiliaryBar", "visible", (v) => !v);
-    window.dispatchEvent(new CustomEvent("layout:auxiliaryBar-toggled", {
+    window.dispatchEvent(new CustomEvent("layout:auxiliary-bar-toggled", {
       detail: { visible: state.auxiliaryBar.visible }
     }));
   };
 
   const setAuxiliaryBarVisible = (visible: boolean) => {
     setState("auxiliaryBar", "visible", visible);
-    window.dispatchEvent(new CustomEvent("layout:auxiliaryBar-toggled", {
+    window.dispatchEvent(new CustomEvent("layout:auxiliary-bar-toggled", {
       detail: { visible }
     }));
   };

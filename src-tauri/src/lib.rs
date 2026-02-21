@@ -44,6 +44,7 @@ mod sandbox;
 mod search;
 mod settings;
 mod settings_sync;
+#[cfg(feature = "remote-ssh")]
 mod ssh_terminal;
 mod system_specs;
 mod tasks;

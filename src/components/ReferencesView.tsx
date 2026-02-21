@@ -521,7 +521,7 @@ export function ReferencesView() {
       );
       // Also dispatch goto-line for compatibility
       window.dispatchEvent(
-        new CustomEvent("goto-line", {
+        new CustomEvent("editor:goto-line", {
           detail: { line: ref.line, column: ref.column },
         })
       );

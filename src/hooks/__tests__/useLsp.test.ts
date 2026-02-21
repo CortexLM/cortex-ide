@@ -528,9 +528,9 @@ describe("useLSPEditor", () => {
     it("should listen for server status events", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("lsp:server_status", () => {});
+      await listen("lsp:server-status", () => {});
 
-      expect(listen).toHaveBeenCalledWith("lsp:server_status", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("lsp:server-status", expect.any(Function));
     });
   });
 

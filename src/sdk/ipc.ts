@@ -406,9 +406,10 @@ export async function dapSetConditionalBreakpoint(
   condition: string,
 ): Promise<DapBreakpoint | null> {
   try {
-    return await invoke<DapBreakpoint>("dap_set_conditional_breakpoint", {
-      sessionId, source, line, condition,
+    const result = await invoke<DapBreakpoint[]>("debug_set_breakpoints", {
+      sessionId, path: source, breakpoints: [{ path: source, line, condition }],
     });
+    return result?.[0] ?? null;
   } catch {
     return null;
   }
@@ -421,9 +422,10 @@ export async function dapSetLogpoint(
   logMessage: string,
 ): Promise<DapBreakpoint | null> {
   try {
-    return await invoke<DapBreakpoint>("dap_set_logpoint", {
-      sessionId, source, line, logMessage,
+    const result = await invoke<DapBreakpoint[]>("debug_set_breakpoints", {
+      sessionId, path: source, breakpoints: [{ path: source, line, logMessage }],
     });
+    return result?.[0] ?? null;
   } catch {
     return null;
   }
@@ -435,21 +437,22 @@ export async function dapSetDataBreakpoint(
   accessType: "read" | "write" | "readWrite",
 ): Promise<DapDataBreakpoint | null> {
   try {
-    return await invoke<DapDataBreakpoint>("dap_set_data_breakpoint", {
-      sessionId, variableName, accessType,
+    const result = await invoke<{ breakpoints: DapDataBreakpoint[] }>("debug_set_data_breakpoints", {
+      sessionId, breakpoints: [{ dataId: variableName, accessType }],
     });
+    return result?.breakpoints?.[0] ?? null;
   } catch {
     return null;
   }
 }
 
 export async function dapAddWatchExpression(
-  sessionId: string,
+  _sessionId: string,
   expression: string,
 ): Promise<WatchExpression | null> {
   try {
-    return await invoke<WatchExpression>("dap_add_watch_expression", {
-      sessionId, expression,
+    return await invoke<WatchExpression>("debug_add_watch", {
+      expression,
     });
   } catch {
     return null;
@@ -457,11 +460,11 @@ export async function dapAddWatchExpression(
 }
 
 export async function dapRemoveWatchExpression(
-  sessionId: string,
+  _sessionId: string,
   id: string,
 ): Promise<boolean> {
   try {
-    await invoke("dap_remove_watch_expression", { sessionId, id });
+    await invoke("debug_remove_watch", { watchId: id });
     return true;
   } catch {
     return false;
@@ -471,11 +474,11 @@ export async function dapRemoveWatchExpression(
 export async function dapEvaluateWatch(
   sessionId: string,
   expression: string,
-  frameId?: number,
+  _frameId?: number,
 ): Promise<EvalResult | null> {
   try {
-    return await invoke<EvalResult>("dap_evaluate_watch", {
-      sessionId, expression, frameId,
+    return await invoke<EvalResult>("debug_evaluate", {
+      sessionId, expression, context: "watch",
     });
   } catch {
     return null;
@@ -485,11 +488,11 @@ export async function dapEvaluateWatch(
 export async function dapDebugConsoleEval(
   sessionId: string,
   expression: string,
-  context: "repl" | "watch" | "hover" = "repl",
+  _context: "repl" | "watch" | "hover" = "repl",
 ): Promise<EvalResult | null> {
   try {
-    return await invoke<EvalResult>("dap_debug_console_eval", {
-      sessionId, expression, context,
+    return await invoke<EvalResult>("debug_evaluate_repl", {
+      sessionId, expression,
     });
   } catch {
     return null;
@@ -503,7 +506,7 @@ export async function dapDisassemble(
   instructionCount: number,
 ): Promise<DisassembledInstruction[]> {
   try {
-    return await invoke<DisassembledInstruction[]>("dap_disassemble", {
+    return await invoke<DisassembledInstruction[]>("debug_disassemble", {
       sessionId, memoryReference, offset, instructionCount,
     });
   } catch {
@@ -513,7 +516,7 @@ export async function dapDisassemble(
 
 export async function extensionInstall(path: string): Promise<ExtensionInfo | null> {
   try {
-    return await invoke<ExtensionInfo>("install_extension", { path });
+    return await invoke<ExtensionInfo>("install_extension_from_path", { path });
   } catch {
     return null;
   }

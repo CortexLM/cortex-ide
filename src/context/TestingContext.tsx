@@ -1992,8 +1992,8 @@ export const TestingProvider: ParentComponent = (props) => {
     unlistenAutoRun?.();
     unlistenFileChanged?.();
     unlistenWatchStopped?.();
-    window.removeEventListener("cortex:terminal_output", handleTerminalOutput);
-    window.removeEventListener("cortex:terminal_status", handleTerminalStatus);
+    window.removeEventListener("cortex:terminal-output", handleTerminalOutput);
+    window.removeEventListener("cortex:terminal-status", handleTerminalStatus);
     window.removeEventListener("testing:run-all", handleRunAllTests);
     window.removeEventListener("testing:run-failed", handleRunFailedTests);
     window.removeEventListener("testing:stop", handleStopTests);
@@ -2020,8 +2020,8 @@ export const TestingProvider: ParentComponent = (props) => {
 
   onMount(() => {
     // ESSENTIAL - Register fast window event listeners immediately (no async)
-    window.addEventListener("cortex:terminal_output", handleTerminalOutput);
-    window.addEventListener("cortex:terminal_status", handleTerminalStatus);
+    window.addEventListener("cortex:terminal-output", handleTerminalOutput);
+    window.addEventListener("cortex:terminal-status", handleTerminalStatus);
     window.addEventListener("testing:run-all", handleRunAllTests);
     window.addEventListener("testing:run-failed", handleRunFailedTests);
     window.addEventListener("testing:stop", handleStopTests);

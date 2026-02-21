@@ -1092,12 +1092,12 @@ Process List:
       return;
     }
 
-    listen<ProcessInfo[]>("process_explorer:update", (event) => {
+    listen<ProcessInfo[]>("process-explorer:update", (event) => {
       setProcesses(event.payload);
     }).then((fn) => {
       unlistenFn = fn;
     }).catch((err) => {
-      console.warn("Failed to listen for process_explorer:update events:", err);
+      console.warn("Failed to listen for process-explorer:update events:", err);
     });
   });
 

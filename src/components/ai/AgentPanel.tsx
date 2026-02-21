@@ -1721,7 +1721,7 @@ export function AgentPanel() {
       // Use SDK to send message via cortex-core (Tauri IPC)
       await sdk.sendMessage(content);
       
-      // The SDK handles streaming via Tauri events (cortex-event)
+      // The SDK handles streaming via Tauri events (cortex:event)
       // We'll sync with SDK state for the response
       // Note: The actual response comes through SDK's message stream
       

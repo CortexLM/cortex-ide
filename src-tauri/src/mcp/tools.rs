@@ -2,12 +2,15 @@
 //!
 //! Provides tools that AI agents can use to interact with Cortex Desktop.
 
+#[cfg(feature = "image-processing")]
 use base64::Engine;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::sync::mpsc;
 use std::time::Duration;
-use tauri::{AppHandle, Emitter, Listener, Manager, Runtime, WebviewWindow};
+#[cfg(feature = "image-processing")]
+use tauri::WebviewWindow;
+use tauri::{AppHandle, Emitter, Listener, Manager, Runtime};
 
 use super::socket_server::SocketResponse;
 
@@ -175,33 +178,42 @@ async fn handle_screenshot<R: Runtime>(app: &AppHandle<R>, payload: Value) -> So
         }
     };
 
-    // Use platform-specific screenshot implementation
-    #[cfg(target_os = "windows")]
+    #[cfg(not(feature = "image-processing"))]
     {
-        match capture_window_screenshot_windows(&window, &request).await {
-            Ok(data) => SocketResponse::success(data),
-            Err(e) => SocketResponse::error(e),
-        }
+        let _ = window;
+        let _ = request;
+        SocketResponse::error("Image processing feature is not enabled".to_string())
     }
 
-    #[cfg(target_os = "macos")]
+    #[cfg(feature = "image-processing")]
     {
-        match capture_window_screenshot_macos(&window, &request).await {
-            Ok(data) => SocketResponse::success(data),
-            Err(e) => SocketResponse::error(e),
+        #[cfg(target_os = "windows")]
+        {
+            match capture_window_screenshot_windows(&window, &request).await {
+                Ok(data) => SocketResponse::success(data),
+                Err(e) => SocketResponse::error(e),
+            }
         }
-    }
 
-    #[cfg(target_os = "linux")]
-    {
-        match capture_window_screenshot_linux(&window, &request).await {
-            Ok(data) => SocketResponse::success(data),
-            Err(e) => SocketResponse::error(e),
+        #[cfg(target_os = "macos")]
+        {
+            match capture_window_screenshot_macos(&window, &request).await {
+                Ok(data) => SocketResponse::success(data),
+                Err(e) => SocketResponse::error(e),
+            }
+        }
+
+        #[cfg(target_os = "linux")]
+        {
+            match capture_window_screenshot_linux(&window, &request).await {
+                Ok(data) => SocketResponse::success(data),
+                Err(e) => SocketResponse::error(e),
+            }
         }
     }
 }
 
-#[cfg(target_os = "windows")]
+#[cfg(all(target_os = "windows", feature = "image-processing"))]
 async fn capture_window_screenshot_windows<R: Runtime>(
     window: &WebviewWindow<R>,
     request: &ScreenshotRequest,
@@ -247,7 +259,7 @@ async fn capture_window_screenshot_windows<R: Runtime>(
     })
 }
 
-#[cfg(target_os = "macos")]
+#[cfg(all(target_os = "macos", feature = "image-processing"))]
 async fn capture_window_screenshot_macos<R: Runtime>(
     window: &WebviewWindow<R>,
     request: &ScreenshotRequest,
@@ -299,7 +311,7 @@ async fn capture_window_screenshot_macos<R: Runtime>(
     })
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", feature = "image-processing"))]
 async fn capture_window_screenshot_linux<R: Runtime>(
     window: &WebviewWindow<R>,
     request: &ScreenshotRequest,
@@ -352,7 +364,7 @@ async fn capture_window_screenshot_linux<R: Runtime>(
     })
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", feature = "image-processing"))]
 async fn capture_linux_screenshot<R: Runtime>(
     output_path: &str,
     _window: &WebviewWindow<R>,
@@ -410,8 +422,7 @@ async fn capture_linux_screenshot<R: Runtime>(
     Err("No screenshot tool available. Please install one of: gnome-screenshot, scrot, maim, imagemagick, or spectacle".to_string())
 }
 
-/// Encode a DynamicImage to JPEG with specified quality (0-100)
-/// Lower quality = smaller file size, higher compression
+#[cfg(feature = "image-processing")]
 fn encode_jpeg(img: &image::DynamicImage, quality: u8) -> Result<Vec<u8>, String> {
     use image::codecs::jpeg::JpegEncoder;
     use std::io::Cursor;
@@ -452,7 +463,7 @@ async fn handle_get_dom<R: Runtime>(app: &AppHandle<R>, payload: Value) -> Socke
     let (tx, rx) = mpsc::channel::<String>();
 
     // Listen for response event (one-time)
-    let _listener_id = app.once("mcp-get-dom-response", move |event| {
+    let _listener_id = app.once("mcp:get-dom-response", move |event| {
         let payload = event.payload().to_string();
         let _ = tx.send(payload);
     });
@@ -463,7 +474,7 @@ async fn handle_get_dom<R: Runtime>(app: &AppHandle<R>, payload: Value) -> Socke
     });
 
     // Emit event to frontend to get DOM
-    if let Err(e) = app.emit_to(&request.window_label, "mcp-get-dom", &event_payload) {
+    if let Err(e) = app.emit_to(&request.window_label, "mcp:get-dom", &event_payload) {
         return SocketResponse::error(format!("Failed to emit get-dom event: {}", e));
     }
 
@@ -516,13 +527,13 @@ async fn handle_execute_js<R: Runtime>(app: &AppHandle<R>, payload: Value) -> So
     let (tx, rx) = mpsc::channel::<String>();
 
     // Listen for response event (one-time)
-    let listener_id = app.once("mcp-execute-js-response", move |event| {
+    let listener_id = app.once("mcp:execute-js-response", move |event| {
         let payload = event.payload().to_string();
         let _ = tx.send(payload);
     });
 
     // Emit event to frontend to execute the script
-    if let Err(e) = app.emit_to(&request.window_label, "mcp-execute-js", &request.script) {
+    if let Err(e) = app.emit_to(&request.window_label, "mcp:execute-js", &request.script) {
         app.unlisten(listener_id);
         return SocketResponse::error(format!("Failed to emit execute-js event: {}", e));
     }

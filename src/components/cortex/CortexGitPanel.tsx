@@ -138,7 +138,9 @@ export const CortexGitPanel: Component = () => {
   const handleClickOutside = (e: MouseEvent) => {
     if (showDotsMenu() && dotsRef && !dotsRef.contains(e.target as Node)) setShowDotsMenu(false);
   };
-  document.addEventListener("mousedown", handleClickOutside);
+  onMount(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+  });
   onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
 
   onMount(() => { if (repo()) fetchStashes(); });

@@ -212,9 +212,9 @@ describe("useLspFeature", () => {
     it("should listen for feature response events", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("lsp:feature_response", () => {});
+      await listen("lsp:feature-response", () => {});
 
-      expect(listen).toHaveBeenCalledWith("lsp:feature_response", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("lsp:feature-response", expect.any(Function));
     });
   });
 });

@@ -89,8 +89,8 @@ export const CortexStartPause: Component<CortexStartPauseProps> = (props) => {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <rect x="3" y="1" width="3" height="14" rx="0.5" fill="var(--cortex-pause-color)" />
-          <rect x="10" y="1" width="3" height="14" rx="0.5" fill="var(--cortex-pause-color)" />
+          <rect x="3" y="1" width="3" height="14" rx="1" fill="var(--cortex-pause-color)" />
+          <rect x="10" y="1" width="3" height="14" rx="1" fill="var(--cortex-pause-color)" />
         </svg>
       </Show>
     </button>

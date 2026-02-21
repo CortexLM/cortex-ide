@@ -860,7 +860,7 @@ export function DiagnosticsProvider(props: ParentProps) {
     if (!diag) return;
 
     window.dispatchEvent(
-      new CustomEvent("navigate-to-location", {
+      new CustomEvent("editor:navigate-to-location", {
         detail: {
           uri: diag.uri,
           line: diag.range.start.line + 1,

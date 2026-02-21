@@ -112,7 +112,7 @@ export function AIAgentProvider(props: ParentProps) {
   const setupEventListeners = async () => {
     try {
       const unlistenIndexProgress = await listen<IndexProgressEvent>(
-        "ai:index_progress",
+        "ai:index-progress",
         (event) => {
           const { totalFiles, indexedFiles, totalChunks, done } = event.payload;
           const progress = totalFiles > 0 ? (indexedFiles / totalFiles) * 100 : 0;

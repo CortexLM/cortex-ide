@@ -241,7 +241,7 @@ export function AgentsSidebar() {
         setAgents((prev) => [...prev, event.payload.agent]);
       });
       
-      const unlisten2 = await listen<{ agentId: string; status: AgentStatus }>("agent:status_changed", (event) => {
+      const unlisten2 = await listen<{ agentId: string; status: AgentStatus }>("agent:status-changed", (event) => {
         setAgents((prev) =>
           prev.map((a) =>
             a.id === event.payload.agentId

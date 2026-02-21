@@ -655,7 +655,7 @@ describe("IPC Wrappers", () => {
           source: "app.ts",
           condition: "x > 10",
         };
-        vi.mocked(invoke).mockResolvedValueOnce(mockBreakpoint);
+        vi.mocked(invoke).mockResolvedValueOnce([mockBreakpoint]);
 
         const result = await dapSetConditionalBreakpoint("session-1", "app.ts", 42, "x > 10");
 
@@ -669,11 +669,10 @@ describe("IPC Wrappers", () => {
 
         await dapSetConditionalBreakpoint("sess-1", "main.ts", 10, "count === 5");
 
-        expect(invoke).toHaveBeenCalledWith("dap_set_conditional_breakpoint", {
+        expect(invoke).toHaveBeenCalledWith("debug_set_breakpoints", {
           sessionId: "sess-1",
-          source: "main.ts",
-          line: 10,
-          condition: "count === 5",
+          path: "main.ts",
+          breakpoints: [{ path: "main.ts", line: 10, condition: "count === 5" }],
         });
       });
 
@@ -695,7 +694,7 @@ describe("IPC Wrappers", () => {
           source: "app.ts",
           logMessage: "Value of x: {x}",
         };
-        vi.mocked(invoke).mockResolvedValueOnce(mockBreakpoint);
+        vi.mocked(invoke).mockResolvedValueOnce([mockBreakpoint]);
 
         const result = await dapSetLogpoint("session-1", "app.ts", 15, "Value of x: {x}");
 
@@ -708,11 +707,10 @@ describe("IPC Wrappers", () => {
 
         await dapSetLogpoint("sess-1", "main.ts", 20, "Reached line 20");
 
-        expect(invoke).toHaveBeenCalledWith("dap_set_logpoint", {
+        expect(invoke).toHaveBeenCalledWith("debug_set_breakpoints", {
           sessionId: "sess-1",
-          source: "main.ts",
-          line: 20,
-          logMessage: "Reached line 20",
+          path: "main.ts",
+          breakpoints: [{ path: "main.ts", line: 20, logMessage: "Reached line 20" }],
         });
       });
 
@@ -733,7 +731,7 @@ describe("IPC Wrappers", () => {
           variableName: "myVar",
           accessType: "write" as const,
         };
-        vi.mocked(invoke).mockResolvedValueOnce(mockBreakpoint);
+        vi.mocked(invoke).mockResolvedValueOnce({ breakpoints: [mockBreakpoint] });
 
         const result = await dapSetDataBreakpoint("session-1", "myVar", "write");
 
@@ -746,10 +744,9 @@ describe("IPC Wrappers", () => {
 
         await dapSetDataBreakpoint("sess-1", "counter", "readWrite");
 
-        expect(invoke).toHaveBeenCalledWith("dap_set_data_breakpoint", {
+        expect(invoke).toHaveBeenCalledWith("debug_set_data_breakpoints", {
           sessionId: "sess-1",
-          variableName: "counter",
-          accessType: "readWrite",
+          breakpoints: [{ dataId: "counter", accessType: "readWrite" }],
         });
       });
 
@@ -784,8 +781,7 @@ describe("IPC Wrappers", () => {
 
         await dapAddWatchExpression("sess-1", "arr.length");
 
-        expect(invoke).toHaveBeenCalledWith("dap_add_watch_expression", {
-          sessionId: "sess-1",
+        expect(invoke).toHaveBeenCalledWith("debug_add_watch", {
           expression: "arr.length",
         });
       });
@@ -813,9 +809,8 @@ describe("IPC Wrappers", () => {
 
         await dapRemoveWatchExpression("sess-1", "watch-42");
 
-        expect(invoke).toHaveBeenCalledWith("dap_remove_watch_expression", {
-          sessionId: "sess-1",
-          id: "watch-42",
+        expect(invoke).toHaveBeenCalledWith("debug_remove_watch", {
+          watchId: "watch-42",
         });
       });
 
@@ -848,10 +843,10 @@ describe("IPC Wrappers", () => {
 
         await dapEvaluateWatch("sess-1", "x + y", 5);
 
-        expect(invoke).toHaveBeenCalledWith("dap_evaluate_watch", {
+        expect(invoke).toHaveBeenCalledWith("debug_evaluate", {
           sessionId: "sess-1",
           expression: "x + y",
-          frameId: 5,
+          context: "watch",
         });
       });
 
@@ -860,10 +855,10 @@ describe("IPC Wrappers", () => {
 
         await dapEvaluateWatch("sess-1", "x + y");
 
-        expect(invoke).toHaveBeenCalledWith("dap_evaluate_watch", {
+        expect(invoke).toHaveBeenCalledWith("debug_evaluate", {
           sessionId: "sess-1",
           expression: "x + y",
-          frameId: undefined,
+          context: "watch",
         });
       });
 
@@ -896,10 +891,9 @@ describe("IPC Wrappers", () => {
 
         await dapDebugConsoleEval("sess-1", "2 + 2", "watch");
 
-        expect(invoke).toHaveBeenCalledWith("dap_debug_console_eval", {
+        expect(invoke).toHaveBeenCalledWith("debug_evaluate_repl", {
           sessionId: "sess-1",
           expression: "2 + 2",
-          context: "watch",
         });
       });
 
@@ -908,10 +902,9 @@ describe("IPC Wrappers", () => {
 
         await dapDebugConsoleEval("sess-1", "expr");
 
-        expect(invoke).toHaveBeenCalledWith("dap_debug_console_eval", {
+        expect(invoke).toHaveBeenCalledWith("debug_evaluate_repl", {
           sessionId: "sess-1",
           expression: "expr",
-          context: "repl",
         });
       });
 
@@ -943,7 +936,7 @@ describe("IPC Wrappers", () => {
 
         await dapDisassemble("sess-1", "0x2000", 5, 20);
 
-        expect(invoke).toHaveBeenCalledWith("dap_disassemble", {
+        expect(invoke).toHaveBeenCalledWith("debug_disassemble", {
           sessionId: "sess-1",
           memoryReference: "0x2000",
           offset: 5,
@@ -985,7 +978,7 @@ describe("IPC Wrappers", () => {
 
         await extensionInstall("/downloads/ext.wasm");
 
-        expect(invoke).toHaveBeenCalledWith("install_extension", {
+        expect(invoke).toHaveBeenCalledWith("install_extension_from_path", {
           path: "/downloads/ext.wasm",
         });
       });

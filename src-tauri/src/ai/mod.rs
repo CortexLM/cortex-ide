@@ -169,12 +169,12 @@ pub async fn ai_complete(
 
 /// Stream a conversation response.
 ///
-/// **Tauri Event:** `"ai:stream_chunk"`
+/// **Tauri Event:** `"ai:stream-chunk"`
 /// **Payload:** `{ threadId: string, content: string, done: bool }`
 /// **Direction:** Backend → Frontend
 /// **Listeners:** `AIContext.tsx`, `AIStreamContext.tsx`, `InlineAssistant.tsx`
 ///
-/// When `chunk.tool_calls` is present, also emits `"ai:tool_call"` events
+/// When `chunk.tool_calls` is present, also emits `"ai:tool-call"` events
 /// with payload `{ threadId, callId, name, arguments }`.
 #[tauri::command]
 pub async fn ai_stream(
@@ -204,7 +204,7 @@ pub async fn ai_stream(
                             name: tc.function.name.clone(),
                             arguments: tc.function.arguments.clone(),
                         };
-                        if let Err(e) = app_clone.emit("ai:tool_call", &tool_payload) {
+                        if let Err(e) = app_clone.emit("ai:tool-call", &tool_payload) {
                             error!("Failed to emit tool_call event: {}", e);
                         }
                     }
@@ -216,7 +216,7 @@ pub async fn ai_stream(
                 content: chunk.content,
                 done: chunk.done,
             };
-            if let Err(e) = app_clone.emit("ai:stream_chunk", &event_payload) {
+            if let Err(e) = app_clone.emit("ai:stream-chunk", &event_payload) {
                 error!("Failed to emit stream event: {}", e);
             }
         }
@@ -231,7 +231,7 @@ pub async fn ai_stream(
     Ok(())
 }
 
-/// Flattened payload for `"ai:stream_chunk"` events.
+/// Flattened payload for `"ai:stream-chunk"` events.
 /// Matches the frontend `StreamChunkEvent` interface: `{ threadId, content, done }`.
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -241,7 +241,7 @@ struct StreamEventPayload {
     done: bool,
 }
 
-/// Payload for `"ai:tool_call"` events.
+/// Payload for `"ai:tool-call"` events.
 /// Matches the frontend `ToolCallEvent` interface.
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

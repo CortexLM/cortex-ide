@@ -795,7 +795,7 @@ Completion (output only the code to insert, nothing else):`;
           requestId: string;
           delta: string;
           done: boolean;
-        }>("ai:completion_stream", (event) => {
+        }>("ai:completion-stream", (event) => {
           if (event.payload.requestId === requestId) {
             this.streamAccumulator += event.payload.delta;
             if (event.payload.done && this.pendingStreamResolve) {

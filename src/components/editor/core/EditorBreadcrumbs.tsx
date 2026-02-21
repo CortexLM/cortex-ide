@@ -270,25 +270,25 @@ export function EditorBreadcrumbs(props: EditorBreadcrumbsProps) {
       }
     };
 
-    window.addEventListener("goto-line", handleGotoLine as EventListener);
+    window.addEventListener("editor:goto-line", handleGotoLine as EventListener);
     window.addEventListener("editor:goto-line", handleEditorGotoLine as EventListener);
     window.addEventListener("editor:set-cursor-position", handleSetCursorPosition as EventListener);
     window.addEventListener("outline:navigate", handleOutlineNavigate as EventListener);
-    window.addEventListener("buffer-search-goto", handleBufferSearchGoto as EventListener);
+    window.addEventListener("buffer-search:goto", handleBufferSearchGoto as EventListener);
     window.addEventListener("buffer-search:get-selection", handleBufferSearchGetSelection);
-    window.addEventListener("editor-command", handleEditorCommand as unknown as EventListener);
+    window.addEventListener("editor:command", handleEditorCommand as unknown as EventListener);
     window.addEventListener("editor:action", handleEditorAction as EventListener);
     window.addEventListener("editor:get-selection-for-terminal", handleGetSelectionForTerminal);
     window.addEventListener("editor:get-active-file-for-terminal", handleGetActiveFileForTerminal);
 
     onCleanup(() => {
-      window.removeEventListener("goto-line", handleGotoLine as EventListener);
+      window.removeEventListener("editor:goto-line", handleGotoLine as EventListener);
       window.removeEventListener("editor:goto-line", handleEditorGotoLine as EventListener);
       window.removeEventListener("editor:set-cursor-position", handleSetCursorPosition as EventListener);
       window.removeEventListener("outline:navigate", handleOutlineNavigate as EventListener);
-      window.removeEventListener("buffer-search-goto", handleBufferSearchGoto as EventListener);
+      window.removeEventListener("buffer-search:goto", handleBufferSearchGoto as EventListener);
       window.removeEventListener("buffer-search:get-selection", handleBufferSearchGetSelection);
-      window.removeEventListener("editor-command", handleEditorCommand as unknown as EventListener);
+      window.removeEventListener("editor:command", handleEditorCommand as unknown as EventListener);
       window.removeEventListener("editor:action", handleEditorAction as EventListener);
       window.removeEventListener("editor:get-selection-for-terminal", handleGetSelectionForTerminal);
       window.removeEventListener("editor:get-active-file-for-terminal", handleGetActiveFileForTerminal);

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use super::command::git_command_with_timeout;
 use super::helpers::find_repo;
-use super::types::{BranchComparison, CommitComparison, CommitFile, GitCommit};
+use super::types::{BranchComparison, CommitComparison, CommitDetails, CommitFile, GitCommit};
 use super::types::{CommitGraphNode, CommitGraphOptions, CommitGraphResult};
 use super::types::{GraphCommitNode, GraphRef};
 use std::path::Path;
@@ -697,6 +697,228 @@ pub async fn git_commit_graph(
             nodes,
             total_count,
             has_more,
+        })
+    })
+    .await
+    .map_err(|e| format!("Task join error: {}", e))?
+}
+
+// ============================================================================
+// Commit Details Command (for git-graph SDK)
+// ============================================================================
+
+#[tauri::command]
+pub async fn git_get_commit_details(
+    hash: String,
+    path: Option<String>,
+) -> Result<CommitDetails, String> {
+    let path = path.unwrap_or_else(|| ".".to_string());
+    tokio::task::spawn_blocking(move || {
+        let repo = find_repo(&path)?;
+
+        let oid = git2::Oid::from_str(&hash)
+            .map_err(|e| format!("Invalid commit hash '{}': {}", hash, e))?;
+
+        let commit = repo
+            .find_commit(oid)
+            .map_err(|e| format!("Failed to find commit '{}': {}", hash, e))?;
+
+        let sha = oid.to_string();
+        let short_sha = sha[..7.min(sha.len())].to_string();
+
+        let message_full = commit.message().unwrap_or("").to_string();
+        let (message, body) = {
+            let mut lines = message_full.splitn(2, '\n');
+            let first = lines.next().unwrap_or("").to_string();
+            let rest = lines.next().unwrap_or("").trim_start().to_string();
+            (first, rest)
+        };
+
+        let author_sig = commit.author();
+        let committer_sig = commit.committer();
+
+        let author = super::types::CommitPerson {
+            name: author_sig.name().unwrap_or("").to_string(),
+            email: author_sig.email().unwrap_or("").to_string(),
+            timestamp: author_sig.when().seconds(),
+        };
+
+        let committer = super::types::CommitPerson {
+            name: committer_sig.name().unwrap_or("").to_string(),
+            email: committer_sig.email().unwrap_or("").to_string(),
+            timestamp: committer_sig.when().seconds(),
+        };
+
+        let parents: Vec<String> = commit.parent_ids().map(|id| id.to_string()).collect();
+
+        // Build refs for this commit
+        let mut refs = Vec::new();
+        let head_target = repo.head().ok().and_then(|h| h.target());
+        let head_branch_name = repo.head().ok().and_then(|h| {
+            if h.is_branch() {
+                h.shorthand().map(|s| s.to_string())
+            } else {
+                None
+            }
+        });
+
+        if head_target.map(|t| t == oid).unwrap_or(false) {
+            refs.push(super::types::CommitDetailRef {
+                name: "HEAD".to_string(),
+                ref_type: "head".to_string(),
+                is_head: Some(true),
+            });
+        }
+
+        if let Ok(references) = repo.references() {
+            for reference in references.flatten() {
+                let target = if reference.is_branch() || reference.is_remote() {
+                    reference.target()
+                } else if reference.is_tag() {
+                    reference
+                        .peel_to_commit()
+                        .ok()
+                        .map(|c| c.id())
+                        .or_else(|| reference.target())
+                } else {
+                    reference.target()
+                };
+
+                if target == Some(oid) {
+                    let ref_name = reference.name().unwrap_or("").to_string();
+                    if ref_name == "HEAD" {
+                        continue;
+                    }
+
+                    let (display_name, ref_type) =
+                        if let Some(name) = ref_name.strip_prefix("refs/heads/") {
+                            (name.to_string(), "branch")
+                        } else if let Some(name) = ref_name.strip_prefix("refs/remotes/") {
+                            (name.to_string(), "remote")
+                        } else if let Some(name) = ref_name.strip_prefix("refs/tags/") {
+                            (name.to_string(), "tag")
+                        } else {
+                            (ref_name.clone(), "branch")
+                        };
+
+                    let is_head = head_branch_name
+                        .as_ref()
+                        .map(|hb| ref_type == "branch" && display_name == *hb);
+
+                    refs.push(super::types::CommitDetailRef {
+                        name: display_name,
+                        ref_type: ref_type.to_string(),
+                        is_head,
+                    });
+                }
+            }
+        }
+
+        // Get diff stats and file changes
+        let commit_tree = commit
+            .tree()
+            .map_err(|e| format!("Failed to get commit tree: {}", e))?;
+
+        let parent_tree = if commit.parent_count() > 0 {
+            Some(
+                commit
+                    .parent(0)
+                    .map_err(|e| format!("Failed to get parent: {}", e))?
+                    .tree()
+                    .map_err(|e| format!("Failed to get parent tree: {}", e))?,
+            )
+        } else {
+            None
+        };
+
+        let diff = repo
+            .diff_tree_to_tree(parent_tree.as_ref(), Some(&commit_tree), None)
+            .map_err(|e| format!("Failed to get diff: {}", e))?;
+
+        let diff_stats = diff
+            .stats()
+            .map_err(|e| format!("Failed to get diff stats: {}", e))?;
+
+        let stats = Some(super::types::CommitDiffStat {
+            insertions: diff_stats.insertions() as u32,
+            deletions: diff_stats.deletions() as u32,
+            files: diff_stats.files_changed() as u32,
+        });
+
+        let mut files = Vec::new();
+        for delta in diff.deltas() {
+            let file_path = delta
+                .new_file()
+                .path()
+                .or_else(|| delta.old_file().path())
+                .map(|p| p.to_string_lossy().to_string())
+                .unwrap_or_default();
+
+            let old_path = if delta.status() == git2::Delta::Renamed {
+                delta
+                    .old_file()
+                    .path()
+                    .map(|p| p.to_string_lossy().to_string())
+            } else {
+                None
+            };
+
+            let status = match delta.status() {
+                git2::Delta::Added => "added",
+                git2::Delta::Deleted => "deleted",
+                git2::Delta::Modified => "modified",
+                git2::Delta::Renamed => "renamed",
+                git2::Delta::Copied => "copied",
+                _ => "modified",
+            }
+            .to_string();
+
+            files.push(super::types::CommitDetailFile {
+                path: file_path,
+                old_path,
+                status,
+                insertions: 0, // Per-file stats computed below
+                deletions: 0,
+            });
+        }
+
+        // Get per-file stats using numstat
+        let repo_root = super::helpers::get_repo_root(&path)?;
+        let repo_root_path = Path::new(&repo_root);
+        if let Ok(output) = git_command_with_timeout(
+            &["diff", "--numstat", &format!("{}^..{}", sha, sha)],
+            repo_root_path,
+        ) {
+            if output.status.success() {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                for line in stdout.lines() {
+                    let parts: Vec<&str> = line.split('\t').collect();
+                    if parts.len() >= 3 {
+                        let ins = parts[0].parse::<u32>().unwrap_or(0);
+                        let del = parts[1].parse::<u32>().unwrap_or(0);
+                        let fpath = parts[2];
+                        if let Some(f) = files.iter_mut().find(|f| f.path == fpath) {
+                            f.insertions = ins;
+                            f.deletions = del;
+                        }
+                    }
+                }
+            }
+        }
+
+        info!("[Git] Got commit details for {}", short_sha);
+
+        Ok(CommitDetails {
+            hash: sha,
+            short_hash: short_sha,
+            message,
+            body,
+            author,
+            committer,
+            parents,
+            refs,
+            stats,
+            files,
         })
     })
     .await

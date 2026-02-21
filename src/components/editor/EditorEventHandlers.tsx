@@ -986,7 +986,7 @@ export function EditorEventHandlers(props: EditorEventHandlersProps): null {
     // Register All Event Listeners
     // =========================================================================
 
-    window.addEventListener("goto-line", handleGotoLine as EventListener);
+    window.addEventListener("editor:goto-line", handleGotoLine as EventListener);
     window.addEventListener(
       "editor:goto-line",
       handleEditorGotoLine as EventListener,
@@ -1000,11 +1000,11 @@ export function EditorEventHandlers(props: EditorEventHandlersProps): null {
       handleOutlineNavigate as EventListener,
     );
     window.addEventListener(
-      "buffer-search-goto",
+      "buffer-search:goto",
       handleBufferSearchGoto as EventListener,
     );
     window.addEventListener(
-      "buffer-search-highlights",
+      "buffer-search:highlights",
       handleBufferSearchHighlights as EventListener,
     );
     window.addEventListener(
@@ -1012,58 +1012,58 @@ export function EditorEventHandlers(props: EditorEventHandlersProps): null {
       handleBufferSearchGetSelection,
     );
     window.addEventListener(
-      "editor-command",
+      "editor:command",
       handleEditorCommand as unknown as EventListener,
     );
-    window.addEventListener("editor-format-document", handleFormatDocument);
-    window.addEventListener("editor-toggle-word-wrap", handleToggleWordWrap);
-    window.addEventListener("editor-toggle-minimap", handleToggleMinimap);
+    window.addEventListener("editor:format-document", handleFormatDocument);
+    window.addEventListener("editor:toggle-word-wrap", handleToggleWordWrap);
+    window.addEventListener("editor:toggle-minimap", handleToggleMinimap);
     window.addEventListener(
-      "editor-toggle-sticky-scroll",
+      "editor:toggle-sticky-scroll",
       handleToggleStickyScroll,
     );
     window.addEventListener(
-      "editor-toggle-bracket-colorization",
+      "editor:toggle-bracket-colorization",
       handleToggleBracketColorization,
     );
     window.addEventListener(
-      "editor-toggle-bracket-guides",
+      "editor:toggle-bracket-guides",
       handleToggleBracketGuides,
     );
     window.addEventListener(
-      "editor-toggle-indentation-guides",
+      "editor:toggle-indentation-guides",
       handleToggleIndentationGuides,
     );
     window.addEventListener(
-      "editor-toggle-inlay-hints",
+      "editor:toggle-inlay-hints",
       handleToggleInlayHints,
     );
     window.addEventListener(
-      "editor-toggle-unicode-highlight",
+      "editor:toggle-unicode-highlight",
       handleToggleUnicodeHighlight,
     );
     window.addEventListener(
-      "editor-unicode-highlight-settings",
+      "editor:unicode-highlight-settings",
       handleUnicodeHighlightSettingsChange as EventListener,
     );
     window.addEventListener(
-      "editor-toggle-linked-editing",
+      "editor:toggle-linked-editing",
       handleToggleLinkedEditing,
     );
     window.addEventListener(
-      "editor-toggle-format-on-type",
+      "editor:toggle-format-on-type",
       handleToggleFormatOnType,
     );
     window.addEventListener(
-      "editor-toggle-format-on-paste",
+      "editor:toggle-format-on-paste",
       handleToggleFormatOnPaste,
     );
     window.addEventListener(
-      "editor-inlay-hints-settings",
+      "editor:inlay-hints-settings",
       handleInlayHintsSettingsChange as EventListener,
     );
     window.addEventListener(
-      "editor-format-on-type-settings",
+      "editor:format-on-type-settings",
       handleFormatOnTypeSettingsChange as EventListener,
     );
     window.addEventListener("testing:coverage-updated", handleCoverageUpdated);
@@ -1073,11 +1073,11 @@ export function EditorEventHandlers(props: EditorEventHandlersProps): null {
     );
     window.addEventListener("testing:coverage-cleared", handleCoverageCleared);
     window.addEventListener(
-      "editor-toggle-coverage-decorations",
+      "editor:toggle-coverage-decorations",
       handleToggleCoverageDecorations,
     );
     window.addEventListener(
-      "debug:inlineValuesUpdated",
+      "debug:inline-values-updated",
       handleDebugInlineValuesUpdated as EventListener,
     );
     window.addEventListener("debug:cleared", handleDebugCleared);
@@ -1136,7 +1136,7 @@ export function EditorEventHandlers(props: EditorEventHandlersProps): null {
 
     const cleanup = () => {
       window.removeEventListener(
-        "goto-line",
+        "editor:goto-line",
         handleGotoLine as EventListener,
       );
       window.removeEventListener(
@@ -1152,11 +1152,11 @@ export function EditorEventHandlers(props: EditorEventHandlersProps): null {
         handleOutlineNavigate as EventListener,
       );
       window.removeEventListener(
-        "buffer-search-goto",
+        "buffer-search:goto",
         handleBufferSearchGoto as EventListener,
       );
       window.removeEventListener(
-        "buffer-search-highlights",
+        "buffer-search:highlights",
         handleBufferSearchHighlights as EventListener,
       );
       window.removeEventListener(
@@ -1164,67 +1164,67 @@ export function EditorEventHandlers(props: EditorEventHandlersProps): null {
         handleBufferSearchGetSelection,
       );
       window.removeEventListener(
-        "editor-command",
+        "editor:command",
         handleEditorCommand as unknown as EventListener,
       );
       window.removeEventListener(
-        "editor-format-document",
+        "editor:format-document",
         handleFormatDocument,
       );
       window.removeEventListener(
-        "editor-toggle-word-wrap",
+        "editor:toggle-word-wrap",
         handleToggleWordWrap,
       );
       window.removeEventListener(
-        "editor-toggle-minimap",
+        "editor:toggle-minimap",
         handleToggleMinimap,
       );
       window.removeEventListener(
-        "editor-toggle-sticky-scroll",
+        "editor:toggle-sticky-scroll",
         handleToggleStickyScroll,
       );
       window.removeEventListener(
-        "editor-toggle-bracket-colorization",
+        "editor:toggle-bracket-colorization",
         handleToggleBracketColorization,
       );
       window.removeEventListener(
-        "editor-toggle-bracket-guides",
+        "editor:toggle-bracket-guides",
         handleToggleBracketGuides,
       );
       window.removeEventListener(
-        "editor-toggle-indentation-guides",
+        "editor:toggle-indentation-guides",
         handleToggleIndentationGuides,
       );
       window.removeEventListener(
-        "editor-toggle-inlay-hints",
+        "editor:toggle-inlay-hints",
         handleToggleInlayHints,
       );
       window.removeEventListener(
-        "editor-toggle-unicode-highlight",
+        "editor:toggle-unicode-highlight",
         handleToggleUnicodeHighlight,
       );
       window.removeEventListener(
-        "editor-unicode-highlight-settings",
+        "editor:unicode-highlight-settings",
         handleUnicodeHighlightSettingsChange as EventListener,
       );
       window.removeEventListener(
-        "editor-toggle-linked-editing",
+        "editor:toggle-linked-editing",
         handleToggleLinkedEditing,
       );
       window.removeEventListener(
-        "editor-toggle-format-on-type",
+        "editor:toggle-format-on-type",
         handleToggleFormatOnType,
       );
       window.removeEventListener(
-        "editor-toggle-format-on-paste",
+        "editor:toggle-format-on-paste",
         handleToggleFormatOnPaste,
       );
       window.removeEventListener(
-        "editor-inlay-hints-settings",
+        "editor:inlay-hints-settings",
         handleInlayHintsSettingsChange as EventListener,
       );
       window.removeEventListener(
-        "editor-format-on-type-settings",
+        "editor:format-on-type-settings",
         handleFormatOnTypeSettingsChange as EventListener,
       );
       window.removeEventListener(
@@ -1240,11 +1240,11 @@ export function EditorEventHandlers(props: EditorEventHandlersProps): null {
         handleCoverageCleared,
       );
       window.removeEventListener(
-        "editor-toggle-coverage-decorations",
+        "editor:toggle-coverage-decorations",
         handleToggleCoverageDecorations,
       );
       window.removeEventListener(
-        "debug:inlineValuesUpdated",
+        "debug:inline-values-updated",
         handleDebugInlineValuesUpdated as EventListener,
       );
       window.removeEventListener("debug:cleared", handleDebugCleared);

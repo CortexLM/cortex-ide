@@ -243,7 +243,7 @@ export function TerminalGroupCommands() {
         shortcut: "Ctrl+Shift+M",
         category: "Terminal",
         action: () => {
-          window.dispatchEvent(new CustomEvent("terminal:toggleMaximize"));
+          window.dispatchEvent(new CustomEvent("terminal:toggle-maximize"));
         },
       },
     ];

@@ -337,7 +337,7 @@ export function setupFormatterIntegration(options: FormatterIntegrationOptions):
       await handleSave();
       // Dispatch a custom event that can be caught by the editor to trigger save
       window.dispatchEvent(
-        new CustomEvent("editor-save-requested", {
+        new CustomEvent("editor:save-requested", {
           detail: { filePath },
         })
       );

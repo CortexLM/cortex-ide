@@ -23,10 +23,10 @@ export function EditorStickyScroll(props: EditorStickyScrollProps) {
       updateEditorSetting("stickyScrollEnabled", newEnabled);
     };
 
-    window.addEventListener("editor-toggle-sticky-scroll", handleToggleStickyScroll);
+    window.addEventListener("editor:toggle-sticky-scroll", handleToggleStickyScroll);
 
     onCleanup(() => {
-      window.removeEventListener("editor-toggle-sticky-scroll", handleToggleStickyScroll);
+      window.removeEventListener("editor:toggle-sticky-scroll", handleToggleStickyScroll);
     });
   });
 

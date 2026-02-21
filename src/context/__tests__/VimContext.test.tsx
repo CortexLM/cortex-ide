@@ -673,17 +673,17 @@ describe("VimContext", () => {
     it("should listen for vim mode change events", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("vim-mode-change", () => {});
+      await listen("vim:mode-change", () => {});
 
-      expect(listen).toHaveBeenCalledWith("vim-mode-change", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("vim:mode-change", expect.any(Function));
     });
 
     it("should listen for vim command execute events", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("vim-command-execute", () => {});
+      await listen("vim:command-execute", () => {});
 
-      expect(listen).toHaveBeenCalledWith("vim-command-execute", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("vim:command-execute", expect.any(Function));
     });
   });
 

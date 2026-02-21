@@ -272,9 +272,9 @@ describe("useTerminalSearch", () => {
     it("should listen for terminal search highlight events", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("terminal:search_highlight", () => {});
+      await listen("terminal:search-highlight", () => {});
 
-      expect(listen).toHaveBeenCalledWith("terminal:search_highlight", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("terminal:search-highlight", expect.any(Function));
     });
   });
 });

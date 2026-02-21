@@ -232,7 +232,7 @@ export function SearchInOpenEditors(props: SearchInOpenEditorsProps) {
     
     // Navigate to line/column
     setTimeout(() => {
-      window.dispatchEvent(new CustomEvent("goto-line", {
+      window.dispatchEvent(new CustomEvent("editor:goto-line", {
         detail: { line: match.line, column: match.column }
       }));
     }, 50);

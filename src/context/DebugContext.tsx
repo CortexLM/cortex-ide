@@ -2066,7 +2066,7 @@ export const DebugProvider: ParentComponent = (props) => {
       setState("isPaused", false);
       
       // Emit event for UI notification
-      window.dispatchEvent(new CustomEvent("debug:hotReload", {
+      window.dispatchEvent(new CustomEvent("debug:hot-reload", {
         detail: { sessionId: state.activeSessionId }
       }));
     } catch (error) {
@@ -3446,7 +3446,7 @@ export const DebugProvider: ParentComponent = (props) => {
     );
 
     // Dispatch event for CodeEditor to update decorations
-    window.dispatchEvent(new CustomEvent("debug:inlineValuesUpdated", {
+    window.dispatchEvent(new CustomEvent("debug:inline-values-updated", {
       detail: {
         path: currentPath,
         values: inlineValuesMap,

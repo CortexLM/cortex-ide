@@ -193,7 +193,7 @@ export const NotebookProvider: ParentComponent = (props) => {
 
   onMount(async () => {
     try {
-      eventUnlisten = await listen<KernelEvent>("notebook:kernel_event", (e) => { outputManager.handleKernelEvent(e.payload); });
+      eventUnlisten = await listen<KernelEvent>("notebook:kernel-event", (e) => { outputManager.handleKernelEvent(e.payload); });
     } catch (_e) { /* Tauri event listener not available */ }
     onCleanup(() => { if (eventUnlisten) eventUnlisten(); if (wsRef.current) wsRef.current.close(); });
   });

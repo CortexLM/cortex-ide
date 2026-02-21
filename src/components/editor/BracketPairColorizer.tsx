@@ -109,10 +109,10 @@ export function BracketPairColorizer(props: BracketPairColorizerProps) {
       applyColorization();
     };
 
-    window.addEventListener("editor-toggle-bracket-colorizer", handleToggle);
+    window.addEventListener("editor:toggle-bracket-colorizer", handleToggle);
 
     onCleanup(() => {
-      window.removeEventListener("editor-toggle-bracket-colorizer", handleToggle);
+      window.removeEventListener("editor:toggle-bracket-colorizer", handleToggle);
     });
   });
 

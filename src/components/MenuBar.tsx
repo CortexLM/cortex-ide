@@ -469,7 +469,7 @@ export function MenuBar(_props: MenuBarProps = {}) {
   // Factory for editor commands
   const createEditorCommand = (command: string) => () => {
     closeMenu();
-    window.dispatchEvent(new CustomEvent("editor-command", { detail: { command } }));
+    window.dispatchEvent(new CustomEvent("editor:command", { detail: { command } }));
   };
 
   // Memoized menu actions object - all handlers created once

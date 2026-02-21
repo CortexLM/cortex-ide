@@ -445,38 +445,38 @@ describe("CollabContext", () => {
   });
 
   describe("IPC Integration", () => {
-    it("should invoke collab_create_room", async () => {
+    it("should invoke collab_create_session", async () => {
       vi.mocked(invoke).mockResolvedValue({ id: "room-1", name: "New Room" });
 
-      const result = await invoke("collab_create_room", {
+      const result = await invoke("collab_create_session", {
         name: "New Room",
-        defaultPermission: "editor",
+        userName: "editor",
       });
 
-      expect(invoke).toHaveBeenCalledWith("collab_create_room", {
+      expect(invoke).toHaveBeenCalledWith("collab_create_session", {
         name: "New Room",
-        defaultPermission: "editor",
+        userName: "editor",
       });
       expect(result).toHaveProperty("id", "room-1");
     });
 
-    it("should invoke collab_join_room", async () => {
+    it("should invoke collab_join_session", async () => {
       vi.mocked(invoke).mockResolvedValue({ success: true });
 
-      await invoke("collab_join_room", { roomId: "room-1", inviteCode: "abc123" });
+      await invoke("collab_join_session", { sessionId: "room-1", userName: "abc123" });
 
-      expect(invoke).toHaveBeenCalledWith("collab_join_room", {
-        roomId: "room-1",
-        inviteCode: "abc123",
+      expect(invoke).toHaveBeenCalledWith("collab_join_session", {
+        sessionId: "room-1",
+        userName: "abc123",
       });
     });
 
-    it("should invoke collab_leave_room", async () => {
+    it("should invoke collab_leave_session", async () => {
       vi.mocked(invoke).mockResolvedValue(undefined);
 
-      await invoke("collab_leave_room", { roomId: "room-1" });
+      await invoke("collab_leave_session", { sessionId: "room-1", userId: "user-1" });
 
-      expect(invoke).toHaveBeenCalledWith("collab_leave_room", { roomId: "room-1" });
+      expect(invoke).toHaveBeenCalledWith("collab_leave_session", { sessionId: "room-1", userId: "user-1" });
     });
 
     it("should invoke collab_send_operation", async () => {
@@ -493,16 +493,16 @@ describe("CollabContext", () => {
       });
     });
 
-    it("should listen for collab:user_joined events", async () => {
-      await listen("collab:user_joined", () => {});
+    it("should listen for collab:user-joined events", async () => {
+      await listen("collab:user-joined", () => {});
 
-      expect(listen).toHaveBeenCalledWith("collab:user_joined", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("collab:user-joined", expect.any(Function));
     });
 
-    it("should listen for collab:user_left events", async () => {
-      await listen("collab:user_left", () => {});
+    it("should listen for collab:user-left events", async () => {
+      await listen("collab:user-left", () => {});
 
-      expect(listen).toHaveBeenCalledWith("collab:user_left", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("collab:user-left", expect.any(Function));
     });
 
     it("should listen for collab:operation events", async () => {
@@ -511,10 +511,10 @@ describe("CollabContext", () => {
       expect(listen).toHaveBeenCalledWith("collab:operation", expect.any(Function));
     });
 
-    it("should listen for collab:cursor_update events", async () => {
-      await listen("collab:cursor_update", () => {});
+    it("should listen for collab:cursor-update events", async () => {
+      await listen("collab:cursor-update", () => {});
 
-      expect(listen).toHaveBeenCalledWith("collab:cursor_update", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("collab:cursor-update", expect.any(Function));
     });
   });
 

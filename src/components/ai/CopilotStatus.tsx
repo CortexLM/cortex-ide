@@ -630,7 +630,7 @@ export function useCopilotCompletions() {
       }, 300);
     };
 
-    window.addEventListener("editor-cursor-change", handleCursorChange as EventListener);
+    window.addEventListener("editor:cursor-change", handleCursorChange as EventListener);
 
     // Listen for keyboard events
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -656,7 +656,7 @@ export function useCopilotCompletions() {
 
     onCleanup(() => {
       unsubCompletion();
-      window.removeEventListener("editor-cursor-change", handleCursorChange as EventListener);
+      window.removeEventListener("editor:cursor-change", handleCursorChange as EventListener);
       window.removeEventListener("keydown", handleKeyDown);
       clearTimeout(debounceTimer);
     });
@@ -676,7 +676,7 @@ export function useCopilotCompletions() {
 
     // Emit event to insert text in editor
     window.dispatchEvent(
-      new CustomEvent("insert-copilot-completion", {
+      new CustomEvent("copilot:insert-completion", {
         detail: comp,
       })
     );

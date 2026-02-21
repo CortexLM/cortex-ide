@@ -139,10 +139,10 @@ export function BookmarksProvider(props: { children: JSX.Element }) {
       setCurrentColumn(e.detail.column);
     };
 
-    window.addEventListener("editor-cursor-change", handleCursorChange as EventListener);
+    window.addEventListener("editor:cursor-change", handleCursorChange as EventListener);
     
     onCleanup(() => {
-      window.removeEventListener("editor-cursor-change", handleCursorChange as EventListener);
+      window.removeEventListener("editor:cursor-change", handleCursorChange as EventListener);
     });
   });
 

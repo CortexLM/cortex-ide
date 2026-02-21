@@ -94,7 +94,7 @@ function EditorGroupPanel(props: EditorGroupPanelProps) {
 
   const handleNewFile = () => {
     // Dispatch event for new file creation
-    window.dispatchEvent(new CustomEvent("create-new-file", { 
+    window.dispatchEvent(new CustomEvent("editor:create-new-file", { 
       detail: { groupId: props.group.id } 
     }));
   };
@@ -587,12 +587,12 @@ export function MultiBuffer() {
       setAgentModeActive(false);
     };
     
-    window.addEventListener("editor:agentActive", handleAgentActive as EventListener);
-    window.addEventListener("editor:agentInactive", handleAgentInactive);
+    window.addEventListener("editor:agent-active", handleAgentActive as EventListener);
+    window.addEventListener("editor:agent-inactive", handleAgentInactive);
     
     onCleanup(() => {
-      window.removeEventListener("editor:agentActive", handleAgentActive as EventListener);
-      window.removeEventListener("editor:agentInactive", handleAgentInactive);
+      window.removeEventListener("editor:agent-active", handleAgentActive as EventListener);
+      window.removeEventListener("editor:agent-inactive", handleAgentInactive);
     });
   });
   

@@ -132,7 +132,7 @@ export function setupEventHandlers(
       }
     };
 
-    window.addEventListener("editor-split", handleEditorSplit as EventListener);
+    window.addEventListener("editor:split", handleEditorSplit as EventListener);
     window.addEventListener("editor:split-right", handleSplitRight);
     window.addEventListener("editor:split-down", handleSplitDown);
     window.addEventListener("editor:next-tab", handleNextTab);
@@ -146,7 +146,7 @@ export function setupEventHandlers(
     window.addEventListener("file:save-all", handleFileSaveAll);
 
     onCleanup(() => {
-      window.removeEventListener("editor-split", handleEditorSplit as EventListener);
+      window.removeEventListener("editor:split", handleEditorSplit as EventListener);
       window.removeEventListener("editor:split-right", handleSplitRight);
       window.removeEventListener("editor:split-down", handleSplitDown);
       window.removeEventListener("editor:next-tab", handleNextTab);

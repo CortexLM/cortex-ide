@@ -1,9 +1,10 @@
 /**
  * CortexActivityBar - Pixel-perfect activity bar matching Figma Sidebar Container (37:893)
- * Width: 40px, border-radius 12px, sidebar bg/border from tokens
+ * Width: 40px, border-radius 12px, bg #1C1C1D, border 1px solid #2E2F31
  * Items: 32×32 containers, 20×20 icons, 8px gap, 4px padding
- * Active state: lime accent bg with dark icon
- * Bottom section: settings + avatar pinned to bottom
+ * Active state: lime accent bg (#BFFF00) with dark icon (#141415), border-radius 8px
+ * Inactive: #8C8D8F, hover: #FCFCFC
+ * Bottom section: settings (settings-02) + avatar circle (24×24) with green status dot
  */
 
 import { Component, JSX, splitProps, createSignal, For, Show } from "solid-js";
@@ -36,11 +37,11 @@ const DEFAULT_ITEMS: ActivityBarItem[] = [
   { id: "search", icon: "search", label: "Search" },
   { id: "git", icon: "git", label: "Source Control" },
   { id: "debug", icon: "play", label: "Run & Debug" },
-  { id: "extensions", icon: "grid", label: "Extensions" },
+  { id: "plugins", icon: "plugins", label: "Plugins" },
   { id: "agents", icon: "users", label: "AI Agents" },
-  { id: "factory", icon: "map", label: "Factory" },
-  { id: "plugins", icon: "puzzle-piece", label: "Plugins" },
-  { id: "themes", icon: "paintbrush", label: "Themes" },
+  { id: "extensions", icon: "grid", label: "Extensions" },
+  { id: "docs", icon: "book", label: "Documentation" },
+  { id: "themes", icon: "brush", label: "Themes" },
 ];
 
 export const CortexActivityBar: Component<CortexActivityBarProps> = (props) => {
@@ -67,7 +68,7 @@ export const CortexActivityBar: Component<CortexActivityBarProps> = (props) => {
           "margin-bottom": "var(--cortex-space-2)",
           background: "var(--cortex-sidebar-bg)",
           "border-radius": "var(--cortex-sidebar-radius)",
-          border: "1px solid var(--cortex-sidebar-border)",
+          border: "1px solid #2E2F31",
           padding: "var(--cortex-space-1)",
           "flex-shrink": "0",
           ...local.style,
@@ -104,7 +105,6 @@ export const CortexActivityBar: Component<CortexActivityBarProps> = (props) => {
           "align-items": "center",
           padding: "0",
           gap: "var(--cortex-space-2)",
-          "border-top": "1px solid var(--cortex-sidebar-border)",
         }}>
           <ActivityBarSettingsButton onClick={local.onSettingsClick} />
           <AvatarButton
@@ -134,15 +134,15 @@ const ActivityBarButton: Component<ActivityBarButtonProps> = (props) => {
   const [isHovered, setIsHovered] = createSignal(false);
 
   const bg = () => {
-    if (props.isActive) return "var(--cortex-accent-primary)";
+    if (props.isActive) return "#BFFF00";
     if (isHovered()) return "var(--cortex-sidebar-selected)";
     return "transparent";
   };
 
   const iconColor = () => {
-    if (props.isActive) return "var(--cortex-icon-active)";
-    if (isHovered()) return "var(--cortex-icon-inactive)";
-    return "var(--cortex-icon-inactive)";
+    if (props.isActive) return "#141415";
+    if (isHovered()) return "#FCFCFC";
+    return "#8C8D8F";
   };
 
   return (
@@ -186,8 +186,8 @@ const ActivityBarButton: Component<ActivityBarButtonProps> = (props) => {
             "align-items": "center",
             "justify-content": "center",
             padding: "0 var(--cortex-space-1)",
-            background: "var(--cortex-accent-primary)",
-            color: "var(--cortex-accent-text)",
+            background: "#BFFF00",
+            color: "#141415",
             "font-family": "var(--cortex-font-sans)",
             "font-size": "9px",
             "font-weight": "var(--cortex-font-semibold)",
@@ -232,11 +232,9 @@ const ActivityBarSettingsButton: Component<{ onClick?: () => void }> = (props) =
         aria-label="Settings"
       >
         <CortexIcon
-          name="gear"
+          name="settings-02"
           size={20}
-          color={isHovered()
-            ? "var(--cortex-accent-primary)"
-            : "var(--cortex-icon-inactive)"}
+          color={isHovered() ? "#FCFCFC" : "#8C8D8F"}
           style={{ transition: "color var(--cortex-transition-fast)" }}
         />
       </button>
@@ -251,18 +249,19 @@ const AvatarButton: Component<{ avatarUrl?: string; onClick?: () => void }> = (p
     <CortexTooltip content="Account" position="right">
       <button
         style={{
-          width: "var(--cortex-space-8)",
-          height: "var(--cortex-space-8)",
+          position: "relative",
+          width: "24px",
+          height: "24px",
           "border-radius": "var(--cortex-radius-full)",
           background: "var(--cortex-bg-tertiary)",
           border: isHovered()
-            ? "2px solid var(--cortex-accent-primary)"
-            : "2px solid var(--cortex-border-default)",
+            ? "2px solid #BFFF00"
+            : "2px solid transparent",
           cursor: "pointer",
           display: "flex",
           "align-items": "center",
           "justify-content": "center",
-          overflow: "hidden",
+          overflow: "visible",
           transition: "border-color var(--cortex-transition-fast)",
           padding: "0",
         }}
@@ -276,8 +275,8 @@ const AvatarButton: Component<{ avatarUrl?: string; onClick?: () => void }> = (p
           fallback={
             <CortexIcon
               name="user"
-              size={18}
-              color="var(--cortex-text-muted)"
+              size={14}
+              color="#8C8D8F"
             />
           }
         >
@@ -288,9 +287,20 @@ const AvatarButton: Component<{ avatarUrl?: string; onClick?: () => void }> = (p
               width: "100%",
               height: "100%",
               "object-fit": "cover",
+              "border-radius": "var(--cortex-radius-full)",
             }}
           />
         </Show>
+        <span style={{
+          position: "absolute",
+          bottom: "-1px",
+          right: "-1px",
+          width: "6px",
+          height: "6px",
+          "border-radius": "var(--cortex-radius-full)",
+          background: "#34D399",
+          border: "1px solid var(--cortex-sidebar-bg)",
+        }} />
       </button>
     </CortexTooltip>
   );

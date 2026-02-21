@@ -128,7 +128,7 @@ pub async fn acp_execute_tool(
 
     // Emit completion event
     let _ = app.emit(
-        "acp:execution_complete",
+        "acp:execution-complete",
         &serde_json::json!({
             "executionId": execution_id,
             "result": result
@@ -184,7 +184,7 @@ pub async fn acp_request_permission(
     request: ToolPermissionRequest,
 ) -> Result<bool, String> {
     // Emit permission request event for UI to handle
-    let _ = app.emit("acp:permission_request", &request);
+    let _ = app.emit("acp:permission-request", &request);
 
     // In a real implementation, this would wait for user response
     // For now, we'll auto-approve read permissions

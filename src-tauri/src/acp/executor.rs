@@ -93,12 +93,12 @@ async fn execute_builtin(
     let tool_name = handler.strip_prefix("builtin:").unwrap_or(handler);
 
     match tool_name {
-        "read_file" => execute_read_file(arguments, sandbox).await,
-        "write_file" => execute_write_file(arguments, sandbox).await,
-        "list_directory" => execute_list_directory(arguments, sandbox).await,
-        "execute_command" => execute_shell_command(arguments, sandbox).await,
-        "http_request" => execute_http_request(arguments, sandbox).await,
-        "search_files" => execute_search_files(arguments, sandbox).await,
+        "read-file" => execute_read_file(arguments, sandbox).await,
+        "write-file" => execute_write_file(arguments, sandbox).await,
+        "list-directory" => execute_list_directory(arguments, sandbox).await,
+        "execute-command" => execute_shell_command(arguments, sandbox).await,
+        "http-request" => execute_http_request(arguments, sandbox).await,
+        "search-files" => execute_search_files(arguments, sandbox).await,
         _ => Err(format!("Unknown builtin tool: {}", tool_name)),
     }
 }

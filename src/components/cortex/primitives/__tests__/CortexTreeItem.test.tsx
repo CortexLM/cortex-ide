@@ -162,7 +162,7 @@ describe("CortexTreeItem", () => {
         <CortexTreeItem item={item} level={0} />
       ));
       const row = container.firstChild as HTMLElement;
-      expect(row.style.paddingLeft).toBe("8px");
+      expect(row.style.paddingLeft).toBe("0px");
     });
 
     it("applies 24px indentation per level", () => {
@@ -171,7 +171,7 @@ describe("CortexTreeItem", () => {
         <CortexTreeItem item={item} level={1} />
       ));
       const row = container.firstChild as HTMLElement;
-      expect(row.style.paddingLeft).toBe("32px");
+      expect(row.style.paddingLeft).toBe("24px");
     });
 
     it("applies correct indentation at level 2", () => {
@@ -180,7 +180,7 @@ describe("CortexTreeItem", () => {
         <CortexTreeItem item={item} level={2} />
       ));
       const row = container.firstChild as HTMLElement;
-      expect(row.style.paddingLeft).toBe("56px");
+      expect(row.style.paddingLeft).toBe("48px");
     });
   });
 
@@ -191,7 +191,7 @@ describe("CortexTreeItem", () => {
         <CortexTreeItem item={item} isSelected />
       ));
       const row = container.firstChild as HTMLElement;
-      expect(row.style.background).toContain("cortex-accent-muted");
+      expect(row.style.background).toContain("rgba(255, 255, 255, 0.05)");
     });
 
     it("applies transparent background when not selected", () => {
@@ -212,7 +212,7 @@ describe("CortexTreeItem", () => {
 
       await fireEvent.mouseEnter(row);
 
-      expect(row.style.background).toContain("cortex-bg-hover");
+      expect(row.style.background).toContain("rgba(255, 255, 255, 0.03)");
     });
 
     it("removes hover background on mouse leave", async () => {
@@ -228,55 +228,56 @@ describe("CortexTreeItem", () => {
   });
 
   describe("chevron visibility", () => {
-    it("shows chevron for folders with children", () => {
+    it("renders folder icon in 20x20 container for folders", () => {
       const item = createFolderItem({
         children: [createFileItem()],
       });
       const { container } = render(() => <CortexTreeItem item={item} />);
-      const chevronIcon = container.querySelector(
-        "[data-testid='cortex-icon'][data-name='chevron-down']"
+      const iconContainer = container.querySelector(
+        "div[style*='width: 20px']"
       );
-      expect(chevronIcon).toBeTruthy();
+      expect(iconContainer).toBeTruthy();
     });
 
-    it("hides chevron for folders without children", () => {
+    it("renders folder icon for folders without children", () => {
       const item = createFolderItem({ children: [] });
       const { container } = render(() => <CortexTreeItem item={item} />);
-      const chevronContainer = container.querySelector(
-        "div[style*='visibility: hidden']"
+      const icons = container.querySelectorAll("[data-testid='cortex-icon']");
+      const folderIcon = Array.from(icons).find(
+        (icon) => icon.getAttribute("data-name") === "folder"
       );
-      expect(chevronContainer).toBeTruthy();
+      expect(folderIcon).toBeTruthy();
     });
 
-    it("hides chevron for files", () => {
+    it("renders file icon for files", () => {
       const item = createFileItem();
       const { container } = render(() => <CortexTreeItem item={item} />);
-      const chevronContainer = container.querySelector(
-        "div[style*='visibility: hidden']"
-      );
-      expect(chevronContainer).toBeTruthy();
+      const icons = container.querySelectorAll("[data-testid='cortex-icon']");
+      expect(icons.length).toBeGreaterThan(0);
     });
 
-    it("rotates chevron when collapsed", () => {
+    it("renders folder icon when collapsed", () => {
       const item = createFolderItem({ children: [createFileItem()] });
       const { container } = render(() => (
         <CortexTreeItem item={item} isExpanded={false} />
       ));
-      const chevronWrapper = container.querySelector(
-        "div[style*='rotate(-90deg)']"
+      const icons = container.querySelectorAll("[data-testid='cortex-icon']");
+      const folderIcon = Array.from(icons).find(
+        (icon) => icon.getAttribute("data-name") === "folder"
       );
-      expect(chevronWrapper).toBeTruthy();
+      expect(folderIcon).toBeTruthy();
     });
 
-    it("does not rotate chevron when expanded", () => {
+    it("renders folder-open icon when expanded", () => {
       const item = createFolderItem({ children: [createFileItem()] });
       const { container } = render(() => (
         <CortexTreeItem item={item} isExpanded />
       ));
-      const chevronWrapper = container.querySelector(
-        "div[style*='rotate(0deg)']"
+      const icons = container.querySelectorAll("[data-testid='cortex-icon']");
+      const folderOpenIcon = Array.from(icons).find(
+        (icon) => icon.getAttribute("data-name") === "folder-open"
       );
-      expect(chevronWrapper).toBeTruthy();
+      expect(folderOpenIcon).toBeTruthy();
     });
   });
 
@@ -340,17 +341,15 @@ describe("CortexTreeItem", () => {
       expect(handleToggle).not.toHaveBeenCalled();
     });
 
-    it("calls onToggle when chevron is clicked", async () => {
+    it("calls onToggle when folder row is clicked", async () => {
       const handleToggle = vi.fn();
       const item = createFolderItem({ children: [createFileItem()] });
       const { container } = render(() => (
         <CortexTreeItem item={item} onToggle={handleToggle} />
       ));
-      const chevronWrapper = container.querySelector(
-        "div[style*='width: 16px']"
-      );
+      const row = container.firstChild as HTMLElement;
 
-      await fireEvent.click(chevronWrapper!);
+      await fireEvent.click(row);
 
       expect(handleToggle).toHaveBeenCalledWith(item);
     });
@@ -477,7 +476,7 @@ describe("IndentGuide", () => {
         <IndentGuide level={1} height={100} />
       ));
       const guide = container.firstChild as HTMLElement;
-      expect(guide.style.left).toBe("40px");
+      expect(guide.style.left).toBe("34px");
     });
 
     it("applies correct height", () => {
@@ -521,7 +520,7 @@ describe("IndentGuide", () => {
         <IndentGuide level={0} height={100} />
       ));
       const guide = container.firstChild as HTMLElement;
-      expect(guide.style.left).toBe("16px");
+      expect(guide.style.left).toBe("10px");
     });
 
     it("calculates level 2 position correctly", () => {
@@ -529,7 +528,7 @@ describe("IndentGuide", () => {
         <IndentGuide level={2} height={100} />
       ));
       const guide = container.firstChild as HTMLElement;
-      expect(guide.style.left).toBe("64px");
+      expect(guide.style.left).toBe("58px");
     });
   });
 });

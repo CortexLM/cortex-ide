@@ -282,41 +282,6 @@ export {
 } from "./useBracketColorization";
 
 // ============================================================================
-// Factory Hooks (Agent Factory)
-// ============================================================================
-
-export {
-  // Workflow management
-  useWorkflow,
-  // Execution tracking
-  useExecution,
-  // Approvals management
-  useApprovals,
-  getApprovalStatusIcon,
-  getApprovalStatusColor,
-  getApprovalActionLabel,
-  isApprovalExpiringSoon,
-  getApprovalTimeRemaining,
-  formatApprovalRequest,
-  // Audit log
-  useAudit,
-  formatAuditEntry,
-  groupAuditEntriesByDate,
-  // Types
-  type UseWorkflowOptions,
-  type UseWorkflowReturn,
-  type ExecutionProgress,
-  type UseExecutionOptions,
-  type UseExecutionReturn,
-  type ApprovalFilter,
-  type UseApprovalsOptions,
-  type UseApprovalsReturn,
-  type AuditStats,
-  type UseAuditOptions,
-  type UseAuditReturn,
-} from "./factory";
-
-// ============================================================================
 // LSP Feature Hooks
 // ============================================================================
 

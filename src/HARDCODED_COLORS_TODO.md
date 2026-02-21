@@ -79,7 +79,6 @@
 | `debugger/WatchPanel.tsx` | various | Debug-specific colors |
 | `debugger/MemoryInspector.tsx` | various | Debug-specific colors |
 | `git/GitGraph.tsx` | branch colors | May need dedicated tokens |
-| `factory/nodes/index.ts` | node category colors | Already has `--node-*` tokens |
 | `notebook/outputs/AnsiOutput.tsx` | ANSI color palette | Terminal-specific, may keep |
 | `notifications/NotificationItem.tsx` | various | Use `--cortex-*` semantic tokens |
 | `notifications/NotificationToast.tsx` | various | Use `--cortex-*` semantic tokens |

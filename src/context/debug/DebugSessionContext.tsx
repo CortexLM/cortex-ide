@@ -69,7 +69,7 @@ export const DebugSessionProvider: ParentComponent = (props) => {
   const restartSession = async (sessionId?: string) => {
     const id = sessionId || state.activeSessionId;
     if (!id) return;
-    await invoke("debug_restart_session", { sessionId: id });
+    await invoke("debug_restart", { sessionId: id });
   };
 
   const getActiveSession = () =>

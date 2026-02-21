@@ -520,12 +520,12 @@ pub async fn action_log_entry(
 
     // Emit event for real-time UI updates
     let event = ActionLogEvent {
-        event_type: "action_logged".to_string(),
+        event_type: "action-logged".to_string(),
         entry: Some(entry.clone()),
         file_path: None,
         session_id: Some(entry.session_id.clone()),
     };
-    let _ = app.emit("agent-action", &event);
+    let _ = app.emit("agent:action", &event);
 
     Ok(entry)
 }
@@ -603,12 +603,12 @@ pub async fn action_log_track_file(
 
     // Emit event
     let event = ActionLogEvent {
-        event_type: "file_tracked".to_string(),
+        event_type: "file-tracked".to_string(),
         entry: None,
         file_path: Some(path),
         session_id: Some(session),
     };
-    let _ = app.emit("agent-action", &event);
+    let _ = app.emit("agent:action", &event);
 
     Ok(())
 }
@@ -640,12 +640,12 @@ pub async fn action_log_record_edit(
 
     // Emit event
     let event = ActionLogEvent {
-        event_type: "file_edited".to_string(),
+        event_type: "file-edited".to_string(),
         entry: None,
         file_path: Some(path),
         session_id: None,
     };
-    let _ = app.emit("agent-action", &event);
+    let _ = app.emit("agent:action", &event);
 
     Ok(edit_id)
 }
@@ -717,12 +717,12 @@ pub async fn action_log_accept_changes(
 
     // Emit event
     let event = ActionLogEvent {
-        event_type: "changes_accepted".to_string(),
+        event_type: "changes-accepted".to_string(),
         entry: None,
         file_path: Some(path),
         session_id: None,
     };
-    let _ = app.emit("agent-action", &event);
+    let _ = app.emit("agent:action", &event);
 
     Ok(())
 }
@@ -758,12 +758,12 @@ pub async fn action_log_reject_changes(
 
     // Emit event
     let event = ActionLogEvent {
-        event_type: "changes_rejected".to_string(),
+        event_type: "changes-rejected".to_string(),
         entry: None,
         file_path: Some(path),
         session_id: None,
     };
-    let _ = app.emit("agent-action", &event);
+    let _ = app.emit("agent:action", &event);
 
     Ok(original_content)
 }
@@ -785,12 +785,12 @@ pub async fn action_log_untrack_file(
 
     // Emit event
     let event = ActionLogEvent {
-        event_type: "file_untracked".to_string(),
+        event_type: "file-untracked".to_string(),
         entry: None,
         file_path: Some(path),
         session_id: None,
     };
-    let _ = app.emit("agent-action", &event);
+    let _ = app.emit("agent:action", &event);
 
     Ok(())
 }
@@ -831,12 +831,12 @@ pub async fn action_log_clear_session(
 
     // Emit event
     let event = ActionLogEvent {
-        event_type: "session_cleared".to_string(),
+        event_type: "session-cleared".to_string(),
         entry: None,
         file_path: None,
         session_id: Some(cleared_session),
     };
-    let _ = app.emit("agent-action", &event);
+    let _ = app.emit("agent:action", &event);
 
     Ok(())
 }
@@ -859,12 +859,12 @@ pub async fn action_log_new_session(
 
     // Emit event
     let event = ActionLogEvent {
-        event_type: "session_created".to_string(),
+        event_type: "session-created".to_string(),
         entry: None,
         file_path: None,
         session_id: Some(session_id.clone()),
     };
-    let _ = app.emit("agent-action", &event);
+    let _ = app.emit("agent:action", &event);
 
     Ok(session_id)
 }

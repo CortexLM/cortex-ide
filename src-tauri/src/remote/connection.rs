@@ -1,13 +1,16 @@
 //! SSH connection wrapper and utilities.
 
+#[cfg(feature = "remote-ssh")]
 use ssh2::{Session, Sftp};
+#[cfg(feature = "remote-ssh")]
 use std::io::Read;
 use std::path::PathBuf;
 
 use super::error::RemoteError;
+#[cfg(feature = "remote-ssh")]
 use super::types::{CommandResult, ConnectionProfile};
 
-/// Internal SSH connection wrapper
+#[cfg(feature = "remote-ssh")]
 pub struct SshConnection {
     pub session: Session,
     pub profile: ConnectionProfile,
@@ -15,6 +18,7 @@ pub struct SshConnection {
     pub platform: String,
 }
 
+#[cfg(feature = "remote-ssh")]
 impl SshConnection {
     pub fn new(
         session: Session,

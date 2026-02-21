@@ -3,7 +3,7 @@
  *
  * Renders a Zed-style orange glow overlay when an AI agent is actively
  * reading or editing the current file. The indicator is driven by
- * "editor:agentActive" / "editor:agentInactive" window events.
+ * "editor:agent-active" / "editor:agent-inactive" window events.
  *
  * This component is part of the CodeEditor refactor that splits the monolithic
  * editor into focused, composable sub-components.
@@ -30,8 +30,8 @@ export interface EditorAIProps {
  * is actively interacting with the current editor file.
  *
  * Event contract:
- * - "editor:agentActive"   → detail: { path?, paths?, action, duration, allSplits? }
- * - "editor:agentInactive" → clears the indicator
+ * - "editor:agent-active"   → detail: { path?, paths?, action, duration, allSplits? }
+ * - "editor:agent-inactive" → clears the indicator
  */
 export function EditorAI(props: EditorAIProps): JSX.Element {
   const [agentActive, setAgentActive] = createSignal(false);
@@ -78,17 +78,17 @@ export function EditorAI(props: EditorAIProps): JSX.Element {
   };
 
   window.addEventListener(
-    "editor:agentActive",
+    "editor:agent-active",
     handleAgentActive as EventListener,
   );
-  window.addEventListener("editor:agentInactive", handleAgentInactive);
+  window.addEventListener("editor:agent-inactive", handleAgentInactive);
 
   onCleanup(() => {
     window.removeEventListener(
-      "editor:agentActive",
+      "editor:agent-active",
       handleAgentActive as EventListener,
     );
-    window.removeEventListener("editor:agentInactive", handleAgentInactive);
+    window.removeEventListener("editor:agent-inactive", handleAgentInactive);
     if (agentActiveTimer) clearTimeout(agentActiveTimer);
   });
 

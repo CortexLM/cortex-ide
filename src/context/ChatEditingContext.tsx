@@ -385,7 +385,7 @@ export function ChatEditingProvider(props: ParentProps) {
         );
         
         window.dispatchEvent(
-          new CustomEvent("cortex:file_saved", {
+          new CustomEvent("cortex:file-saved", {
             detail: { path: change.filePath },
           })
         );

@@ -25,7 +25,6 @@ export type SidebarTab =
   | "wiki"
   | "codemap"
   | "design"
-  | "factory"
   | "testing"
   | "remote";
 

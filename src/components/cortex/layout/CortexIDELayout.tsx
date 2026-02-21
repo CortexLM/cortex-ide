@@ -35,20 +35,8 @@ export interface CortexIDELayoutProps {
   branchName?: string | null;
   isSyncing?: boolean;
   hasChanges?: boolean;
-  cursorLine?: number;
-  cursorColumn?: number;
-  selectionCount?: number;
   languageName?: string;
-  encoding?: string;
-  lineEnding?: "LF" | "CRLF" | "CR";
-  indentType?: "spaces" | "tabs";
-  indentSize?: number;
   onBranchClick?: () => void;
-  onCursorClick?: () => void;
-  onLanguageClick?: () => void;
-  onEncodingClick?: () => void;
-  onLineEndingClick?: () => void;
-  onIndentationClick?: () => void;
   onTogglePanel?: () => void;
   onToggleTerminal?: () => void;
 }
@@ -60,15 +48,15 @@ export function CortexIDELayout(props: CortexIDELayoutProps) {
     "flex-direction": "column",
     overflow: "hidden",
     "min-width": "0",
-    height: "calc(100% - var(--cortex-space-4))",
-    "margin-top": "var(--cortex-space-2)",
-    "margin-bottom": "var(--cortex-space-2)",
-    "margin-left": "var(--cortex-space-3)",
-    "margin-right": "var(--cortex-space-2)",
-    background: "var(--cortex-bg-primary)",
+    height: "calc(100% - 16px)",
+    "margin-top": "8px",
+    "margin-bottom": "8px",
+    "margin-left": "12px",
+    "margin-right": "8px",
+    background: "var(--cortex-bg-primary, #141415)",
     "border-radius": "var(--cortex-container-radius, 24px)",
-    border: "1px solid var(--cortex-border-default)",
-    "box-shadow": "var(--cortex-panel-shadow)",
+    border: "1px solid var(--cortex-border-default, #2E2F31)",
+    "box-shadow": "var(--cortex-panel-shadow, 0px 4px 26px 15px rgba(38,36,37,0.38), inset 0px 0px 13.1px 6px rgba(26,24,25,0.2))",
     transition: "box-shadow 200ms ease-out",
   });
 
@@ -130,20 +118,8 @@ export function CortexIDELayout(props: CortexIDELayoutProps) {
           branchName={props.branchName}
           isSyncing={props.isSyncing}
           hasChanges={props.hasChanges}
-          cursorLine={props.cursorLine}
-          cursorColumn={props.cursorColumn}
-          selectionCount={props.selectionCount}
           languageName={props.languageName}
-          encoding={props.encoding}
-          lineEnding={props.lineEnding}
-          indentType={props.indentType}
-          indentSize={props.indentSize}
           onBranchClick={props.onBranchClick}
-          onCursorClick={props.onCursorClick}
-          onLanguageClick={props.onLanguageClick}
-          onEncodingClick={props.onEncodingClick}
-          onLineEndingClick={props.onLineEndingClick}
-          onIndentationClick={props.onIndentationClick}
           onTogglePanel={props.onTogglePanel}
           onToggleTerminal={props.onToggleTerminal}
         />

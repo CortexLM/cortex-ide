@@ -176,7 +176,7 @@ export function SupermavenProvider(props: ParentProps) {
     const unsubCompletion = supermaven.onCompletion((completion) => {
       if (completion) {
         // Emit event for Monaco editor to render ghost text
-        window.dispatchEvent(new CustomEvent("supermaven-ghost-text", {
+        window.dispatchEvent(new CustomEvent("supermaven:ghost-text", {
           detail: {
             text: completion.text,
             line: completion.range.startLine,
@@ -184,7 +184,7 @@ export function SupermavenProvider(props: ParentProps) {
           },
         }));
       } else {
-        window.dispatchEvent(new CustomEvent("supermaven-ghost-text", {
+        window.dispatchEvent(new CustomEvent("supermaven:ghost-text", {
           detail: null,
         }));
       }
@@ -247,13 +247,13 @@ export function SupermavenProvider(props: ParentProps) {
       }
     };
 
-    window.addEventListener("editor-cursor-change", handleCursorChange as EventListener);
+    window.addEventListener("editor:cursor-change", handleCursorChange as EventListener);
     window.addEventListener("keydown", handleKeyDown, { capture: true });
 
     onCleanup(() => {
       unsubState();
       unsubCompletion();
-      window.removeEventListener("editor-cursor-change", handleCursorChange as EventListener);
+      window.removeEventListener("editor:cursor-change", handleCursorChange as EventListener);
       window.removeEventListener("keydown", handleKeyDown, { capture: true });
     });
   });
@@ -354,7 +354,7 @@ export function SupermavenProvider(props: ParentProps) {
     const completion = supermaven.acceptCompletion();
     if (completion) {
       // Emit event for editor to insert the completion
-      window.dispatchEvent(new CustomEvent("supermaven-accept", {
+      window.dispatchEvent(new CustomEvent("supermaven:accept", {
         detail: {
           text: completion.text,
           range: completion.range,
@@ -367,7 +367,7 @@ export function SupermavenProvider(props: ParentProps) {
     const text = supermaven.acceptPartialCompletion(mode);
     if (text) {
       // Emit event for editor to insert partial completion
-      window.dispatchEvent(new CustomEvent("supermaven-accept-partial", {
+      window.dispatchEvent(new CustomEvent("supermaven:accept-partial", {
         detail: { text },
       }));
     }

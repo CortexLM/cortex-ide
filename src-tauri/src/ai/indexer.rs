@@ -579,7 +579,7 @@ pub async fn index_workspace(
 
     // Emit initial progress
     let _ = app.emit(
-        "ai:index_progress",
+        "ai:index-progress",
         &IndexProgress {
             total_files,
             indexed_files: 0,
@@ -650,7 +650,7 @@ pub async fn index_workspace(
         // Emit progress
         let current_file = batch.last().map(|p| p.to_string_lossy().to_string());
         let _ = app.emit(
-            "ai:index_progress",
+            "ai:index-progress",
             &IndexProgress {
                 total_files,
                 indexed_files,
@@ -670,7 +670,7 @@ pub async fn index_workspace(
     }
 
     let _ = app.emit(
-        "ai:index_progress",
+        "ai:index-progress",
         &IndexProgress {
             total_files,
             indexed_files,

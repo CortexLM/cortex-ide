@@ -62,7 +62,7 @@ const STORAGE_KEYS = {
 } as const;
 
 const VALID_MODES: ViewMode[] = ["vibe", "ide"];
-const VALID_SIDEBAR_TABS: SidebarTab[] = ["files", "search", "git", "debug", "extensions", "agents", "factory", "themes", "plugins", "account"];
+const VALID_SIDEBAR_TABS: SidebarTab[] = ["files", "search", "git", "debug", "extensions", "agents", "themes", "plugins", "account"];
 const VALID_CHAT_STATES: ChatPanelState[] = ["minimized", "expanded", "home"];
 
 function loadLayoutState() {
@@ -188,22 +188,9 @@ export function CortexDesktopLayout(props: ParentProps) {
     if (!repo) return false;
     return repo.stagedFiles.length > 0 || repo.unstagedFiles.length > 0;
   });
-  const statusBarCursorLine = createMemo(() => activeFile()?.cursorPosition?.line ?? 1);
-  const statusBarCursorColumn = createMemo(() => activeFile()?.cursorPosition?.column ?? 1);
-  const statusBarSelectionCount = createMemo(() => editor.state.selectionCount);
   const statusBarLanguage = createMemo(() => activeFile()?.language ?? "Plain Text");
-  const statusBarLineEnding = createMemo((): "LF" | "CRLF" | "CR" => {
-    const le = activeFile()?.lineEnding;
-    if (le === "LF" || le === "CRLF" || le === "CR") return le;
-    return "LF";
-  });
 
   const handleStatusBarBranchClick = () => window.dispatchEvent(new CustomEvent("view:git"));
-  const handleStatusBarLanguageClick = () => window.dispatchEvent(new CustomEvent("editor:language-picker"));
-  const handleStatusBarEncodingClick = () => window.dispatchEvent(new CustomEvent("editor:encoding-picker"));
-  const handleStatusBarLineEndingClick = () => window.dispatchEvent(new CustomEvent("editor:line-ending-picker"));
-  const handleStatusBarIndentationClick = () => window.dispatchEvent(new CustomEvent("editor:indentation-picker"));
-  const handleStatusBarCursorClick = () => window.dispatchEvent(new CustomEvent("editor:go-to-line"));
   const handleStatusBarTogglePanel = () => window.dispatchEvent(new CustomEvent("layout:toggle-panel"));
   const handleStatusBarToggleTerminal = () => window.dispatchEvent(new CustomEvent("terminal:toggle"));
 
@@ -263,7 +250,6 @@ export function CortexDesktopLayout(props: ParentProps) {
     if (id === "home") { setMode("vibe"); setChatState("home"); return; }
     if (id === "new") { window.dispatchEvent(new CustomEvent("file:new")); return; }
     const tabId = id as SidebarTab;
-    if (tabId === "factory") { setSidebarTab("factory"); setSidebarCollapsed(false); return; }
     if (sidebarCollapsed()) { setSidebarCollapsed(false); setSidebarTab(tabId); }
     else if (sidebarTab() === tabId) { setSidebarCollapsed(true); }
     else { setSidebarTab(tabId); }
@@ -280,9 +266,9 @@ export function CortexDesktopLayout(props: ParentProps) {
   return (
     <div style={{
       display: "flex", "flex-direction": "column", width: "100vw", height: "100vh",
-      background: "var(--cortex-bg-primary)", border: "1px solid var(--cortex-border-default)",
-      "border-radius": "var(--cortex-container-radius)",
-      "box-shadow": "var(--cortex-panel-shadow)",
+      background: "#141415", border: "1px solid #2E2F31",
+      "border-radius": "24px",
+      "box-shadow": "0px 4px 26px 15px rgba(38,36,37,0.38), inset 0px 0px 13.1px 6px rgba(26,24,25,0.2)",
       overflow: "hidden", "font-family": "var(--cortex-font-sans)", color: "var(--cortex-text-primary)",
     }}>
       <FileEditHandlers />
@@ -334,11 +320,8 @@ export function CortexDesktopLayout(props: ParentProps) {
               onBottomPanelTabChange={setBottomPanelTab} onBottomPanelCollapse={() => setBottomPanelCollapsed(true)} onBottomPanelHeightChange={setBottomPanelHeight}
               onChatInputChange={setChatInput} onChatSubmit={handleChatSubmit}
               branchName={statusBarBranch()} isSyncing={statusBarIsSyncing()} hasChanges={statusBarHasChanges()}
-              cursorLine={statusBarCursorLine()} cursorColumn={statusBarCursorColumn()} selectionCount={statusBarSelectionCount()}
-              languageName={statusBarLanguage()} lineEnding={statusBarLineEnding()}
-              onBranchClick={handleStatusBarBranchClick} onCursorClick={handleStatusBarCursorClick}
-              onLanguageClick={handleStatusBarLanguageClick} onEncodingClick={handleStatusBarEncodingClick}
-              onLineEndingClick={handleStatusBarLineEndingClick} onIndentationClick={handleStatusBarIndentationClick}
+              languageName={statusBarLanguage()}
+              onBranchClick={handleStatusBarBranchClick}
               onTogglePanel={handleStatusBarTogglePanel} onToggleTerminal={handleStatusBarToggleTerminal}
             />
           }

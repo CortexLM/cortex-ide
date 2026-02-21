@@ -1,4 +1,4 @@
-export type SidebarTab = "files" | "search" | "git" | "debug" | "extensions" | "agents" | "factory" | "themes" | "plugins" | "account";
+export type SidebarTab = "files" | "search" | "git" | "debug" | "extensions" | "agents" | "themes" | "plugins" | "account";
 export type BottomPanelTab = "terminal" | "output" | "problems";
 export type ViewMode = "vibe" | "ide";
 

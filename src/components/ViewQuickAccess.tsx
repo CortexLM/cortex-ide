@@ -216,7 +216,7 @@ function createViewItems(): ViewItem[] {
       icon: "table-columns",
       category: "other",
       action: () => {
-        window.dispatchEvent(new CustomEvent("reset-layout"));
+        window.dispatchEvent(new CustomEvent("layout:reset"));
       },
     },
     {

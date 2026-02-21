@@ -61,7 +61,7 @@
   --cortex-palette-gray-figma-bg: #141415;
   --cortex-palette-gray-figma-surface: #1C1C1D;
   --cortex-palette-gray-figma-elevated: #252628;
-  --cortex-palette-gray-figma-border: #333337;
+  --cortex-palette-gray-figma-border: #2E2F31;
   --cortex-palette-gray-figma-border-hover: #3C3D40;
   --cortex-palette-gray-figma-border-strong: #4C4C4D;
   --cortex-palette-gray-figma-border-alt: #4E4F54;
@@ -177,15 +177,15 @@
   --cortex-git-conflict: var(--cortex-warning);
   
   /* ---- BORDER COLORS (Figma Exact) ---- */
-  --cortex-border-default: #333337;                           /* Primary border (Figma exact) */
+  --cortex-border-default: #2E2F31;                           /* Primary border (Figma exact) */
   --cortex-border-hover: #3C3D40;                             /* Secondary border */
   --cortex-border-focus: var(--cortex-palette-lime-500);
   --cortex-border-error: var(--cortex-palette-error-500);
   --cortex-border-success: var(--cortex-palette-success-500);
-  --cortex-border-subtle: #333337;                            /* Card border */
+  --cortex-border-subtle: #2E2F31;                            /* Card border */
   --cortex-border-strong: #4C4C4D;                            /* Dropdown border */
   --cortex-border-accent: rgba(255, 255, 255, 0.15);          /* Chat input border */
-  --cortex-border-card: #333337;                              /* Card borders */
+  --cortex-border-card: #2E2F31;                              /* Card borders */
   --cortex-border-internal: rgba(255, 255, 255, 0.04);        /* Icon container internal */
   
   /* ===========================================================================
@@ -205,8 +205,8 @@
   --cortex-text-line-number: rgba(255, 255, 255, 0.5);        /* Editor line numbers */
   --cortex-text-on-surface: #FCFCFC;                          /* Text on dark surfaces */
   --cortex-card-border: rgba(255, 255, 255, 0.15);            /* Standard card border */
-  --cortex-icon-inactive: rgba(116, 117, 119, 1);             /* Inactive sidebar icons */
-  --cortex-icon-active: #000000;                              /* Active icon on accent bg */
+  --cortex-icon-inactive: #8C8D8F;                            /* Inactive sidebar icons (Figma exact) */
+  --cortex-icon-active: #141415;                              /* Active icon on accent bg (Figma exact) */
   
   /* Font Sizes (Figma: 10, 12, 14, 16) */
   --cortex-text-2xs: 10px;          /* Figma smallest text */
@@ -373,7 +373,7 @@
   --cortex-height-button-sm: 32px;
   --cortex-height-button-lg: 48px;
   --cortex-height-tab: 44px;
-  --cortex-height-titlebar: 40px;
+  --cortex-height-titlebar: 56px;
   --cortex-height-statusbar: 24px;
   --cortex-height-navbar: 56px;
   
@@ -454,8 +454,8 @@
   /* ===========================================================================
      COMPONENT TOKENS: DROPDOWN
      =========================================================================== */
-  --cortex-dropdown-bg: #252628;
-  --cortex-dropdown-border: #3C3D40;
+  --cortex-dropdown-bg: #1C1C1D;
+  --cortex-dropdown-border: #2E2F31;
   --cortex-dropdown-radius: var(--cortex-radius-md);
   --cortex-dropdown-shadow: var(--cortex-elevation-3);
   --cortex-dropdown-item-hover: var(--cortex-bg-hover);
@@ -564,7 +564,7 @@
      CODE/SYNTAX HIGHLIGHTING - Cortex UI Design Exact Colors
      =========================================================================== */
   --cortex-syntax-keyword: #FEAB78;        /* const, typeof, if, false, true */
-  --cortex-syntax-string: #8EFF96;         /* "object", template literals, numbers */
+  --cortex-syntax-string: #FFB7FA;         /* "object", template literals, string values */
   --cortex-syntax-number: #8EFF96;         /* 0, 1, numeric values */
   --cortex-syntax-comment: rgba(255,255,255,0.5);  /* Comments, line numbers */
   --cortex-syntax-function: #66BFFF;       /* useTranslation, useState, Object.keys */
@@ -578,6 +578,19 @@
   --cortex-syntax-line-number: rgba(255,255,255,0.5);
   --cortex-syntax-type-hint-bg: rgba(255,255,255,0.05);
   --cortex-syntax-type-hint-text: rgba(255,255,255,0.5);
+
+  /* Named syntax color aliases (for outline, breadcrumbs, debug UI) */
+  --cortex-syntax-purple: #C792EA;         /* Methods, constructors, namespaces */
+  --cortex-syntax-orange: #FEAB78;         /* Modules, classes, enums */
+  --cortex-syntax-cyan: #89DDFF;           /* Properties, fields, decorators */
+  --cortex-syntax-red: #FF5370;            /* Errors, deletions */
+  --cortex-syntax-green: #8EFF96;          /* Success, interfaces, additions */
+  --cortex-syntax-yellow: #FFCB6B;         /* Warnings, attributes */
+  --cortex-syntax-blue: #66BFFF;           /* Info, functions */
+  --cortex-syntax-tag: #FF5370;            /* HTML/JSX tags */
+  --cortex-syntax-attribute: #FFCB6B;      /* HTML/JSX attributes */
+  --cortex-syntax-regex: #89DDFF;          /* Regular expressions */
+  --cortex-syntax-punctuation: #FFFFFF;    /* Punctuation, delimiters */
 
   /* ===========================================================================
      FIGMA-SPECIFIC LAYOUT TOKENS
@@ -626,7 +639,7 @@
   /* ===========================================================================
      FIGMA COMPONENT STATE COLORS
      =========================================================================== */
-  --cortex-open-project-open-text: #000000;                  /* Text on open project bg */
+  --cortex-open-project-open-text: #1C1C1D;                  /* Text on open project bg */
   --cortex-config-selected-bg: #252628;                      /* Config selected state */
   --cortex-config-variant-bg: #1C1C1D;                       /* Config variant bg */
 

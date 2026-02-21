@@ -793,7 +793,7 @@ export function ProjectSearch() {
     
     if (isAlreadyActive) {
       // File is already active, just navigate to line
-      window.dispatchEvent(new CustomEvent("goto-line", { 
+      window.dispatchEvent(new CustomEvent("editor:goto-line", { 
         detail: { line, column }
       }));
       return;
@@ -808,7 +808,7 @@ export function ProjectSearch() {
       if (eventPath === normalizedFullPath) {
         handled = true;
         window.removeEventListener("editor:file-ready", handleEditorReady as EventListener);
-        window.dispatchEvent(new CustomEvent("goto-line", { 
+        window.dispatchEvent(new CustomEvent("editor:goto-line", { 
           detail: { line, column }
         }));
       }
@@ -823,7 +823,7 @@ export function ProjectSearch() {
       if (!handled) {
         handled = true;
         window.removeEventListener("editor:file-ready", handleEditorReady as EventListener);
-        window.dispatchEvent(new CustomEvent("goto-line", { 
+        window.dispatchEvent(new CustomEvent("editor:goto-line", { 
           detail: { line, column }
         }));
       }
@@ -2403,7 +2403,7 @@ export function ProjectSearch() {
                         const fullPath = projectPath ? `${projectPath}/${aiResult.file}` : aiResult.file;
                         await openFile(fullPath);
                         setTimeout(() => {
-                          window.dispatchEvent(new CustomEvent("goto-line", {
+                          window.dispatchEvent(new CustomEvent("editor:goto-line", {
                             detail: { line: aiResult.startLine + 1, column: 1 },
                           }));
                         }, 100);

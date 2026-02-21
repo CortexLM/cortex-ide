@@ -1105,7 +1105,7 @@ export function TerminalPanel() {
             // Give the editor a moment to open the file, then navigate
             setTimeout(() => {
               window.dispatchEvent(
-                new CustomEvent("goto-line", {
+                new CustomEvent("editor:goto-line", {
                   detail: { line, column: column || 1 },
                 })
               );
@@ -1863,8 +1863,8 @@ export function TerminalPanel() {
       }
     };
     
-    window.addEventListener("terminal:goToNextCommand", handleGoToNextCommand);
-    window.addEventListener("terminal:goToPrevCommand", handleGoToPrevCommand);
+    window.addEventListener("terminal:go-to-next-command", handleGoToNextCommand);
+    window.addEventListener("terminal:go-to-prev-command", handleGoToPrevCommand);
     window.addEventListener("terminal:select-all", handleSelectAll);
     
     // Event handlers for rename and color picker dialogs
@@ -1889,8 +1889,8 @@ export function TerminalPanel() {
     
     onCleanup(() => {
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("terminal:goToNextCommand", handleGoToNextCommand);
-      window.removeEventListener("terminal:goToPrevCommand", handleGoToPrevCommand);
+      window.removeEventListener("terminal:go-to-next-command", handleGoToNextCommand);
+      window.removeEventListener("terminal:go-to-prev-command", handleGoToPrevCommand);
       window.removeEventListener("terminal:select-all", handleSelectAll);
       window.removeEventListener("terminal:show-rename-dialog", handleShowRenameDialog);
       window.removeEventListener("terminal:show-color-picker", handleShowColorPicker);

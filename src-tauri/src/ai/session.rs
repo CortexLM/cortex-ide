@@ -580,7 +580,7 @@ fn emit_agent_action(app_handle: &AppHandle, session_id: &str, action: AgentActi
         category: action.category().to_string(),
     };
 
-    if let Err(e) = app_handle.emit("agent-action", &entry) {
+    if let Err(e) = app_handle.emit("agent:action", &entry) {
         warn!("Failed to emit agent-action event: {}", e);
     }
 }
@@ -802,7 +802,7 @@ async fn forward_events(
 
         if let Some(ws_msg) = convert_event_to_ws(&event) {
             // Emit Tauri event
-            if let Err(e) = app_handle.emit("cortex-event", ws_msg) {
+            if let Err(e) = app_handle.emit("cortex:event", ws_msg) {
                 error!(session_id = %sid, "Failed to emit Tauri event: {}", e);
             }
         }

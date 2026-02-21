@@ -12,6 +12,7 @@ use super::types::{
     KeybindingContribution, LanguageContribution, MenuContribution, PanelContribution,
     SettingsContribution, SnippetContribution, ViewContainerContribution, ViewContribution,
 };
+use crate::LazyState;
 
 // ============================================================================
 // Theme Management
@@ -20,9 +21,9 @@ use super::types::{
 /// Get all available themes from enabled extensions
 #[tauri::command]
 pub async fn get_extension_themes(app: AppHandle) -> Result<Vec<ExtensionTheme>, String> {
-    let state = app.state::<ExtensionsState>();
+    let state = app.state::<LazyState<ExtensionsState>>();
     let extensions = {
-        let manager = state.0.lock();
+        let manager = state.get().0.lock();
         manager.get_enabled_extensions()
     };
 
@@ -61,8 +62,8 @@ pub async fn get_extension_themes(app: AppHandle) -> Result<Vec<ExtensionTheme>,
 /// Get all commands from enabled extensions
 #[tauri::command]
 pub async fn get_extension_commands(app: AppHandle) -> Result<Vec<CommandContribution>, String> {
-    let state = app.state::<ExtensionsState>();
-    let manager = state.0.lock();
+    let state = app.state::<LazyState<ExtensionsState>>();
+    let manager = state.get().0.lock();
 
     let mut commands = Vec::new();
 
@@ -80,8 +81,8 @@ pub async fn get_extension_commands(app: AppHandle) -> Result<Vec<CommandContrib
 /// Get all language contributions from enabled extensions
 #[tauri::command]
 pub async fn get_extension_languages(app: AppHandle) -> Result<Vec<LanguageContribution>, String> {
-    let state = app.state::<ExtensionsState>();
-    let manager = state.0.lock();
+    let state = app.state::<LazyState<ExtensionsState>>();
+    let manager = state.get().0.lock();
 
     let mut languages = Vec::new();
 
@@ -99,8 +100,8 @@ pub async fn get_extension_languages(app: AppHandle) -> Result<Vec<LanguageContr
 /// Get all panel contributions from enabled extensions
 #[tauri::command]
 pub async fn get_extension_panels(app: AppHandle) -> Result<Vec<PanelContribution>, String> {
-    let state = app.state::<ExtensionsState>();
-    let manager = state.0.lock();
+    let state = app.state::<LazyState<ExtensionsState>>();
+    let manager = state.get().0.lock();
 
     let mut panels = Vec::new();
 
@@ -118,8 +119,8 @@ pub async fn get_extension_panels(app: AppHandle) -> Result<Vec<PanelContributio
 /// Get all settings contributions from enabled extensions
 #[tauri::command]
 pub async fn get_extension_settings(app: AppHandle) -> Result<Vec<SettingsContribution>, String> {
-    let state = app.state::<ExtensionsState>();
-    let manager = state.0.lock();
+    let state = app.state::<LazyState<ExtensionsState>>();
+    let manager = state.get().0.lock();
 
     let mut settings = Vec::new();
 
@@ -139,8 +140,8 @@ pub async fn get_extension_settings(app: AppHandle) -> Result<Vec<SettingsContri
 pub async fn get_extension_keybindings(
     app: AppHandle,
 ) -> Result<Vec<KeybindingContribution>, String> {
-    let state = app.state::<ExtensionsState>();
-    let manager = state.0.lock();
+    let state = app.state::<LazyState<ExtensionsState>>();
+    let manager = state.get().0.lock();
 
     let mut keybindings = Vec::new();
 
@@ -158,8 +159,8 @@ pub async fn get_extension_keybindings(
 /// Get all snippet contributions from enabled extensions
 #[tauri::command]
 pub async fn get_extension_snippets(app: AppHandle) -> Result<Vec<SnippetContribution>, String> {
-    let state = app.state::<ExtensionsState>();
-    let manager = state.0.lock();
+    let state = app.state::<LazyState<ExtensionsState>>();
+    let manager = state.get().0.lock();
 
     let mut snippets = Vec::new();
 
@@ -182,17 +183,25 @@ pub async fn execute_extension_command(
     command: String,
     args: Option<Vec<serde_json::Value>>,
 ) -> Result<serde_json::Value, String> {
-    let state = app.state::<ExtensionsState>();
-    let mut manager = state.0.lock();
+    #[cfg(feature = "wasm-extensions")]
+    {
+        let state = app.state::<LazyState<ExtensionsState>>();
+        let mut manager = state.get().0.lock();
 
-    let args_json = serde_json::to_string(&args.unwrap_or_default())
-        .map_err(|e| format!("Failed to serialize args: {}", e))?;
+        let args_json = serde_json::to_string(&args.unwrap_or_default())
+            .map_err(|e| format!("Failed to serialize args: {}", e))?;
 
-    let result = manager
-        .wasm_runtime
-        .execute_command(&extension_id, &command, &args_json)?;
+        let result = manager
+            .wasm_runtime
+            .execute_command(&extension_id, &command, &args_json)?;
 
-    serde_json::from_str(&result).unwrap_or(Ok(serde_json::Value::String(result)))
+        serde_json::from_str(&result).unwrap_or(Ok(serde_json::Value::String(result)))
+    }
+    #[cfg(not(feature = "wasm-extensions"))]
+    {
+        let _ = (app, extension_id, command, args);
+        Err("WASM extensions feature is not enabled".to_string())
+    }
 }
 
 // ============================================================================
@@ -202,8 +211,8 @@ pub async fn execute_extension_command(
 /// Get all menu contributions from enabled extensions
 #[tauri::command]
 pub async fn get_extension_menus(app: AppHandle) -> Result<Vec<MenuContribution>, String> {
-    let state = app.state::<ExtensionsState>();
-    let manager = state.0.lock();
+    let state = app.state::<LazyState<ExtensionsState>>();
+    let manager = state.get().0.lock();
 
     let mut menus = Vec::new();
 
@@ -223,8 +232,8 @@ pub async fn get_extension_menus(app: AppHandle) -> Result<Vec<MenuContribution>
 pub async fn get_extension_views_containers(
     app: AppHandle,
 ) -> Result<Vec<ViewContainerContribution>, String> {
-    let state = app.state::<ExtensionsState>();
-    let manager = state.0.lock();
+    let state = app.state::<LazyState<ExtensionsState>>();
+    let manager = state.get().0.lock();
 
     let mut containers = Vec::new();
 
@@ -242,8 +251,8 @@ pub async fn get_extension_views_containers(
 /// Get all view contributions from enabled extensions
 #[tauri::command]
 pub async fn get_extension_views(app: AppHandle) -> Result<Vec<ViewContribution>, String> {
-    let state = app.state::<ExtensionsState>();
-    let manager = state.0.lock();
+    let state = app.state::<LazyState<ExtensionsState>>();
+    let manager = state.get().0.lock();
 
     let mut views = Vec::new();
 
@@ -263,8 +272,8 @@ pub async fn get_extension_views(app: AppHandle) -> Result<Vec<ViewContribution>
 pub async fn get_extension_configuration(
     app: AppHandle,
 ) -> Result<Vec<ConfigurationContribution>, String> {
-    let state = app.state::<ExtensionsState>();
-    let manager = state.0.lock();
+    let state = app.state::<LazyState<ExtensionsState>>();
+    let manager = state.get().0.lock();
 
     let mut configs = Vec::new();
 
@@ -282,8 +291,8 @@ pub async fn get_extension_configuration(
 /// Get all grammar contributions from enabled extensions
 #[tauri::command]
 pub async fn get_extension_grammars(app: AppHandle) -> Result<Vec<GrammarContribution>, String> {
-    let state = app.state::<ExtensionsState>();
-    let manager = state.0.lock();
+    let state = app.state::<LazyState<ExtensionsState>>();
+    let manager = state.get().0.lock();
 
     let mut grammars = Vec::new();
 

@@ -103,13 +103,13 @@ export interface GitFileChange {
 export async function gitGetCommitGraph(options: GitGraphOptions = {}): Promise<GitGraphResult> {
   try {
     const result = await invoke<GitGraphResult>("git_get_commit_graph", {
+      path: options.path ?? ".",
       options: {
-        path: options.path,
-        max_count: options.maxCount ?? 100,
+        maxCount: options.maxCount ?? 100,
         skip: options.skip ?? 0,
         branch: options.branch,
         all: options.all ?? true,
-        first_parent: options.firstParent ?? false,
+        firstParent: options.firstParent ?? false,
         since: options.since,
         until: options.until,
         author: options.author,
@@ -144,8 +144,15 @@ export async function gitGetCommitDetails(hash: string, path?: string): Promise<
 
 export async function gitGetBranches(path?: string): Promise<GitBranch[]> {
   try {
-    const result = await invoke<GitBranch[]>("git_get_branches", { path });
-    return result;
+    const result = await invoke<{ branches: Array<{ name: string; is_head: boolean; is_remote: boolean; upstream?: string; ahead?: number; behind?: number }> }>("git_branches", { path: path ?? "." });
+    return result.branches.map((b) => ({
+      name: b.name,
+      isRemote: b.is_remote,
+      isHead: b.is_head,
+      upstream: b.upstream,
+      ahead: b.ahead,
+      behind: b.behind,
+    }));
   } catch (error) {
     console.error("[git-graph] Failed to get branches:", error);
     return [];
@@ -154,8 +161,12 @@ export async function gitGetBranches(path?: string): Promise<GitBranch[]> {
 
 export async function gitGetTags(path?: string): Promise<GitTag[]> {
   try {
-    const result = await invoke<GitTag[]>("git_get_tags", { path });
-    return result;
+    const result = await invoke<Array<{ name: string; commit_sha: string; message?: string; tagger?: string; date?: string; is_annotated: boolean }>>("git_list_tags", { path: path ?? "." });
+    return result.map((t) => ({
+      name: t.name,
+      hash: t.commit_sha,
+      message: t.message,
+    }));
   } catch (error) {
     console.error("[git-graph] Failed to get tags:", error);
     return [];
@@ -174,7 +185,7 @@ export async function gitCheckout(ref: string, path?: string): Promise<boolean> 
 
 export async function gitCreateBranch(name: string, startPoint?: string, path?: string): Promise<boolean> {
   try {
-    await invoke("git_create_branch", { name, start_point: startPoint, path });
+    await invoke("git_create_branch", { name, startPoint, path });
     return true;
   } catch (error) {
     console.error("[git-graph] Failed to create branch:", error);
@@ -194,7 +205,7 @@ export async function gitDeleteBranch(name: string, force?: boolean, path?: stri
 
 export async function gitMerge(branch: string, noFastForward?: boolean, path?: string): Promise<boolean> {
   try {
-    await invoke("git_merge", { branch, no_ff: noFastForward ?? false, path });
+    await invoke("git_merge", { branch, noFf: noFastForward ?? false, path });
     return true;
   } catch (error) {
     console.error("[git-graph] Failed to merge:", error);
@@ -246,13 +257,23 @@ export async function gitCompareCommits(
   from: string,
   to: string,
   path?: string
-): Promise<{ ahead: number; behind: number; files: GitFileChange[] } | null> {
+): Promise<{ filesChanged: number; additions: number; deletions: number; files: GitFileChange[] } | null> {
   try {
-    const result = await invoke<{ ahead: number; behind: number; files: GitFileChange[] }>(
+    const result = await invoke<{ filesChanged: number; additions: number; deletions: number; files: Array<{ path: string; status: string; additions: number; deletions: number }> }>(
       "git_compare_commits",
-      { from, to, path }
+      { fromSha: from, toSha: to, path: path ?? "." }
     );
-    return result;
+    return {
+      filesChanged: result.filesChanged,
+      additions: result.additions,
+      deletions: result.deletions,
+      files: result.files.map((f) => ({
+        path: f.path,
+        status: f.status as GitFileChange["status"],
+        insertions: f.additions,
+        deletions: f.deletions,
+      })),
+    };
   } catch (error) {
     console.error("[git-graph] Failed to compare commits:", error);
     return null;

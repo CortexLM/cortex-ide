@@ -16,14 +16,13 @@ SolidJS frontend for Cortex Desktop. Provides the full IDE UI including code edi
 
 | Directory | Description |
 |-----------|-------------|
-| `components/` | 797 UI component files organized by feature (editor, terminal, git, debug, chat, factory, etc.) |
+| `components/` | 797 UI component files organized by feature (editor, terminal, git, debug, chat, etc.) |
 | `components/ui/` | Shared UI primitives (Button, Dialog, Tooltip, etc.) |
 | `components/Chat/` | AI chat components |
 | `components/editor/` | Monaco editor components |
 | `components/terminal/` | Terminal components |
 | `components/debug/` | Debugger components |
 | `components/git/` | Git panel components |
-| `components/factory/` | Agent workflow designer components |
 | `components/extensions/` | Extension management components |
 | `context/` | 181 context files (99 top-level + 15 editor + 5 AI + 10 debug + 1 diff + 1 merge + 5 extensions + 7 notebook + 6 iconTheme + 12 keymap + 14 theme + 2 tasks + 1 i18n + 2 utils + 1 workspace) — each manages a domain of app state |
 | `context/editor/` | Editor-specific contexts (`EditorCursorContext`, `EditorFeaturesProvider`, `EditorFilesContext`, `EditorProvider`, `EditorUIContext`, `TabsProvider`) + helpers (`editorGridLayout`, `editorGroupOps`, `editorTypes`, `eventHandlers`, `fileOperations`, `gridOperations`, `languageDetection`, `tabOperations`, `index`) |
@@ -40,11 +39,11 @@ SolidJS frontend for Cortex Desktop. Provides the full IDE UI including code edi
 | `context/merge/` | Merge editor context (`MergeEditorProvider`) |
 | `context/workspace/` | Workspace sub-context (`MultiRootProvider`) |
 | `context/utils/` | `ProviderComposer.tsx` (flat composition), `LazyProvider.tsx` (deferred loading) |
-| `hooks/` | 33 custom SolidJS hooks + 4 factory hooks in `hooks/factory/` (keyboard, subscriptions, local storage, animations, etc.) — 39 non-test files total (including 2 index files) |
+| `hooks/` | 33 custom SolidJS hooks (keyboard, subscriptions, local storage, animations, etc.) — 35 non-test files total (including 2 index files) |
 | `pages/` | Route-level page components (`Home.tsx`, `Session.tsx`, `admin/`, `share/`) |
 | `providers/` | 12 Monaco editor providers bridging LSP to Monaco API (CodeLens, InlayHints, InlineCompletions, Timeline, etc.) + 9 quickaccess providers — 24 files total |
 | `sdk/` | TypeScript SDK for Tauri IPC — wraps `invoke()` calls (`client.ts`, `executor.ts`, `types.ts`, `errors.ts`) |
-| `services/` | Business logic services (factory, etc.) |
+| `services/` | Business logic services |
 | `design-system/` | Design tokens and layout primitives (Flex, etc.) |
 | `styles/` | Global CSS and Tailwind configuration |
 | `layout/` | Layout containers for panel arrangement |
@@ -69,7 +68,6 @@ SolidJS frontend for Cortex Desktop. Provides the full IDE UI including code edi
 | `LSPContext` | `context/LSPContext.tsx` | Language server connections |
 | `DebugContext` | `context/DebugContext.tsx` | Debug sessions, breakpoints |
 | `CommandContext` | `context/CommandContext.tsx` | Command palette registry |
-| `FactoryContext` | `context/FactoryContext.tsx` | Agent workflow designer |
 | `TerminalsContext` | `context/TerminalsContext.tsx` | Terminal instances |
 | `ExtensionsContext` | `context/ExtensionsContext.tsx` | Installed extensions |
 | `SessionContext` | `context/SessionContext.tsx` | Current session state |
@@ -99,7 +97,7 @@ Tests live in `__tests__/` directories next to the code they test (196 test file
 
 - **SDK (3):** `sdk/__tests__/sdk.test.ts`, `sdk/__tests__/client.test.ts`, `sdk/__tests__/ipc.test.ts`
 - **Components (92):** `components/__tests__/`, `components/editor/__tests__/`, `components/terminal/__tests__/`, `components/debug/__tests__/`, `components/debugger/__tests__/`, `components/cortex/__tests__/`, `components/cortex/primitives/__tests__/`, `components/accessibility/__tests__/`, `components/diagnostics/__tests__/`, `components/workspace-trust/__tests__/`, `components/workspace/__tests__/`, `components/timeline/__tests__/`, `components/output/__tests__/`, `components/notifications/__tests__/`, `components/quickaccess/__tests__/`, `components/git/__tests__/`, `components/testing/__tests__/`, `components/profiles/__tests__/`, `components/remote/__tests__/`
-- **Context (83):** `context/__tests__/` — covers all major context providers (AIContext, EditorContext, LSPContext, DebugContext, TerminalsContext, SettingsContext, WorkspaceContext, ExtensionsContext, FactoryContext, etc.)
+- **Context (83):** `context/__tests__/` — covers all major context providers (AIContext, EditorContext, LSPContext, DebugContext, TerminalsContext, SettingsContext, WorkspaceContext, ExtensionsContext, etc.)
 - **Hooks (13):** `hooks/__tests__/` — useAccessibility, useAsync, useDebounce, useDebug, useDebugSession, useDiagnostics, useGit, useKeyboard, useLocalStorage, useLsp, useLspFeature, useTerminal, useTerminalSearch
 - **Utils (3):** `utils/__tests__/ansiParser.test.ts`, `utils/__tests__/eventBus.test.ts`, `utils/__tests__/diffAlgorithm.test.ts`
 - **Services (2):** `services/__tests__/bracketPairColorization.test.ts`, `services/__tests__/indentGuides.test.ts`

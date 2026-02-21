@@ -12,6 +12,7 @@ use tracing::{info, warn};
 
 use super::types::{Extension, ExtensionManifest, ExtensionSource};
 use super::utils::{copy_dir_recursive, extensions_directory_path};
+#[cfg(feature = "wasm-extensions")]
 use super::wasm::WasmRuntime;
 
 /// State for managing extensions
@@ -26,7 +27,7 @@ pub struct ExtensionsManager {
     pub extensions_dir: PathBuf,
     /// Enabled extensions (persisted)
     pub enabled_extensions: HashMap<String, bool>,
-    /// WASM extension runtime
+    #[cfg(feature = "wasm-extensions")]
     pub wasm_runtime: WasmRuntime,
 }
 
@@ -44,6 +45,7 @@ impl ExtensionsManager {
             extensions: HashMap::new(),
             extensions_dir,
             enabled_extensions: HashMap::new(),
+            #[cfg(feature = "wasm-extensions")]
             wasm_runtime: WasmRuntime::new(),
         }
     }
@@ -147,8 +149,10 @@ impl ExtensionsManager {
 
     /// Uninstall an extension
     pub fn uninstall_extension(&mut self, name: &str) -> Result<(), String> {
-        // Unload from WASM runtime if loaded
-        let _ = self.wasm_runtime.unload_extension(name);
+        #[cfg(feature = "wasm-extensions")]
+        {
+            let _ = self.wasm_runtime.unload_extension(name);
+        }
 
         if let Some(ext) = self.extensions.remove(name) {
             fs::remove_dir_all(&ext.path)

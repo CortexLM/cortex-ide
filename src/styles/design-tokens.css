@@ -55,21 +55,6 @@
   --palette-neon-cyan: #00D9FF;
   --palette-neon-glow: rgba(0, 217, 255, 0.6);
 
-  /* Factory Node Category Colors - Palette */
-  --palette-node-trigger: #E9AA46;
-  --palette-node-agent: #3574F0;
-  --palette-node-supervisor: #9D5BD2;
-  --palette-node-action: #59A869;
-  --palette-node-logic: #CC7832;
-  --palette-node-communication: #C75450;
-  --palette-node-utility: #8B8B8B;
-  
-  /* Factory Port Data Type Colors - Palette */
-  --palette-port-object: #9B59B6;
-  --palette-port-array: #1ABC9C;
-  --palette-port-agent: #3498DB;
-  --palette-port-message: #00BCD4;
-  --palette-port-event: #E91E63;
 
   /* ===========================================================================
      VARIABLES SÉMANTIQUES
@@ -129,26 +114,6 @@
   --neon-color: var(--palette-neon-cyan);
   --neon-glow: var(--palette-neon-glow);
 
-  /* ---- FACTORY NODE COLORS ---- */
-  --node-trigger: var(--palette-node-trigger);
-  --node-agent: var(--palette-node-agent);
-  --node-supervisor: var(--palette-node-supervisor);
-  --node-action: var(--palette-node-action);
-  --node-logic: var(--palette-node-logic);
-  --node-communication: var(--palette-node-communication);
-  --node-utility: var(--palette-node-utility);
-
-  /* ---- FACTORY PORT COLORS ---- */
-  --port-any: var(--text-muted);
-  --port-string: var(--state-success);
-  --port-number: var(--accent-primary);
-  --port-boolean: var(--state-warning);
-  --port-object: var(--palette-port-object);
-  --port-array: var(--palette-port-array);
-  --port-agent: var(--palette-port-agent);
-  --port-message: var(--palette-port-message);
-  --port-event: var(--palette-port-event);
-  --port-error: var(--state-error);
 
   /* ===========================================================================
      OMBRES
@@ -235,7 +200,7 @@
   --height-button-md: 32px;
   --height-button-lg: 36px;
   --height-tab: 35px;
-  --height-titlebar: 40px;
+  --height-titlebar: 56px;
   --height-statusbar: 22px;
   
   --width-sidebar: 260px;

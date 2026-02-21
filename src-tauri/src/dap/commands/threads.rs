@@ -7,14 +7,15 @@ use tauri::State;
 
 use super::super::protocol::{Scope, StackFrame, Thread};
 use super::state::DebuggerState;
+use crate::LazyState;
 
 /// Get threads
 #[tauri::command]
 pub async fn debug_get_threads(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<Vec<Thread>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -26,11 +27,11 @@ pub async fn debug_get_threads(
 /// Get stack trace for a thread
 #[tauri::command]
 pub async fn debug_get_stack_trace(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     thread_id: i64,
 ) -> Result<Vec<StackFrame>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -42,11 +43,11 @@ pub async fn debug_get_stack_trace(
 /// Get scopes for a stack frame
 #[tauri::command]
 pub async fn debug_get_scopes(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     frame_id: i64,
 ) -> Result<Vec<Scope>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -61,11 +62,11 @@ pub async fn debug_get_scopes(
 /// Set active thread
 #[tauri::command]
 pub async fn debug_set_active_thread(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     thread_id: i64,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -78,11 +79,11 @@ pub async fn debug_set_active_thread(
 /// Set active frame
 #[tauri::command]
 pub async fn debug_set_active_frame(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     frame_id: i64,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -95,10 +96,10 @@ pub async fn debug_set_active_frame(
 /// Get active thread ID
 #[tauri::command]
 pub async fn debug_get_active_thread(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<Option<i64>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -110,10 +111,10 @@ pub async fn debug_get_active_thread(
 /// Get active frame ID
 #[tauri::command]
 pub async fn debug_get_active_frame(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
 ) -> Result<Option<i64>, String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;
@@ -125,11 +126,11 @@ pub async fn debug_get_active_frame(
 /// Terminate specific threads
 #[tauri::command]
 pub async fn debug_terminate_threads(
-    state: State<'_, DebuggerState>,
+    state: State<'_, LazyState<DebuggerState>>,
     session_id: String,
     thread_ids: Vec<i64>,
 ) -> Result<(), String> {
-    let sessions = state.sessions.read().await;
+    let sessions = state.get().sessions.read().await;
     let session = sessions
         .get(&session_id)
         .ok_or_else(|| format!("Session not found: {}", session_id))?;

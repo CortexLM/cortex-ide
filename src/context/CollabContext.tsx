@@ -542,7 +542,7 @@ export function CollabProvider(props: ParentProps) {
     const data = payload.data as string;
     const userId = payload.userId as string;
 
-    window.dispatchEvent(new CustomEvent("collab:terminal_output", {
+    window.dispatchEvent(new CustomEvent("collab:terminal-output", {
       detail: { terminalId, data, userId }
     }));
   };
@@ -630,7 +630,7 @@ export function CollabProvider(props: ParentProps) {
     await ensureServerRunning();
 
     try {
-      const result = await invoke<CollabRoomResult>("collab_create_room", {
+      const result = await invoke<CollabRoomResult>("collab_create_session", {
         name: `${name}'s Room`,
         userName: name,
       });
@@ -688,8 +688,8 @@ export function CollabProvider(props: ParentProps) {
     await ensureServerRunning();
 
     try {
-      const result = await invoke<CollabRoomResult>("collab_join_room", {
-        roomId,
+      const result = await invoke<CollabRoomResult>("collab_join_session", {
+        sessionId: roomId,
         userName,
       });
 
@@ -744,8 +744,8 @@ export function CollabProvider(props: ParentProps) {
 
   const leaveRoom = () => {
     if (state.currentRoom && state.currentUser) {
-      invoke("collab_leave_room", {
-        roomId: state.currentRoom.id,
+      invoke("collab_leave_session", {
+        sessionId: state.currentRoom.id,
         userId: state.currentUser.id,
       }).catch(() => {});
 
@@ -777,7 +777,7 @@ export function CollabProvider(props: ParentProps) {
     if (!state.currentRoom) throw new Error("Not in a room");
 
     const result = await invoke<number[]>("collab_sync_document", {
-      roomId: state.currentRoom.id,
+      sessionId: state.currentRoom.id,
       fileId,
       update: Array.from(update),
     });
@@ -789,10 +789,10 @@ export function CollabProvider(props: ParentProps) {
     if (!state.currentRoom) throw new Error("Not in a room");
 
     await invoke("collab_init_document", {
-      roomId: state.currentRoom.id,
+      sessionId: state.currentRoom.id,
       fileId,
       content,
-    });
+    }).catch(() => {});
   };
 
   // ============================================================================
@@ -818,8 +818,8 @@ export function CollabProvider(props: ParentProps) {
       timestamp: Date.now(),
     });
 
-    invoke("collab_update_cursor", {
-      roomId: state.currentRoom.id,
+    invoke("collab_broadcast_cursor", {
+      sessionId: state.currentRoom.id,
       userId: state.currentUser.id,
       fileId: position.fileId,
       line: position.line,
@@ -1230,18 +1230,17 @@ export function CollabProvider(props: ParentProps) {
     let unlistenLeft: (() => void) | undefined;
     let unlistenSessionCreated: (() => void) | undefined;
 
-    listen<{ roomId: string; userId: string; userName: string }>("collab:user_joined", (event) => {
+    listen<{ roomId: string; userId: string; userName: string }>("collab:user-joined", (event) => {
       collabLogger.debug("User joined via backend event:", event.payload);
     }).then(u => { unlistenJoined = u; });
 
-    listen<{ roomId: string; userId: string }>("collab:user_left", (event) => {
+    listen<{ roomId: string; userId: string }>("collab:user-left", (event) => {
       collabLogger.debug("User left via backend event:", event.payload);
     }).then(u => { unlistenLeft = u; });
 
-    listen<{ id: string; name: string; hostId: string; createdAt: number; participants: unknown[]; documentIds: string[]; serverPort: number }>("collab:session_created", (event) => {
+    listen<{ id: string; name: string; hostId: string; createdAt: number; participants: unknown[]; documentIds: string[]; serverPort: number }>("collab:session-created", (event) => {
       collabLogger.debug("Session created via backend event:", event.payload);
     }).then(u => { unlistenSessionCreated = u; });
-
     onCleanup(() => {
       disconnect();
       unlistenJoined?.();

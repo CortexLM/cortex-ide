@@ -122,7 +122,7 @@ export function useDebugSession(): UseDebugSessionReturn {
   const [sessionId, setSessionId] = createSignal<string | null>(null);
 
   const startSession = async (config: DebugSessionConfig): Promise<void> => {
-    const id = await invoke<string>("dap_start_session", { config });
+    const id = await invoke<string>("debug_start_session", { config });
 
     batch(() => {
       setSessionId(id);
@@ -137,7 +137,7 @@ export function useDebugSession(): UseDebugSessionReturn {
       return;
     }
 
-    await invoke("dap_stop_session", { sessionId: currentId });
+    await invoke("debug_stop_session", { sessionId: currentId, terminateDebuggee: true });
 
     batch(() => {
       setIsActive(false);
@@ -153,10 +153,10 @@ export function useDebugSession(): UseDebugSessionReturn {
     }
 
     if (isPaused()) {
-      await invoke("dap_continue", { sessionId: currentId });
+      await invoke("debug_continue", { sessionId: currentId });
       setIsPaused(false);
     } else {
-      await invoke("dap_pause", { sessionId: currentId });
+      await invoke("debug_pause", { sessionId: currentId });
       setIsPaused(true);
     }
   };
@@ -167,7 +167,7 @@ export function useDebugSession(): UseDebugSessionReturn {
       return;
     }
 
-    await invoke("dap_step_over", { sessionId: currentId });
+    await invoke("debug_step_over", { sessionId: currentId });
   };
 
   const stepInto = async (): Promise<void> => {
@@ -176,7 +176,7 @@ export function useDebugSession(): UseDebugSessionReturn {
       return;
     }
 
-    await invoke("dap_step_into", { sessionId: currentId });
+    await invoke("debug_step_into", { sessionId: currentId });
   };
 
   const stepOut = async (): Promise<void> => {
@@ -185,13 +185,13 @@ export function useDebugSession(): UseDebugSessionReturn {
       return;
     }
 
-    await invoke("dap_step_out", { sessionId: currentId });
+    await invoke("debug_step_out", { sessionId: currentId });
   };
 
   onCleanup(() => {
     const currentId = sessionId();
     if (currentId && isActive()) {
-      void invoke("dap_stop_session", { sessionId: currentId });
+      void invoke("debug_stop_session", { sessionId: currentId, terminateDebuggee: true });
     }
   });
 

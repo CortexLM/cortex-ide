@@ -203,9 +203,9 @@ describe("SDKContext", () => {
     it("should listen for cortex events", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("cortex-event", () => {});
+      await listen("cortex:event", () => {});
 
-      expect(listen).toHaveBeenCalledWith("cortex-event", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("cortex:event", expect.any(Function));
     });
   });
 

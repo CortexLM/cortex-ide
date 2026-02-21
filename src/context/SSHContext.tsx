@@ -746,17 +746,17 @@ export const SSHProvider: ParentComponent = (props) => {
     if (!MOCK_MODE) {
       try {
         unlistenOutput = await listen<{ session_id: string; data: string }>(
-          "ssh_terminal:output",
+          "ssh-terminal:output",
           (event) => handleOutputEvent(event.payload)
         );
 
         unlistenStatus = await listen<{
           session_id: string;
           status: string | { error: { message: string } };
-        }>("ssh_terminal:status", (event) => handleStatusEvent(event.payload));
+        }>("ssh-terminal:status", (event) => handleStatusEvent(event.payload));
 
         unlistenProgress = await listen<SSHProgressEvent>(
-          "ssh_terminal:progress",
+          "ssh-terminal:progress",
           (event) => {
             const subscribers = progressSubscribers.get(event.payload.sessionId);
             if (subscribers) {

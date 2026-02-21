@@ -57,21 +57,19 @@ describe("CortexActivityBar Component Logic", () => {
 
     const DEFAULT_ITEMS: ActivityBarItem[] = [
       { id: "home", icon: "home", label: "Home" },
-      { id: "new", icon: "plus", label: "New" },
       { id: "files", icon: "folder", label: "Explorer" },
+      { id: "search", icon: "search", label: "Search" },
       { id: "git", icon: "git", label: "Source Control" },
       { id: "debug", icon: "play", label: "Run & Debug" },
-      { id: "extensions", icon: "box", label: "Extensions" },
+      { id: "plugins", icon: "plugins", label: "Plugins" },
       { id: "agents", icon: "users", label: "AI Agents" },
-      { id: "packages", icon: "cube", label: "Packages" },
-      { id: "factory", icon: "grid", label: "Factory" },
+      { id: "extensions", icon: "grid", label: "Extensions" },
       { id: "docs", icon: "book", label: "Documentation" },
-      { id: "maps", icon: "map", label: "Code Maps" },
-      { id: "themes", icon: "paintbrush", label: "Themes" },
+      { id: "themes", icon: "brush", label: "Themes" },
     ];
 
-    it("should have 12 default items", () => {
-      expect(DEFAULT_ITEMS).toHaveLength(12);
+    it("should have 10 default items", () => {
+      expect(DEFAULT_ITEMS).toHaveLength(10);
     });
 
     it("should start with home item", () => {
@@ -86,8 +84,8 @@ describe("CortexActivityBar Component Logic", () => {
       const ids = DEFAULT_ITEMS.map(item => item.id);
 
       expect(ids).toContain("home");
-      expect(ids).toContain("new");
       expect(ids).toContain("files");
+      expect(ids).toContain("search");
       expect(ids).toContain("git");
       expect(ids).toContain("debug");
       expect(ids).toContain("extensions");

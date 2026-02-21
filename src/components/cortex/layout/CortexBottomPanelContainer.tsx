@@ -71,7 +71,7 @@ export function CortexBottomPanelContainer(props: CortexBottomPanelContainerProp
                 border: "none",
                 "border-bottom": props.bottomPanelTab === tab ? "2px solid var(--cortex-accent-primary)" : "2px solid transparent",
                 color: props.bottomPanelTab === tab ? "var(--cortex-text-primary)" : "var(--cortex-text-muted)",
-                "font-family": "var(--cortex-font-sans, Inter, sans-serif)",
+                "font-family": "var(--cortex-font-sans)",
                 "font-size": "12px",
                 cursor: "pointer",
                 "text-transform": "capitalize",

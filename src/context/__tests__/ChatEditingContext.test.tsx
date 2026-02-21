@@ -320,16 +320,16 @@ describe("ChatEditingContext", () => {
       });
     });
 
-    it("should listen for chat_editing:progress events", async () => {
-      await listen("chat_editing:progress", () => {});
+    it("should listen for chat-editing:progress events", async () => {
+      await listen("chat-editing:progress", () => {});
 
-      expect(listen).toHaveBeenCalledWith("chat_editing:progress", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("chat-editing:progress", expect.any(Function));
     });
 
-    it("should listen for chat_editing:change_added events", async () => {
-      await listen("chat_editing:change_added", () => {});
+    it("should listen for chat-editing:change-added events", async () => {
+      await listen("chat-editing:change-added", () => {});
 
-      expect(listen).toHaveBeenCalledWith("chat_editing:change_added", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("chat-editing:change-added", expect.any(Function));
     });
   });
 

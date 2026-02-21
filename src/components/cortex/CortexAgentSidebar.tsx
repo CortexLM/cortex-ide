@@ -129,7 +129,7 @@ export const CortexAgentSidebar: Component<CortexAgentSidebarProps> = (props) =>
 
   onMount(async () => {
     try {
-      const u = await listen("agent:task_progress", () => {});
+      const u = await listen("agent:task-progress", () => {});
       unlistenFns.push(u);
     } catch { /* Not in Tauri */ }
   });

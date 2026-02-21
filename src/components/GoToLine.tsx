@@ -61,7 +61,7 @@ export function GoToLine() {
     if (!parsed) return;
     
     // Emit event to Monaco editor
-    window.dispatchEvent(new CustomEvent("goto-line", { 
+    window.dispatchEvent(new CustomEvent("editor:goto-line", { 
       detail: { line: parsed.line, column: parsed.column }
     }));
     

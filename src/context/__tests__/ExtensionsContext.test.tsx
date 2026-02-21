@@ -65,11 +65,11 @@ describe("ExtensionsContext", () => {
     it("should install extension via invoke", async () => {
       vi.mocked(invoke).mockResolvedValueOnce({ success: true });
 
-      const result = await invoke("install_extension", {
+      const result = await invoke("install_extension_from_path", {
         extensionId: "publisher.extension-name",
       });
 
-      expect(invoke).toHaveBeenCalledWith("install_extension", {
+      expect(invoke).toHaveBeenCalledWith("install_extension_from_path", {
         extensionId: "publisher.extension-name",
       });
       expect(result).toEqual({ success: true });
@@ -90,7 +90,7 @@ describe("ExtensionsContext", () => {
     it("should handle installation error", async () => {
       vi.mocked(invoke).mockRejectedValueOnce(new Error("Network error"));
 
-      await expect(invoke("install_extension", { extensionId: "invalid" }))
+      await expect(invoke("install_extension_from_path", { extensionId: "invalid" }))
         .rejects.toThrow("Network error");
     });
 

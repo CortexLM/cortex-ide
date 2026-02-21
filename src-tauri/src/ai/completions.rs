@@ -338,7 +338,7 @@ pub async fn request_inline_completion(
                 delta: chunk.content,
                 done: chunk.done,
             };
-            if let Err(e) = app_clone.emit("ai:completion_stream", &stream_chunk) {
+            if let Err(e) = app_clone.emit("ai:completion-stream", &stream_chunk) {
                 warn!("Failed to emit completion stream event: {}", e);
             }
         }

@@ -28,17 +28,17 @@ export const CortexBreadcrumb: Component<CortexBreadcrumbProps> = (props) => {
   const containerStyle = (): JSX.CSSProperties => ({
     display: "flex",
     "align-items": "center",
-    gap: "4px",
+    gap: "2px",
     height: "26px",
     ...local.style,
   });
 
   const segmentStyle = (isLast: boolean): JSX.CSSProperties => ({
-    "font-family": "'Figtree', var(--cortex-font-sans, Inter, sans-serif)",
+    "font-family": "var(--cortex-font-sans)",
     "font-size": "14px",
     "font-weight": "500",
     "line-height": "1em",
-    color: isLast ? "#FCFCFC" : "var(--cortex-text-secondary, #8C8D8F)",
+    color: isLast ? "var(--cortex-text-on-surface)" : "var(--cortex-text-secondary)",
     "white-space": "nowrap",
     cursor: "pointer",
     background: "transparent",
@@ -58,11 +58,11 @@ export const CortexBreadcrumb: Component<CortexBreadcrumbProps> = (props) => {
               style={segmentStyle(index() === local.segments.length - 1)}
               onClick={segment.onClick}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "#FCFCFC";
+                (e.currentTarget as HTMLElement).style.color = "var(--cortex-text-on-surface)";
               }}
               onMouseLeave={(e) => {
                 if (index() !== local.segments.length - 1) {
-                  (e.currentTarget as HTMLElement).style.color = "var(--cortex-text-secondary, #8C8D8F)";
+                  (e.currentTarget as HTMLElement).style.color = "var(--cortex-text-secondary)";
                 }
               }}
             >
@@ -71,8 +71,8 @@ export const CortexBreadcrumb: Component<CortexBreadcrumbProps> = (props) => {
             <Show when={index() < local.segments.length - 1}>
               <CortexIcon
                 name="chevron-right"
-                size={12}
-                color="var(--cortex-text-secondary, #8C8D8F)"
+                size={16}
+                color="var(--cortex-text-secondary)"
               />
             </Show>
           </>

@@ -113,7 +113,6 @@ import { DebugProvider } from "@/context/DebugContext";
 import { TestingProvider } from "@/context/TestingContext";
 import { SnippetsProvider } from "@/context/SnippetsContext";
 import { PromptStoreProvider } from "@/context/PromptStoreContext";
-import { FactoryProvider } from "@/context/FactoryContext";
 import { SupermavenProvider } from "@/context/SupermavenContext";
 import { TimelineProvider } from "@/context/TimelineContext";
 import { WorkspaceSymbolsProvider } from "@/context/WorkspaceSymbolsContext";
@@ -210,7 +209,6 @@ function DeferredProviders(props: ParentProps): JSX.Element {
       <TestingProvider>
       <SnippetsProvider>
       <PromptStoreProvider>
-      <FactoryProvider>
       <SupermavenProvider>
       <TimelineProvider>
       <WorkspaceSymbolsProvider>
@@ -232,7 +230,6 @@ function DeferredProviders(props: ParentProps): JSX.Element {
       </WorkspaceSymbolsProvider>
       </TimelineProvider>
       </SupermavenProvider>
-      </FactoryProvider>
       </PromptStoreProvider>
       </SnippetsProvider>
       </TestingProvider>

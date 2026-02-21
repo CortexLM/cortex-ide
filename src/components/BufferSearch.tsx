@@ -398,7 +398,7 @@ export function BufferSearch() {
       };
     });
     
-    window.dispatchEvent(new CustomEvent("buffer-search-highlights", {
+    window.dispatchEvent(new CustomEvent("buffer-search:highlights", {
       detail: { 
         decorations,
         totalMatches: allMatches.length,
@@ -409,7 +409,7 @@ export function BufferSearch() {
   };
 
   const clearHighlights = () => {
-    window.dispatchEvent(new CustomEvent("buffer-search-highlights", {
+    window.dispatchEvent(new CustomEvent("buffer-search:highlights", {
       detail: { decorations: [] }
     }));
   };
@@ -423,7 +423,7 @@ export function BufferSearch() {
     
     const match = allMatches[safeIndex];
     if (match) {
-      window.dispatchEvent(new CustomEvent("buffer-search-goto", { 
+      window.dispatchEvent(new CustomEvent("buffer-search:goto", { 
         detail: { 
           line: match.line, 
           column: match.column,

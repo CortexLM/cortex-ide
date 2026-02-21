@@ -18,10 +18,10 @@ export function EditorMinimap(props: EditorMinimapProps) {
       editor.updateOptions({ minimap: { enabled: !currentOption.enabled } });
     };
 
-    window.addEventListener("editor-toggle-minimap", handleToggleMinimap);
+    window.addEventListener("editor:toggle-minimap", handleToggleMinimap);
 
     onCleanup(() => {
-      window.removeEventListener("editor-toggle-minimap", handleToggleMinimap);
+      window.removeEventListener("editor:toggle-minimap", handleToggleMinimap);
     });
   });
 

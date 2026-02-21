@@ -267,12 +267,10 @@ export const CortexDropdown: Component<CortexDropdownProps> = (props) => {
       bottom: pos.showAbove ? `${window.innerHeight - pos.y + 4}px` : undefined,
       width: `${pos.width}px`,
       "min-width": "160px",
-      "max-height": `${maxHeight()}px`,
-      background: "var(--cortex-dropdown-bg, #252628)",
-      border: "1px solid var(--cortex-dropdown-border, #3C3D40)",
-      "border-radius": "8px",
-      padding: "4px 0px",
-      "box-shadow": "var(--cortex-shadow-lg, 0 8px 24px rgba(0,0,0,0.4))",
+      background: "#1C1C1D",
+      border: "1px solid #2E2F31",
+      padding: "4px",
+      "box-shadow": "0 8px 16px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.4)",
       "z-index": "var(--cortex-z-dropdown, 600)",
       overflow: "hidden",
     };
@@ -289,15 +287,18 @@ export const CortexDropdown: Component<CortexDropdownProps> = (props) => {
       index === highlightedIndex()
         ? "#252628"
         : opt.value === local.value
-          ? "var(--cortex-interactive-selected, rgba(255,255,255,0.08))"
+          ? "rgba(255,255,255,0.08)"
           : "transparent",
     "border-radius": index === highlightedIndex() ? "4px" : "0",
     color:
       opt.value === local.value
         ? "var(--cortex-accent-primary)"
-        : "var(--cortex-text-primary)",
-    "font-size": "14px",
-    transition: "background var(--cortex-transition-fast, 100ms ease)",
+        : "#FCFCFC",
+    "font-family": "'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "font-size": "12px",
+    "font-weight": "400",
+    "line-height": "1.167em",
+    transition: "background 100ms ease",
   });
 
   return (

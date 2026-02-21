@@ -7,7 +7,7 @@ export interface MenuItem {
 
 export const MENU_LABELS = [
   "File", "Edit", "Selection", "View", "Go",
-  "Terminal", "Run", "Git", "Developer", "Help",
+  "Terminal", "Help",
 ];
 
 const emit = (name: string) => () => window.dispatchEvent(new CustomEvent(name));

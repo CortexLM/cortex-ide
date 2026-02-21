@@ -249,18 +249,18 @@ export function useSnippetCompletions(options: UseSnippetCompletionsOptions) {
       // Session ended, cursor stays where it is
     };
 
-    window.addEventListener("snippet-session-start", handleSessionStart as EventListener);
-    window.addEventListener("snippet-placeholder-change", handlePlaceholderChange as EventListener);
-    window.addEventListener("snippet-session-end", handleSessionEnd);
+    window.addEventListener("snippet:session-start", handleSessionStart as EventListener);
+    window.addEventListener("snippet:placeholder-change", handlePlaceholderChange as EventListener);
+    window.addEventListener("snippet:session-end", handleSessionEnd);
 
     onCleanup(() => {
       disposables.forEach((d) => d?.dispose?.());
       disposables = [];
       completionProviderDisposable?.dispose?.();
       completionProviderDisposable = null;
-      window.removeEventListener("snippet-session-start", handleSessionStart as EventListener);
-      window.removeEventListener("snippet-placeholder-change", handlePlaceholderChange as EventListener);
-      window.removeEventListener("snippet-session-end", handleSessionEnd);
+      window.removeEventListener("snippet:session-start", handleSessionStart as EventListener);
+      window.removeEventListener("snippet:placeholder-change", handlePlaceholderChange as EventListener);
+      window.removeEventListener("snippet:session-end", handleSessionEnd);
     });
   });
 }
@@ -463,7 +463,7 @@ export function updateMirrorPlaceholders(
   });
 
   if (edits.length > 0) {
-    editor.executeEdits("snippet-mirror-update", edits);
+    editor.executeEdits("snippet:mirror-update", edits);
   }
 }
 

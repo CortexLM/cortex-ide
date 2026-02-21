@@ -33,6 +33,9 @@ macro_rules! git_commands {
             $crate::git::log::git_compare_commits,
             $crate::git::log::git_commit_graph,
             $crate::git::log::git_log_graph,
+            // Git graph commands
+            $crate::git::graph::git_get_commit_graph,
+            $crate::git::log::git_get_commit_details,
             // Git stash commands
             $crate::git::stash::git_stashes,
             $crate::git::stash::git_stash_list,
@@ -58,12 +61,14 @@ macro_rules! git_commands {
             $crate::git::bisect::git_bisect_reset,
             // Git cherry-pick commands
             $crate::git::cherry_pick::git_commit_files,
+            $crate::git::cherry_pick::git_cherry_pick,
             $crate::git::cherry_pick::git_cherry_pick_status,
             $crate::git::cherry_pick::git_cherry_pick_start,
             $crate::git::cherry_pick::git_cherry_pick_continue,
             $crate::git::cherry_pick::git_cherry_pick_skip,
             $crate::git::cherry_pick::git_cherry_pick_abort,
             // Git rebase commands
+            $crate::git::rebase::git_rebase,
             $crate::git::rebase::git_rebase_commits,
             $crate::git::rebase::git_rebase_status,
             $crate::git::rebase::git_rebase_start,
@@ -137,6 +142,11 @@ macro_rules! git_commands {
             $crate::git::branch::git_branch_rename,
             $crate::git::branch::git_reset_soft,
             $crate::git::branch::git_clean,
+            $crate::git::branch::git_checkout,
+            $crate::git::branch::git_create_branch,
+            $crate::git::branch::git_delete_branch,
+            $crate::git::branch::git_reset,
+            $crate::git::branch::git_revert,
             // Git repository watcher
             $crate::git::watcher::git_watch_repository,
             // Git line staging

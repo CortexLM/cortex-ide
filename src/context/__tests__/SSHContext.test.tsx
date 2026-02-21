@@ -206,25 +206,25 @@ describe("SSHContext", () => {
     it("should listen for terminal output events", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("ssh_terminal:output", () => {});
+      await listen("ssh-terminal:output", () => {});
 
-      expect(listen).toHaveBeenCalledWith("ssh_terminal:output", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("ssh-terminal:output", expect.any(Function));
     });
 
     it("should listen for terminal status events", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("ssh_terminal:status", () => {});
+      await listen("ssh-terminal:status", () => {});
 
-      expect(listen).toHaveBeenCalledWith("ssh_terminal:status", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("ssh-terminal:status", expect.any(Function));
     });
 
     it("should listen for progress events", async () => {
       vi.mocked(listen).mockResolvedValueOnce(() => {});
 
-      await listen("ssh_terminal:progress", () => {});
+      await listen("ssh-terminal:progress", () => {});
 
-      expect(listen).toHaveBeenCalledWith("ssh_terminal:progress", expect.any(Function));
+      expect(listen).toHaveBeenCalledWith("ssh-terminal:progress", expect.any(Function));
     });
   });
 

@@ -67,7 +67,7 @@ function handleSegmentClick(segment: BreadcrumbSegment) {
     window.dispatchEvent(new CustomEvent("breadcrumb:navigate-folder", {
       detail: { path: segment.fullPath },
     }));
-    window.dispatchEvent(new CustomEvent("reveal-in-explorer", {
+    window.dispatchEvent(new CustomEvent("explorer:reveal", {
       detail: { path: segment.fullPath },
     }));
   }

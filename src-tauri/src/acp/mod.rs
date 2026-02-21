@@ -75,7 +75,7 @@ impl ACPManager {
                     idempotent_hint: Some(true),
                     open_world_hint: None,
                 }),
-                "builtin:read_file",
+                "builtin:read-file",
             ),
             ACPTool::new_builtin(
                 "write_file",
@@ -112,7 +112,7 @@ impl ACPManager {
                     idempotent_hint: Some(true),
                     open_world_hint: None,
                 }),
-                "builtin:write_file",
+                "builtin:write-file",
             ),
             ACPTool::new_builtin(
                 "list_directory",
@@ -143,7 +143,7 @@ impl ACPManager {
                     idempotent_hint: Some(true),
                     open_world_hint: None,
                 }),
-                "builtin:list_directory",
+                "builtin:list-directory",
             ),
             ACPTool::new_builtin(
                 "execute_command",
@@ -184,7 +184,7 @@ impl ACPManager {
                     idempotent_hint: None,
                     open_world_hint: Some(true),
                 }),
-                "builtin:execute_command",
+                "builtin:execute-command",
             ),
             ACPTool::new_builtin(
                 "http_request",
@@ -226,7 +226,7 @@ impl ACPManager {
                     idempotent_hint: None,
                     open_world_hint: Some(true),
                 }),
-                "builtin:http_request",
+                "builtin:http-request",
             ),
             ACPTool::new_builtin(
                 "search_files",
@@ -262,7 +262,7 @@ impl ACPManager {
                     idempotent_hint: Some(true),
                     open_world_hint: None,
                 }),
-                "builtin:search_files",
+                "builtin:search-files",
             ),
         ];
 

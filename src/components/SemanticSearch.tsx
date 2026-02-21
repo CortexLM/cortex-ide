@@ -231,7 +231,7 @@ export function SemanticSearch(props: SemanticSearchProps) {
     
     // Navigate to the line
     setTimeout(() => {
-      window.dispatchEvent(new CustomEvent("goto-line", {
+      window.dispatchEvent(new CustomEvent("editor:goto-line", {
         detail: { line: result.startLine + 1, column: 1 },
       }));
     }, 100);

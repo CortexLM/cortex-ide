@@ -137,7 +137,7 @@ export const ProblemsPanel: Component<ProblemsPanelProps> = (props) => {
 
   const navigateTo = (d: TaskDiagnostic) => {
     setSelectedId(d.id);
-    window.dispatchEvent(new CustomEvent("navigate-to-location", {
+    window.dispatchEvent(new CustomEvent("editor:navigate-to-location", {
       detail: { uri: `file://${d.file.replace(/\\/g, "/")}`, line: d.line, column: d.column },
     }));
   };

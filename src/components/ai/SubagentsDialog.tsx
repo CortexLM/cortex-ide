@@ -123,7 +123,7 @@ export function SubagentsDialog(props: SubagentsDialogProps) {
       setAgents((prev) => [...prev, event.payload]);
     });
     
-    const unlisten2 = await listen<{ agentId: string; status: string }>("agent:status_changed", (event) => {
+    const unlisten2 = await listen<{ agentId: string; status: string }>("agent:status-changed", (event) => {
       setAgents((prev) =>
         prev.map((a) =>
           a.id === event.payload.agentId
@@ -133,7 +133,7 @@ export function SubagentsDialog(props: SubagentsDialogProps) {
       );
     });
     
-    const unlisten3 = await listen<AgentTask>("agent:task_completed", (event) => {
+    const unlisten3 = await listen<AgentTask>("agent:task-completed", (event) => {
       setTasks((prev) =>
         prev.map((t) =>
           t.id === event.payload.id ? event.payload : t

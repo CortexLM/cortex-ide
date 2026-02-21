@@ -31,7 +31,6 @@ export const CortexConfigBadge: Component<CortexConfigBadgeProps> = (props) => {
 
   const [hovered, setHovered] = createSignal(false);
 
-  const displayLabel = () => local.label ?? "config";
   const effectiveVariant = () => local.variant ?? "default";
 
   const getBackground = (): string => {
@@ -62,16 +61,6 @@ export const CortexConfigBadge: Component<CortexConfigBadgeProps> = (props) => {
     ...local.style,
   });
 
-  const labelStyle = (): JSX.CSSProperties => ({
-    "font-family": "var(--cortex-font-sans)",
-    "font-size": "16px",
-    "font-weight": "500",
-    "line-height": "1em",
-    color: "var(--cortex-text-primary)",
-    "white-space": "nowrap",
-    "user-select": "none",
-  });
-
   const handleMouseEnter = () => {
     setHovered(true);
   };
@@ -96,7 +85,20 @@ export const CortexConfigBadge: Component<CortexConfigBadgeProps> = (props) => {
         {...others}
       >
         <CortexIcon name="gear" size={16} />
-        <span style={labelStyle()}>{displayLabel()}</span>
+        <Show when={local.label}>
+          <span
+            style={{
+              "font-family": "var(--cortex-font-sans, 'Figtree', sans-serif)",
+              "font-size": "16px",
+              "font-weight": "500",
+              "line-height": "1em",
+              color: "#FCFCFC",
+              "white-space": "nowrap",
+            }}
+          >
+            {local.label}
+          </span>
+        </Show>
         <CortexIcon
           name={local.isOpen ? "chevron-up" : "chevron-down"}
           size={20}

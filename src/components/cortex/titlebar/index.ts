@@ -1,5 +1,10 @@
 export { CortexLogo } from "./CortexLogo";
 export { MacWindowControls } from "./MacWindowControls";
+export { WindowsLinuxWindowControls } from "./WindowsLinuxWindowControls";
+export { WindowControls } from "./WindowControls";
+export type { WindowControlsProps } from "./WindowControls";
+export { detectPlatform } from "./platformDetect";
+export type { Platform } from "./platformDetect";
 export { TitleBarDropdownMenu } from "./TitleBarDropdownMenu";
 export type { TitleBarDropdownMenuProps } from "./TitleBarDropdownMenu";
 export { MENU_LABELS, DEFAULT_MENUS } from "./defaultMenus";

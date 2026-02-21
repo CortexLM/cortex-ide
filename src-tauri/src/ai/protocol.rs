@@ -8,13 +8,13 @@ pub struct TokenUsageInfo {
     pub total_tokens: u32,
 }
 
-/// Server-to-client messages emitted via the `"cortex-event"` Tauri event channel.
+/// Server-to-client messages emitted via the `"cortex:event"` Tauri event channel.
 ///
 /// This is the **primary AI pipeline** used by `SDKContext.tsx` and `AgentPanel.tsx`.
 /// Events are serialized with `#[serde(tag = "type", rename_all = "snake_case")]`,
 /// so each variant becomes a `{ type: "variant_name", ...fields }` JSON object.
 ///
-/// **Tauri Event:** `"cortex-event"`
+/// **Tauri Event:** `"cortex:event"`
 /// **Direction:** Backend (`session.rs`) → Frontend (`SDKContext.tsx`)
 /// **Emitter:** `convert_event_to_ws()` in `session.rs`
 ///

@@ -45,21 +45,21 @@ export const lightColors: ThemeColors = {
 // Editor Color Palettes
 // ============================================================================
 
-// Figma Design Editor Colors
+// Figma Design Editor Colors (node 5:12544)
 export const darkEditorColors: EditorColors = {
-  editorBackground: "#1A1B1F",            // Figma card background
-  editorForeground: "#FFFFFF",            // White text
+  editorBackground: "#141415",
+  editorForeground: "#FCFCFC",
   editorLineHighlight: "rgba(255,255,255,0.05)",
   editorSelectionBackground: "rgba(255,255,255,0.15)",
-  editorSelectionForeground: "#FFFFFF",
-  editorCursor: "#FFFFFF",
+  editorSelectionForeground: "#FCFCFC",
+  editorCursor: "#FCFCFC",
   editorWhitespace: "rgba(255,255,255,0.1)",
   editorIndentGuide: "rgba(255,255,255,0.05)",
   editorIndentGuideActive: "rgba(255,255,255,0.1)",
-  editorLineNumber: "rgba(255,255,255,0.5)",  // Figma line numbers
-  editorLineNumberActive: "#FFFFFF",
+  editorLineNumber: "#8C8D8F",
+  editorLineNumberActive: "#FCFCFC",
   editorRuler: "rgba(255,255,255,0.1)",
-  editorGutter: "#1A1B1F",
+  editorGutter: "#141415",
   editorFoldBackground: "rgba(255,255,255,0.05)",
 };
 
@@ -84,26 +84,26 @@ export const lightEditorColors: EditorColors = {
 // Syntax Highlighting Color Palettes
 // ============================================================================
 
-// Figma Design Exact Syntax Colors
+// Figma Design Exact Syntax Colors (node 5:12544)
 export const darkSyntaxColors: SyntaxColors = {
-  comment: "rgba(255,255,255,0.5)",  // Line numbers, comments
-  string: "#8EFF96",                  // Strings, template literals
-  number: "#8EFF96",                  // Numbers
-  keyword: "#FEAB78",                 // const, typeof, if, false, true
-  operator: "#FFFFFF",                // =, ===, &&, ||
-  function: "#66BFFF",                // useTranslation, useState, Object.keys
-  variable: "#FFFFFF",                // Default text
-  type: "#FEAB78",                    // <boolean>, type annotations
-  class: "#66BFFF",                   // Class names
-  constant: "#FEAB78",                // false, true, null
-  parameter: "#FFFFFF",               // Function parameters
-  property: "#FFB7FA",                // .length, .household, .members
-  punctuation: "#FFFFFF",             // (), {}, []
-  tag: "#FEAB78",                     // JSX tags
-  attribute: "#FFB7FA",               // JSX attributes
-  regexp: "#8EFF96",                  // Regular expressions
-  escape: "#FEAB78",                  // Escape sequences
-  invalid: "#ef4444",                 // Invalid code
+  comment: "#8C8D8F",                 // Comments
+  string: "#FFB7FA",                  // Strings, template literals (pink)
+  number: "#FFB7FA",                  // Numbers (pink)
+  keyword: "#FEAB78",                 // const, typeof, if, false, true (orange)
+  operator: "#FCFCFC",                // =, ===, &&, ||
+  function: "#66BFFF",                // useTranslation, useState, Object.keys (blue)
+  variable: "#FCFCFC",                // Default text
+  type: "#FEAB78",                    // <boolean>, type annotations (orange)
+  class: "#66BFFF",                   // Class names (blue)
+  constant: "#FEAB78",                // false, true, null (orange)
+  parameter: "#FCFCFC",               // Function parameters
+  property: "#FFB7FA",                // .length, .household, .members (pink)
+  punctuation: "#FCFCFC",             // (), {}, []
+  tag: "#FEAB78",                     // JSX tags (orange)
+  attribute: "#FFB7FA",               // JSX attributes (pink)
+  regexp: "#FFB7FA",                  // Regular expressions (pink)
+  escape: "#FEAB78",                  // Escape sequences (orange)
+  invalid: "#FF7070",                 // Invalid code
 };
 
 export const lightSyntaxColors: SyntaxColors = {

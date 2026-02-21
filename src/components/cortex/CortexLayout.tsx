@@ -260,8 +260,6 @@ export const CortexLayout: Component<CortexLayoutProps> = (props) => {
                 onTabClick={local.onTabClick}
                 onTabClose={local.onTabClose}
                 onNewTab={local.onNewTab}
-                currentLine={local.currentLine}
-                currentColumn={local.currentColumn}
                 language={local.language}
               >
                 {local.editorContent}

@@ -105,41 +105,32 @@ describe("CortexFileExplorer", () => {
       expect(getByTestId("tree-item-2")).toBeTruthy();
     });
 
-    it("should render header with title", () => {
+    it("should render Explorer tab in header", () => {
       const { container } = render(() => <CortexFileExplorer title="My Project" />);
-      const header = container.querySelector("header");
-      expect(header?.textContent).toContain("My Project");
+      const explorerTab = container.querySelector('[aria-label="Explorer"]');
+      expect(explorerTab).toBeTruthy();
     });
 
-    it("should render default title when not provided", () => {
+    it("should render Project title in tree view", () => {
       const { container } = render(() => <CortexFileExplorer />);
-      const header = container.querySelector("header");
-      expect(header?.textContent).toContain("Project");
+      expect(container.textContent).toContain("Project");
     });
 
     it("should render header action buttons", () => {
       const { container } = render(() => <CortexFileExplorer />);
-      const searchIcon = container.querySelector('[data-testid="icon-search"]');
-      const plusIcon = container.querySelector('[data-testid="icon-plus"]');
-      const refreshIcon = container.querySelector('[data-testid="icon-refresh"]');
-      
-      expect(searchIcon).toBeTruthy();
-      expect(plusIcon).toBeTruthy();
-      expect(refreshIcon).toBeTruthy();
+      const searchButton = container.querySelector('[aria-label="Search (Ctrl+Shift+F)"]');
+      const addButton = container.querySelector('[aria-label="New File"]');
+      const refreshButton = container.querySelector('[aria-label="Refresh"]');
+
+      expect(searchButton).toBeTruthy();
+      expect(addButton).toBeTruthy();
+      expect(refreshButton).toBeTruthy();
     });
 
-    it("should render footer with project info", () => {
-      const { container } = render(() => (
-        <CortexFileExplorer projectType="Docker" projectName="my-app" />
-      ));
-      const footer = container.querySelector("footer");
-      expect(footer?.textContent).toContain("my-app");
-    });
-
-    it("should render footer with default project name", () => {
-      const { container } = render(() => <CortexFileExplorer projectType="Node" />);
-      const footer = container.querySelector("footer");
-      expect(footer?.textContent).toContain("Node Project");
+    it("should render AI Terminal tab", () => {
+      const { container } = render(() => <CortexFileExplorer />);
+      const aiTab = container.querySelector('[aria-label="AI Terminal"]');
+      expect(aiTab).toBeTruthy();
     });
   });
 
@@ -296,10 +287,23 @@ describe("CortexFileExplorer", () => {
       expect(div?.style.backgroundColor).toBe("blue");
     });
 
-    it("should have correct container width of 317px", () => {
+    it("should have correct container width of 320px", () => {
       const { container } = render(() => <CortexFileExplorer />);
       const div = container.firstChild as HTMLElement;
-      expect(div?.style.width).toBe("317px");
+      expect(div?.style.width).toBe("320px");
+    });
+
+    it("should have correct border-radius of 16px", () => {
+      const { container } = render(() => <CortexFileExplorer />);
+      const div = container.firstChild as HTMLElement;
+      expect(div?.style.borderRadius).toBe("16px");
+    });
+
+    it("should have correct background color #141415", () => {
+      const { container } = render(() => <CortexFileExplorer />);
+      const div = container.firstChild as HTMLElement;
+      const bg = div?.style.background;
+      expect(bg === "#141415" || bg === "rgb(20, 20, 21)").toBe(true);
     });
   });
 });

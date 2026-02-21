@@ -9,7 +9,7 @@
  * Decoration categories managed via events:
  *
  * 1. **Debug Inline Values**
- *    - Event: "debug:inlineValuesUpdated" / "debug:cleared"
+ *    - Event: "debug:inline-values-updated" / "debug:cleared"
  *    - Shows variable values inline during debugging sessions
  *    - Uses Monaco `afterLineContent` decorations
  *
@@ -20,7 +20,7 @@
  *    - Managed via `applyCoverageDecorations` / `clearCoverageDecorations`
  *
  * 3. **Buffer Search Highlights**
- *    - Event: "buffer-search-highlights"
+ *    - Event: "buffer-search:highlights"
  *    - Highlights search matches with current-match emphasis
  *    - Uses overview ruler and minimap indicators
  *

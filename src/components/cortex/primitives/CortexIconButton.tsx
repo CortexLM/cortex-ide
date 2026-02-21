@@ -41,7 +41,7 @@ export const CortexIconButton: Component<CortexIconButtonProps> = (props) => {
     padding: "0",
     margin: "0",
     border: "none",
-    background: hovered() && !local.disabled ? "rgba(252, 252, 252, 0.08)" : "transparent",
+    background: hovered() && !local.disabled ? "var(--cortex-icon-button-hover-bg)" : "transparent",
     "border-radius": hovered() && !local.disabled ? "4px" : "0",
     cursor: local.disabled ? "not-allowed" : "pointer",
     opacity: local.disabled ? "0.5" : "1",

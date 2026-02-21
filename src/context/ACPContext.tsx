@@ -192,7 +192,7 @@ export function ACPProvider(props: ParentProps) {
     unlistenExecution = await listen<{
       executionId: string;
       result: ToolExecutionResult;
-    }>("acp:execution_complete", (event) => {
+    }>("acp:execution-complete", (event) => {
       const { executionId, result } = event.payload;
       setState("executions", executionId, result);
       setState(
@@ -206,7 +206,7 @@ export function ACPProvider(props: ParentProps) {
     });
 
     unlistenPermission = await listen<ToolPermissionRequest>(
-      "acp:permission_request",
+      "acp:permission-request",
       (event) => {
         setState(
           produce((s) => {
@@ -652,7 +652,7 @@ export const BUILTIN_TOOLS: Omit<ACPTool, "id" | "enabled">[] = [
     annotations: {
       readOnlyHint: true,
     },
-    handler: "builtin:read_file",
+    handler: "builtin:read-file",
   },
   {
     name: "write_file",
@@ -686,7 +686,7 @@ export const BUILTIN_TOOLS: Omit<ACPTool, "id" | "enabled">[] = [
     annotations: {
       destructiveHint: true,
     },
-    handler: "builtin:write_file",
+    handler: "builtin:write-file",
   },
   {
     name: "list_directory",
@@ -714,7 +714,7 @@ export const BUILTIN_TOOLS: Omit<ACPTool, "id" | "enabled">[] = [
     annotations: {
       readOnlyHint: true,
     },
-    handler: "builtin:list_directory",
+    handler: "builtin:list-directory",
   },
   {
     name: "execute_command",
@@ -753,7 +753,7 @@ export const BUILTIN_TOOLS: Omit<ACPTool, "id" | "enabled">[] = [
       destructiveHint: true,
       openWorldHint: true,
     },
-    handler: "builtin:execute_command",
+    handler: "builtin:execute-command",
   },
   {
     name: "http_request",
@@ -792,7 +792,7 @@ export const BUILTIN_TOOLS: Omit<ACPTool, "id" | "enabled">[] = [
     annotations: {
       openWorldHint: true,
     },
-    handler: "builtin:http_request",
+    handler: "builtin:http-request",
   },
   {
     name: "search_files",
@@ -825,7 +825,7 @@ export const BUILTIN_TOOLS: Omit<ACPTool, "id" | "enabled">[] = [
     annotations: {
       readOnlyHint: true,
     },
-    handler: "builtin:search_files",
+    handler: "builtin:search-files",
   },
 ];
 

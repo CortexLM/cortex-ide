@@ -266,15 +266,15 @@ class MonacoManager {
         // #FEAB78 = orange (keywords: const, typeof, if, true, false, <boolean>)
         // #66BFFF = blue (functions: useState, setIsLoading, useAccount, Object.keys)
         // #FFB7FA = pink (hooks/special: useTranslation, properties: .length, .household)
-        // #8EFF96 = green (strings: "object", numbers: 0, 1)
+        // #FFB7FA = pink (strings, hooks/special, properties: .length, .household)
         // #FFFFFF = white (variables, operators, brackets, punctuation)
-        // #808080 = gray (comments, line numbers)
+        // #8C8D8F = gray (comments, line numbers)
         
-        // Comments - Figma: rgba(255,255,255,0.5) ≈ #808080
-        { token: "comment", foreground: "808080", fontStyle: "italic" },
-        { token: "comment.block", foreground: "808080", fontStyle: "italic" },
-        { token: "comment.line", foreground: "808080", fontStyle: "italic" },
-        { token: "comment.doc", foreground: "808080", fontStyle: "italic" },
+        // Comments - Figma: #8C8D8F
+        { token: "comment", foreground: "8C8D8F", fontStyle: "italic" },
+        { token: "comment.block", foreground: "8C8D8F", fontStyle: "italic" },
+        { token: "comment.line", foreground: "8C8D8F", fontStyle: "italic" },
+        { token: "comment.doc", foreground: "8C8D8F", fontStyle: "italic" },
         
         // Keywords - Figma: #FEAB78 (orange)
         { token: "keyword", foreground: "FEAB78" },
@@ -323,18 +323,18 @@ class MonacoManager {
         { token: "meta.property", foreground: "FFB7FA" },
         { token: "entity.name.tag.localname", foreground: "FFB7FA" },
         
-        // Strings - Figma: #8EFF96 (green)
-        { token: "string", foreground: "8EFF96" },
+        // Strings - Figma: #FFB7FA (pink)
+        { token: "string", foreground: "FFB7FA" },
         { token: "string.escape", foreground: "FEAB78" },
-        { token: "string.template", foreground: "8EFF96" },
-        { token: "string.quoted", foreground: "8EFF96" },
-        { token: "string.regexp", foreground: "8EFF96" },
+        { token: "string.template", foreground: "FFB7FA" },
+        { token: "string.quoted", foreground: "FFB7FA" },
+        { token: "string.regexp", foreground: "FFB7FA" },
         
-        // Numbers - Figma: #8EFF96 (green)
-        { token: "number", foreground: "8EFF96" },
-        { token: "number.hex", foreground: "8EFF96" },
-        { token: "number.float", foreground: "8EFF96" },
-        { token: "constant.numeric", foreground: "8EFF96" },
+        // Numbers - Figma: #FFB7FA (pink)
+        { token: "number", foreground: "FFB7FA" },
+        { token: "number.hex", foreground: "FFB7FA" },
+        { token: "number.float", foreground: "FFB7FA" },
+        { token: "constant.numeric", foreground: "FFB7FA" },
         
         // Operators - Figma: #FFFFFF (white)
         { token: "operator", foreground: "FFFFFF" },
@@ -344,15 +344,15 @@ class MonacoManager {
         { token: "keyword.operator.logical", foreground: "FFFFFF" },
         { token: "keyword.operator.comparison", foreground: "FFFFFF" },
         
-        // Punctuation/Brackets - Figma: #FFFFFF (white)
-        { token: "delimiter", foreground: "FFFFFF" },
-        { token: "delimiter.bracket", foreground: "FFFFFF" },
-        { token: "delimiter.parenthesis", foreground: "FFFFFF" },
-        { token: "delimiter.square", foreground: "FFFFFF" },
-        { token: "delimiter.curly", foreground: "FFFFFF" },
-        { token: "punctuation", foreground: "FFFFFF" },
-        { token: "punctuation.definition", foreground: "FFFFFF" },
-        { token: "meta.brace", foreground: "FFFFFF" },
+        // Punctuation/Brackets - Figma: #FCFCFC
+        { token: "delimiter", foreground: "FCFCFC" },
+        { token: "delimiter.bracket", foreground: "FCFCFC" },
+        { token: "delimiter.parenthesis", foreground: "FCFCFC" },
+        { token: "delimiter.square", foreground: "FCFCFC" },
+        { token: "delimiter.curly", foreground: "FCFCFC" },
+        { token: "punctuation", foreground: "FCFCFC" },
+        { token: "punctuation.definition", foreground: "FCFCFC" },
+        { token: "meta.brace", foreground: "FCFCFC" },
         
         // Annotations/Decorators - Figma: #FEAB78 (orange)
         { token: "annotation", foreground: "FEAB78" },
@@ -367,7 +367,7 @@ class MonacoManager {
         
         // JSX/HTML Attributes - Figma: #FFB7FA (pink)
         { token: "attribute.name", foreground: "FFB7FA" },
-        { token: "attribute.value", foreground: "8EFF96" },
+        { token: "attribute.value", foreground: "FFB7FA" },
         
         // Constants (true/false/null) - Figma: #FEAB78 (orange)
         { token: "constant", foreground: "FEAB78" },
@@ -375,26 +375,26 @@ class MonacoManager {
         { token: "constant.language.boolean", foreground: "FEAB78" },
         { token: "constant.language.null", foreground: "FEAB78" },
         { token: "constant.language.undefined", foreground: "FEAB78" },
-        { token: "constant.character", foreground: "8EFF96" },
+        { token: "constant.character", foreground: "FFB7FA" },
         
-        // Regex - Figma: #8EFF96 (green)
-        { token: "regexp", foreground: "8EFF96" },
+        // Regex - Figma: #FFB7FA (pink)
+        { token: "regexp", foreground: "FFB7FA" },
         
-        // Default/Fallback - white
-        { token: "", foreground: "FFFFFF" },
+        // Default/Fallback
+        { token: "", foreground: "FCFCFC" },
       ],
       colors: {
-        // Editor core - Figma design: #1A1B1F
-        "editor.background": "#1A1B1F",
-        "editor.foreground": "#FFFFFF",
-        "editorCursor.foreground": "#FFFFFF",
+        // Editor core - Figma: #141415
+        "editor.background": "#141415",
+        "editor.foreground": "#FCFCFC",
+        "editorCursor.foreground": "#FCFCFC",
         
         // Gutter/margin background - same as editor
-        "editorGutter.background": "#1A1B1F",
+        "editorGutter.background": "#141415",
         
-        // Line numbers - Figma: rgba(255,255,255,0.5)
-        "editorLineNumber.foreground": "#808080",
-        "editorLineNumber.activeForeground": "#FFFFFF",
+        // Line numbers - Figma: #8C8D8F
+        "editorLineNumber.foreground": "#8C8D8F",
+        "editorLineNumber.activeForeground": "#FCFCFC",
         
         // Active line
         "editor.lineHighlightBackground": "#ffffff08",
@@ -455,30 +455,30 @@ class MonacoManager {
         "editorBracketPairGuide.activeBackground6": "#FFFFFF",
         
         // Minimap - same as editor
-        "minimap.background": "#1A1A1A",
+        "minimap.background": "#141415",
         "minimap.foregroundOpacity": "#000000cc",
-        "minimapSlider.background": "#3F3F4650",
-        "minimapSlider.hoverBackground": "#3F3F4680",
-        "minimapSlider.activeBackground": "#3F3F46a0",
+        "minimapSlider.background": "#2E2F3150",
+        "minimapSlider.hoverBackground": "#2E2F3180",
+        "minimapSlider.activeBackground": "#2E2F31a0",
         
-        // Scrollbar - Trae/Cortex subtle
-        "scrollbarSlider.background": "#3F3F4650",
-        "scrollbarSlider.hoverBackground": "#52525B80",
-        "scrollbarSlider.activeBackground": "#52525Ba0",
+        // Scrollbar - Figma: #2E2F31 thumb, transparent track
+        "scrollbarSlider.background": "#2E2F31",
+        "scrollbarSlider.hoverBackground": "#2E2F31cc",
+        "scrollbarSlider.activeBackground": "#2E2F31e0",
         
         // Error/warning/info squiggles
-        "editorError.foreground": "#EF4444",
-        "editorWarning.foreground": "#F97316",
+        "editorError.foreground": "#FF7070",
+        "editorWarning.foreground": "#FEC55A",
         "editorInfo.foreground": "#6366F1",
         "editorHint.foreground": "#6366F1",
         
         // Inlay hints
-        "editorInlayHint.background": "#1A1A1A80",
-        "editorInlayHint.foreground": "#52525B",
-        "editorInlayHint.typeForeground": "#52525B",
-        "editorInlayHint.typeBackground": "#1A1A1A80",
-        "editorInlayHint.parameterForeground": "#52525B",
-        "editorInlayHint.parameterBackground": "#1A1A1A80",
+        "editorInlayHint.background": "#14141580",
+        "editorInlayHint.foreground": "#8C8D8F",
+        "editorInlayHint.typeForeground": "#8C8D8F",
+        "editorInlayHint.typeBackground": "#14141580",
+        "editorInlayHint.parameterForeground": "#8C8D8F",
+        "editorInlayHint.parameterBackground": "#14141580",
         
         // Linked editing
         "editor.linkedEditingBackground": "#6366F120",
@@ -494,8 +494,8 @@ class MonacoManager {
         "editorGutter.deletedBackground": "#EF4444",
         
         // Overview ruler (right-side scrollbar annotations)
-        "editorOverviewRuler.errorForeground": "#EF4444",
-        "editorOverviewRuler.warningForeground": "#F97316",
+        "editorOverviewRuler.errorForeground": "#FF7070",
+        "editorOverviewRuler.warningForeground": "#FEC55A",
         "editorOverviewRuler.infoForeground": "#6366F1",
         "editorOverviewRuler.bracketMatchForeground": "#6366F1",
         "editorOverviewRuler.findMatchForeground": "#6366F1",

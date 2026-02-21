@@ -150,7 +150,7 @@ export function BreakpointsView() {
     // Small delay to ensure editor is ready after opening the file
     setTimeout(() => {
       window.dispatchEvent(
-        new CustomEvent("goto-line", {
+        new CustomEvent("editor:goto-line", {
           detail: { line, column: 1 },
         })
       );

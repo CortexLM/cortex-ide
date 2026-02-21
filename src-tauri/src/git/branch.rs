@@ -174,6 +174,150 @@ pub async fn git_clean(path: String, files: Option<Vec<String>>) -> Result<(), S
     .map_err(|e| format!("Task join error: {}", e))?
 }
 
+/// Checkout a branch, tag, or commit
+#[tauri::command]
+pub async fn git_checkout(path: Option<String>, r#ref: String) -> Result<(), String> {
+    let path = path.unwrap_or_else(|| ".".to_string());
+    tokio::task::spawn_blocking(move || {
+        let repo_root = get_repo_root(&path)?;
+        let repo_root_path = Path::new(&repo_root);
+
+        let output = git_command_with_timeout(&["checkout", &r#ref], repo_root_path)?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(format!("Failed to checkout '{}': {}", r#ref, stderr));
+        }
+
+        info!("[Git] Checked out '{}'", r#ref);
+        Ok(())
+    })
+    .await
+    .map_err(|e| format!("Task join error: {}", e))?
+}
+
+/// Create a new branch
+#[tauri::command]
+pub async fn git_create_branch(
+    path: Option<String>,
+    name: String,
+    start_point: Option<String>,
+) -> Result<(), String> {
+    let path = path.unwrap_or_else(|| ".".to_string());
+    tokio::task::spawn_blocking(move || {
+        let repo_root = get_repo_root(&path)?;
+        let repo_root_path = Path::new(&repo_root);
+
+        let mut args = vec!["branch".to_string(), name.clone()];
+        if let Some(ref s) = start_point {
+            args.push(s.clone());
+        }
+        let args_refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+
+        let output = git_command_with_timeout(&args_refs, repo_root_path)?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(format!("Failed to create branch '{}': {}", name, stderr));
+        }
+
+        info!("[Git] Created branch '{}'", name);
+        Ok(())
+    })
+    .await
+    .map_err(|e| format!("Task join error: {}", e))?
+}
+
+/// Delete a local branch
+#[tauri::command]
+pub async fn git_delete_branch(
+    path: Option<String>,
+    name: String,
+    force: Option<bool>,
+) -> Result<(), String> {
+    let path = path.unwrap_or_else(|| ".".to_string());
+    tokio::task::spawn_blocking(move || {
+        let repo_root = get_repo_root(&path)?;
+        let repo_root_path = Path::new(&repo_root);
+
+        let flag = if force.unwrap_or(false) { "-D" } else { "-d" };
+        let output = git_command_with_timeout(&["branch", flag, &name], repo_root_path)?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(format!("Failed to delete branch '{}': {}", name, stderr));
+        }
+
+        info!("[Git] Deleted branch '{}'", name);
+        Ok(())
+    })
+    .await
+    .map_err(|e| format!("Task join error: {}", e))?
+}
+
+/// Reset current HEAD to a specific commit
+#[tauri::command]
+pub async fn git_reset(
+    path: Option<String>,
+    hash: String,
+    mode: Option<String>,
+) -> Result<(), String> {
+    let path = path.unwrap_or_else(|| ".".to_string());
+    tokio::task::spawn_blocking(move || {
+        let repo_root = get_repo_root(&path)?;
+        let repo_root_path = Path::new(&repo_root);
+
+        let mode_str = mode.unwrap_or_else(|| "mixed".to_string());
+        let mode_flag = match mode_str.as_str() {
+            "soft" => "--soft",
+            "mixed" => "--mixed",
+            "hard" => "--hard",
+            other => return Err(format!("Invalid reset mode: {}", other)),
+        };
+
+        let output = git_command_with_timeout(&["reset", mode_flag, &hash], repo_root_path)?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(format!("Failed to reset to '{}': {}", hash, stderr));
+        }
+
+        info!("[Git] Reset ({}) to {}", mode_str, hash);
+        Ok(())
+    })
+    .await
+    .map_err(|e| format!("Task join error: {}", e))?
+}
+
+/// Revert a commit
+#[tauri::command]
+pub async fn git_revert(path: Option<String>, hash: String) -> Result<(), String> {
+    let path = path.unwrap_or_else(|| ".".to_string());
+    tokio::task::spawn_blocking(move || {
+        let repo_root = get_repo_root(&path)?;
+        let repo_root_path = Path::new(&repo_root);
+
+        let output = git_command_with_timeout(&["revert", "--no-edit", &hash], repo_root_path)?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            if stderr.contains("CONFLICT") || stderr.contains("conflict") {
+                info!(
+                    "[Git] Revert of {} has conflicts, waiting for resolution",
+                    hash
+                );
+                return Ok(());
+            }
+            return Err(format!("Failed to revert '{}': {}", hash, stderr));
+        }
+
+        info!("[Git] Reverted commit {}", hash);
+        Ok(())
+    })
+    .await
+    .map_err(|e| format!("Task join error: {}", e))?
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
