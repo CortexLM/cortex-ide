@@ -209,38 +209,4 @@ jobs:
           fi
           echo "All CI checks passed!"
 
-  # ==========================================================================
-  # Release - Semantic versioning (only on push to main/master)
-  # ==========================================================================
-  release:
-    name: Release
-    runs-on: blacksmith-2vcpu-ubuntu-2404
-    needs: [ci-success]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-
-      - name: Mount node_modules (sticky disk)
-        uses: useblacksmith/stickydisk@v1
-        with:
-          key: ${{ github.repository }}-node-modules
-          path: ./node_modules
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run semantic-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
