@@ -35,3 +35,6 @@ src-tauri/WixTools/
 # Build cache
 .cargo/
 .sccache/
+-e 
+# Coverage output
+coverage/
