@@ -1,9 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import {
   EVENTS,
-  dispatchEvent,
   dispatchUntypedEvent,
-  addEventListener,
   addUntypedEventListener,
 } from "../events";
 
