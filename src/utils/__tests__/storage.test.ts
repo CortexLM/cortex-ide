@@ -74,13 +74,17 @@ describe("storage", () => {
 
     it("saves and retrieves messages", () => {
       const messages = [
-        { role: "user", content: "Hello" },
-        { role: "assistant", content: "Hi" },
+        { role: "user", parts: [{ type: "text", content: "Hello" }] },
+        { role: "assistant", parts: [{ type: "text", content: "Hi" }] },
       ] as any[];
       saveMessages("s1", messages);
       const retrieved = getMessages("s1");
       expect(retrieved).toHaveLength(2);
-      expect(retrieved[0].content).toBe("Hello");
+      const firstPart = retrieved[0].parts[0];
+      expect(firstPart.type).toBe("text");
+      if (firstPart.type === "text") {
+        expect(firstPart.content).toBe("Hello");
+      }
     });
   });
 

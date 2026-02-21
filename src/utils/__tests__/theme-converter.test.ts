@@ -59,14 +59,14 @@ describe("theme-converter", () => {
 
   describe("convertWorkbenchColors", () => {
     it("extracts workbench colors", () => {
-      const colors = convertWorkbenchColors(minimalTheme.colors);
+      const colors = convertWorkbenchColors(minimalTheme.colors, "dark");
       expect(colors).toBeDefined();
     });
   });
 
   describe("convertEditorColors", () => {
     it("extracts editor colors", () => {
-      const colors = convertEditorColors(minimalTheme.colors);
+      const colors = convertEditorColors(minimalTheme.colors, "dark");
       expect(colors).toBeDefined();
       expect(colors.editorBackground).toBe("#1e1e1e");
     });
@@ -74,7 +74,7 @@ describe("theme-converter", () => {
 
   describe("convertTerminalColors", () => {
     it("extracts terminal colors", () => {
-      const colors = convertTerminalColors(minimalTheme.colors);
+      const colors = convertTerminalColors(minimalTheme.colors, "dark");
       expect(colors).toBeDefined();
       expect(colors.terminalBackground).toBe("#1e1e1e");
     });
@@ -82,7 +82,7 @@ describe("theme-converter", () => {
 
   describe("convertSyntaxColors", () => {
     it("converts token colors", () => {
-      const syntax = convertSyntaxColors(minimalTheme.tokenColors);
+      const syntax = convertSyntaxColors(minimalTheme.tokenColors, "dark");
       expect(syntax).toBeDefined();
     });
   });

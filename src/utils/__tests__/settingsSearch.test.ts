@@ -77,13 +77,13 @@ describe("settingsSearch", () => {
 
   describe("highlightMatches", () => {
     it("returns highlight ranges", () => {
-      const result = highlightMatches("Font Size", "font");
+      const result = highlightMatches("Font Size", [{ start: 0, end: 4 }]);
       expect(Array.isArray(result)).toBe(true);
     });
 
-    it("returns empty for no match", () => {
-      const result = highlightMatches("Font Size", "xyz");
-      expect(result).toHaveLength(0);
+    it("returns non-highlighted text for no match", () => {
+      const result = highlightMatches("Font Size", []);
+      expect(result.every((r) => !r.highlighted)).toBe(true);
     });
   });
 

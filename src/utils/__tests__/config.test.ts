@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { API_BASE_URL, updateApiBaseUrl, getWsUrl } from "../config";
+import { API_BASE_URL, getWsUrl } from "../config";
 
 describe("config", () => {
   it("has default API base URL", () => {

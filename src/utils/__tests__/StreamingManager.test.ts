@@ -12,7 +12,7 @@ describe("StreamingManager", () => {
   let manager: StreamingManager;
 
   beforeEach(() => {
-    manager = new StreamingManager();
+    manager = getStreamingManager();
   });
 
   afterEach(() => {
@@ -106,7 +106,7 @@ describe("StreamingManager", () => {
 
   describe("createListUpdate", () => {
     it("creates list add update", () => {
-      const update = createListUpdate("mylist", "list_add", [{ id: "1", content: "item" }]);
+      const update = createListUpdate("mylist", "list_add", [{ id: "1", data: "item" }]);
       expect(update.type).toBe("list_add");
       expect(update.listId).toBe("mylist");
       expect(update.items).toHaveLength(1);
