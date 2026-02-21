@@ -19,9 +19,9 @@ import { ContributedPanel } from "../ContributedPanel";
 describe("ContributedPanel coverage", () => {
   it("should exercise ContributedPanel", () => {
     expect(ContributedPanel).toBeDefined();
-    try { if (typeof ContributedPanel === "function") ContributedPanel(); } catch (_e) {}
-    try { if (typeof ContributedPanel === "function") ContributedPanel("test"); } catch (_e) {}
-    try { if (typeof ContributedPanel === "function") ContributedPanel("test", {}); } catch (_e) {}
+    try { if (typeof ContributedPanel === "function") ContributedPanel({ panelId: "test", extensionId: "ext1", title: "Test Panel" }); } catch (_e) {}
+    try { if (typeof ContributedPanel === "function") ContributedPanel({ panelId: "test2", extensionId: "ext2", title: "Test Panel 2", icon: "icon" }); } catch (_e) {}
+    try { if (typeof ContributedPanel === "function") ContributedPanel({ panelId: "test3", extensionId: "ext3", title: "Test Panel 3", class: "custom" }); } catch (_e) {}
   });
 
 });

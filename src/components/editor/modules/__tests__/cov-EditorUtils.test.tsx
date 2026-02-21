@@ -199,11 +199,11 @@ describe("EditorUtils coverage", () => {
     try { if (typeof toCamelCase === "function") toCamelCase("test", {}); } catch (_e) {}
   });
 
-  it("should exercise executeBatched", () => {
+  it("should exercise executeBatched", async () => {
     expect(executeBatched).toBeDefined();
-    try { if (typeof executeBatched === "function") executeBatched(); } catch (_e) {}
-    try { if (typeof executeBatched === "function") executeBatched("test"); } catch (_e) {}
-    try { if (typeof executeBatched === "function") executeBatched("test", {}); } catch (_e) {}
+    await executeBatched([]);
+    await executeBatched([() => {}, () => {}]);
+    await executeBatched([() => {}, () => {}, () => {}], 2);
   });
 
   it("should exercise estimateLineCount", () => {

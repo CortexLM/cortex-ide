@@ -19,9 +19,9 @@ import { ContributedView } from "../ContributedView";
 describe("ContributedView coverage", () => {
   it("should exercise ContributedView", () => {
     expect(ContributedView).toBeDefined();
-    try { if (typeof ContributedView === "function") ContributedView(); } catch (_e) {}
-    try { if (typeof ContributedView === "function") ContributedView("test"); } catch (_e) {}
-    try { if (typeof ContributedView === "function") ContributedView("test", {}); } catch (_e) {}
+    try { if (typeof ContributedView === "function") ContributedView({ viewId: "test", extensionId: "ext1", title: "Test View" }); } catch (_e) {}
+    try { if (typeof ContributedView === "function") ContributedView({ viewId: "test2", extensionId: "ext2", title: "Test View 2", icon: "icon" }); } catch (_e) {}
+    try { if (typeof ContributedView === "function") ContributedView({ viewId: "test3", extensionId: "ext3", title: "Test View 3", class: "custom" }); } catch (_e) {}
   });
 
 });

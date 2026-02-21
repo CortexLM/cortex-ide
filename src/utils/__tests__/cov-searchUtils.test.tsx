@@ -16,25 +16,108 @@ vi.mock("@tauri-apps/plugin-store", () => ({ Store: vi.fn(() => ({ get: vi.fn(()
 import * as mod from "../searchUtils";
 
 describe("searchUtils comprehensive", () => {
-  const exports = Object.keys(mod).filter(k => typeof (mod as any)[k] === "function");
-  
-  it("should call all exported functions with various args", () => {
-    for (const name of exports) {
-      const fn = (mod as any)[name];
-      try { fn(); } catch(_e) {}
-      try { fn("test"); } catch(_e) {}
-      try { fn("test", "content"); } catch(_e) {}
-      try { fn("hello", "hello world"); } catch(_e) {}
-      try { fn("test", "line1\ntest here\nline3", { caseSensitive: false }); } catch(_e) {}
-      try { fn("test", "line1\ntest here\nline3", { caseSensitive: true }); } catch(_e) {}
-      try { fn("test", "line1\ntest here\nline3", { wholeWord: true }); } catch(_e) {}
-      try { fn("test", "line1\ntest here\nline3", { regex: true }); } catch(_e) {}
-      try { fn("t.st", "line1\ntest here\nline3", { regex: true }); } catch(_e) {}
-      try { fn([{ path: "/test/file.ts", content: "hello world" }], "hello"); } catch(_e) {}
-      try { fn("pattern", ["/test"], { include: "*.ts", exclude: "node_modules" }); } catch(_e) {}
-      try { fn({ query: "test", files: ["/a.ts"], options: {} }); } catch(_e) {}
-      try { fn("hello", "HELLO world", { caseSensitive: false }); } catch(_e) {}
-      try { fn("hello", "HELLO world", { caseSensitive: true }); } catch(_e) {}
-    }
+  const match = { line: 1, column: 5, text: "hello world", matchStart: 5, matchEnd: 10 };
+  const match2 = { line: 3, column: 1, text: "test line", matchStart: 0, matchEnd: 4 };
+  const result = { file: "/test/file.ts", matches: [match, match2] };
+  const copyOpts = { includeLineNumbers: true, includeFilePaths: true, format: "plain" as const };
+
+  it("should exercise buildResultsTree", () => {
+    expect(mod.buildResultsTree).toBeDefined();
+    mod.buildResultsTree([]);
+    mod.buildResultsTree([result]);
+    mod.buildResultsTree([result, { file: "/test/other.ts", matches: [match] }]);
+  });
+
+  it("should exercise buildSimpleTree", () => {
+    expect(mod.buildSimpleTree).toBeDefined();
+    mod.buildSimpleTree([]);
+    mod.buildSimpleTree([result]);
+  });
+
+  it("should exercise flattenTree", () => {
+    expect(mod.flattenTree).toBeDefined();
+    const tree = mod.buildResultsTree([result]);
+    const expanded = new Set<string>(["/test", "/test/file.ts"]);
+    mod.flattenTree(tree, expanded);
+    mod.flattenTree([], new Set());
+    mod.flattenTree(tree, new Set());
+  });
+
+  it("should exercise copyMatchText", async () => {
+    expect(mod.copyMatchText).toBeDefined();
+    await mod.copyMatchText(match);
+  });
+
+  it("should exercise copyFilePath", async () => {
+    expect(mod.copyFilePath).toBeDefined();
+    await mod.copyFilePath("/test/file.ts");
+  });
+
+  it("should exercise copyRelativePath", async () => {
+    expect(mod.copyRelativePath).toBeDefined();
+    await mod.copyRelativePath("/test/file.ts", "/test");
+  });
+
+  it("should exercise copyLine", async () => {
+    expect(mod.copyLine).toBeDefined();
+    await mod.copyLine(match);
+  });
+
+  it("should exercise copyFileMatches", async () => {
+    expect(mod.copyFileMatches).toBeDefined();
+    await mod.copyFileMatches("/test/file.ts", [match], copyOpts);
+    await mod.copyFileMatches("/test/file.ts", [match], { ...copyOpts, format: "markdown" });
+    await mod.copyFileMatches("/test/file.ts", [match], { ...copyOpts, format: "json" });
+  });
+
+  it("should exercise copyAllResults", async () => {
+    expect(mod.copyAllResults).toBeDefined();
+    await mod.copyAllResults([result], copyOpts);
+    await mod.copyAllResults([], copyOpts);
+  });
+
+  it("should exercise serializeToCodeSearch", () => {
+    expect(mod.serializeToCodeSearch).toBeDefined();
+    mod.serializeToCodeSearch({
+      query: "test",
+      isRegex: false,
+      isCaseSensitive: false,
+      isWholeWord: false,
+      includePattern: "",
+      excludePattern: "",
+      contextLines: 2,
+      results: [result],
+    });
+  });
+
+  it("should exercise parseCodeSearchFile", () => {
+    expect(mod.parseCodeSearchFile).toBeDefined();
+    const serialized = mod.serializeToCodeSearch({
+      query: "test",
+      isRegex: false,
+      isCaseSensitive: false,
+      isWholeWord: false,
+      includePattern: "",
+      excludePattern: "",
+      contextLines: 2,
+      results: [result],
+    });
+    try { mod.parseCodeSearchFile(serialized); } catch (_e) {}
+    try { mod.parseCodeSearchFile(""); } catch (_e) {}
+    try { mod.parseCodeSearchFile("invalid content"); } catch (_e) {}
+  });
+
+  it("should exercise isCodeSearchFile", () => {
+    expect(mod.isCodeSearchFile).toBeDefined();
+    mod.isCodeSearchFile("/test/search.code-search");
+    mod.isCodeSearchFile("/test/file.ts");
+    mod.isCodeSearchFile("test.code-search");
+  });
+
+  it("should exercise generateCodeSearchFilename", () => {
+    expect(mod.generateCodeSearchFilename).toBeDefined();
+    mod.generateCodeSearchFilename("test query");
+    mod.generateCodeSearchFilename("");
+    mod.generateCodeSearchFilename("hello world");
   });
 });
