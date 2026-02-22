@@ -21,6 +21,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { getWindowLabel } from "@/utils/windowStorage";
 
 import CortexTitleBar from "./CortexTitleBar";
+import { WindowResizers } from "./titlebar/WindowResizers";
 import { ChatPanelState, ChatMessage } from "./CortexChatPanel";
 import { Agent } from "./CortexAgentSidebar";
 import { FileChange } from "./CortexChangesPanel";
@@ -389,6 +390,8 @@ export function CortexDesktopLayout(props: ParentProps) {
       <ApprovalDialog />
       <CortexNotifications />
       <NotificationHandler />
+
+      <WindowResizers />
 
       {props.children}
     </div>
